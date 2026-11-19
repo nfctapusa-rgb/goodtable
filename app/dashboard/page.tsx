@@ -22,7 +22,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   const user = await currentUser();
   if (!user) redirect("/login");
   const sql = await db();
-  const bizList = await sql`SELECT b.id, b.name, b.plan, b.website, b.address FROM businesses b
+  const bizList = await sql`SELECT b.id, b.name, b.plan, b.website, b.address, b.stats_url FROM businesses b
     JOIN memberships m ON m.business_id = b.id WHERE m.user_id = ${user.id} ORDER BY b.created_at`;
   const { b } = await searchParams;
   const biz = bizList.find(x => x.id === b) ?? bizList[0];
@@ -70,6 +70,12 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
             <div className="spark">{[...reports].reverse().map(r => <div key={r.id} title={`${r.score} · ${new Date(r.created_at).toLocaleDateString()}`} style={{ height: `${Math.max(r.score, 4)}%` }} />)}</div>
           </div>
         )}
+
+        <div className="card stats">
+          <div><b>Your Google stats</b><p className="muted small">Calls, direction requests, profile views and where you rank in your area, updated by your Lokly team.</p></div>
+          {biz.stats_url ? <a className="btn dark sm" href={biz.stats_url} target="_blank" rel="noreferrer">Open my Google stats</a>
+            : <p className="muted small">We're connecting your Google profile. Your stats will show up here within 1 business day of signup.</p>}
+        </div>
 
         {!paid && (
           <a href="/pricing" className="card nudge"><b>Let Lokly fix {todo.length ? `all ${todo.length} issues` : "everything"} from $25/mo</b><span>See the plan →</span></a>

@@ -49,6 +49,7 @@ async function migrate(sql: ReturnType<typeof neon>) {
     score int NOT NULL,
     data jsonb NOT NULL,
     created_at timestamptz NOT NULL DEFAULT now())`;
+  await sql`ALTER TABLE businesses ADD COLUMN IF NOT EXISTS stats_url text`;
   await sql`CREATE INDEX IF NOT EXISTS reports_biz ON reports(business_id, created_at DESC)`;
   await sql`CREATE TABLE IF NOT EXISTS leads (
     id bigserial PRIMARY KEY,

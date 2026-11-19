@@ -139,3 +139,5 @@ body{font-stretch:100%}
 .pc-stamp{align-self:flex-end;border:2px dashed var(--gray);padding:10px 8px;font-size:11px;color:var(--gray)}
 @media(max-width:900px){.ml-grid{grid-template-columns:1fr}.ml-preview{position:static;order:-1}.qty{grid-template-columns:1fr}.qty label{border-right:0;border-bottom:2px solid var(--ink)}}
 .addons-h{margin-top:72px}.menu .ds a{color:var(--ink);font-weight:700}
+.ad-row.c3{grid-template-columns:1fr 1fr 2fr}.ad-edit{display:flex!important;gap:6px;flex-wrap:wrap}.ad-edit input,.ad-edit select{padding:8px;border:1px solid var(--line);border-radius:8px;font:14px inherit;flex:1;min-width:120px}
+.stats{display:flex;justify-content:space-between;align-items:center;gap:16px;border:2px solid var(--ink)}.stats p{margin:2px 0 0;max-width:46ch}
