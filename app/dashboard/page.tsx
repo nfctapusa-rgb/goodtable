@@ -16,7 +16,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   const user = await currentUser();
   if (!user) redirect("/login");
   const sql = await db();
-  const bizList = await sql`SELECT b.id, b.name, b.plan, b.website, b.address, b.place_id, b.stats_url, b.leadsnap_id, b.status, b.trial_ends_at, b.stripe_customer_id FROM businesses b
+  const bizList = await sql`SELECT b.id, b.name, b.plan, b.website, b.address, b.place_id, b.stats_url, b.leadsnap_id, b.status, b.trial_ends_at, b.stripe_customer_id, b.assets FROM businesses b
     JOIN memberships m ON m.business_id = b.id WHERE m.user_id = ${user.id} ORDER BY b.created_at`;
   const { b, requested, upgraded, billing } = await searchParams;
   const biz = bizList.find(x => x.id === b) ?? bizList[0];
@@ -149,6 +149,30 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
                 <div><b>{c.title}</b><p className="muted">{c.why}</p>{c.found && <code>Found: {c.found}</code>}</div></li>
             ))}
           </ol>
+        </div>
+
+        <div className="card" id="brand">
+          <div className="gs-head"><b>Your brand kit</b><span className="muted small">Used for your postcards and social posts</span></div>
+          <form method="post" action="/api/brandkit" className="bk-form">
+            <input type="hidden" name="b" value={biz.id} />
+            <input name="website" defaultValue={biz.website ?? ""} placeholder="yourbusiness.com" aria-label="Your website" inputMode="url" />
+            <button className="btn dark sm">{biz.assets ? "Refresh from my site" : "Pull from my website"}</button>
+          </form>
+          {biz.assets ? (
+            <div className="bk">
+              <div className="bk-row">
+                {biz.assets.logo && <img src={biz.assets.logo} alt="Your logo" className="bk-logo" />}
+                <div>
+                  <b>{biz.assets.title ?? biz.name}</b>
+                  {biz.assets.tagline && <p className="muted small">{biz.assets.tagline}</p>}
+                  <p className="small">{[biz.assets.color && `Color ${biz.assets.color}`, biz.assets.instagram && "Instagram found", biz.assets.facebook && "Facebook found", biz.assets.tiktok && "TikTok found"].filter(Boolean).join(" · ") || "No social links found on your site"}</p>
+                </div>
+                {biz.assets.color && <span className="bk-swatch" style={{ background: biz.assets.color }} aria-hidden="true" />}
+              </div>
+              {biz.assets.photos?.length > 0 ? <div className="bk-photos">{biz.assets.photos.slice(0, 8).map((p: string) => <img key={p} src={p} alt="" loading="lazy" />)}</div>
+                : <p className="small muted">No photos found yet. Text us 5 or more and we'll add them.</p>}
+            </div>
+          ) : <p className="small muted">Add your website and we'll pull your logo, colors and photos. No website? Text us your logo and photos instead.</p>}
         </div>
 
         <div className="card" id="tools">

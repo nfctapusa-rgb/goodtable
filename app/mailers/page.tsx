@@ -8,13 +8,22 @@ export default function Mailers() {
   const [f, setF] = useState({ businessName: "", address: "", headline: "10% off your first visit", detail: "Bring this card in. Good through the end of the month.", qty: 500, area: "1 mile", zips: "", contactName: "", email: "", phone: "" });
   const [state, setState] = useState<"idle" | "busy" | "done">("idle");
   const [err, setErr] = useState<string | null>(null);
-  useEffect(() => { document.title = "Postcard mailers | Lokly"; }, []);
+  const [kit, setKit] = useState<{ logo?: string; color?: string; photos: string[] } | null>(null);
+  const [photo, setPhoto] = useState<string | null>(null);
+  useEffect(() => {
+    document.title = "Postcard mailers | Lokly";
+    fetch("/api/brandkit").then(r => r.json()).then(j => {
+      if (!j?.business) return;
+      setF(x => ({ ...x, businessName: x.businessName || j.business.name || "", address: x.address || j.business.address || "", phone: x.phone || j.business.phone || "", email: x.email || j.email || "" }));
+      if (j.kit) { setKit(j.kit); setPhoto(j.kit.photos?.[0] ?? null); }
+    }).catch(() => {});
+  }, []);
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setF({ ...f, [k]: k === "qty" ? Number(e.target.value) : e.target.value });
   const tier = MAILERS.find(m => m.qty === f.qty)!;
 
   async function order(e: React.FormEvent) {
     e.preventDefault(); setState("busy"); setErr(null);
-    const res = await fetch("/api/mailer", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(f) });
+    const res = await fetch("/api/mailer", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...f, photo, logo: kit?.logo, color: kit?.color }) });
     if (res.ok) { setState("done"); scrollTo(0, 0); } else { setErr((await res.json()).error ?? "Couldn't send. Try again."); setState("idle"); }
   }
 
@@ -38,6 +47,10 @@ export default function Mailers() {
           <h2 className="ad-h">Your offer</h2>
           <label>Business name<input required value={f.businessName} onChange={set("businessName")} autoComplete="organization" /></label>
           <label>Shop address<input required placeholder="225 W 7th St, Los Angeles" value={f.address} onChange={set("address")} autoComplete="street-address" /></label>
+          {kit?.photos?.length ? (
+            <div className="ml-photos"><p className="tp-h">Front photo <span className="opt">(from your brand kit)</span></p>
+              <div>{kit.photos.slice(0, 8).map(p => <button type="button" key={p} className={p === photo ? "on" : ""} onClick={() => setPhoto(p)} aria-label="Use this photo"><img src={p} alt="" /></button>)}</div></div>
+          ) : null}
           <label>Headline<input required maxLength={48} value={f.headline} onChange={set("headline")} /></label>
           <label>Details<textarea rows={2} maxLength={120} value={f.detail} onChange={set("detail")} /></label>
 
@@ -66,7 +79,8 @@ export default function Mailers() {
 
         <div className="ml-preview" aria-label="Postcard preview">
           <p className="ml-cap">Front</p>
-          <div className="card4x6 front6">
+          <div className="card4x6 front6" style={photo ? { backgroundImage: `linear-gradient(rgba(10,18,30,.25),rgba(10,18,30,.75)),url(${photo})`, backgroundSize: "cover", backgroundPosition: "center" } : kit?.color ? { background: kit.color } : undefined}>
+            {kit?.logo && <img src={kit.logo} alt="" className="pc-logo" />}
             <span className="pc-name">{f.businessName || "Your Business"}</span>
             <h3>{f.headline || "Your offer"}</h3>
             <p>{f.detail}</p>

@@ -9,7 +9,7 @@ const FIELDS: { k: string; label: string; ph: string; type?: string; req?: boole
   { k: "email", label: "Email", ph: "you@business.com", type: "email", req: true },
   { k: "phone", label: "Mobile number", ph: "(213) 555-0100", type: "tel", req: true },
   { k: "password", label: "Create a password for your dashboard", ph: "At least 8 characters", type: "password", req: true },
-  { k: "website", label: "Current website", ph: "yourbusiness.com (leave blank if none)" },
+  { k: "website", label: "Your website, if you have one (we'll use its logo and photos for your posts and postcards)", ph: "yourbusiness.com" },
   { k: "googleProfile", label: "Google Business Profile link", ph: "Paste your Google Maps link" },
   { k: "orderLink", label: "Ordering or booking link", ph: "DoorDash, Uber Eats, Square, Vagaro…", pro: true },
   { k: "shipTo", label: "Where should we mail your free NFC review card?", ph: "Business mailing address", req: true, card: true },
