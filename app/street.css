@@ -208,3 +208,8 @@ html{-webkit-text-size-adjust:100%}
 .nogbp{border:2px solid #E5402F;background:#FFF1EF;padding:14px 16px;margin:0 0 14px;line-height:1.5}
 .nogbp a{font-weight:700;color:var(--ink)}
 @media(max-width:640px){.hits .meta{display:none}.hits button{padding:14px 12px}}
+
+/* New logo: red pin + heavy wordmark */
+.logo{font-stretch:100%;font-weight:900;font-size:24px;letter-spacing:-.02em;color:#142133;gap:7px;line-height:1}
+.logo .mark{width:20px;height:25px;background:none;border-radius:0;transform:none;box-shadow:none;flex:0 0 auto;margin-top:-2px}
+.foot .logo{color:inherit}
