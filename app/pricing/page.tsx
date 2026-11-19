@@ -3,12 +3,12 @@ import { PlanCards } from "../plancards";
 export const metadata = { title: "Pricing | Lokly", description: "Lokly pricing: a $150 website built to rank, $49.99/mo Google profile management, or $99/mo Lokly Pro." };
 
 const FAQ = [
-  ["What's the difference between the plans?", "Lokly Site is a one-time $150 website built to rank #1 in local search. Lokly Local ($49.99/mo) is us running your Google Business Profile: review replies, posts, offers and photos. Lokly Pro ($99/mo) includes everything in Local plus your website, online ordering and growth tools."],
+  ["What's the difference between the plans?", "Lokly Site is a one-time $150 website built for local search. Lokly Local ($49.99/mo) is us running your Google Business Profile: review replies, posts, offers and photos. Lokly Pro ($99/mo) includes everything in Local plus your website, online ordering and growth tools."],
   ["Is there a contract?", "No. Monthly plans are month-to-month and you can cancel anytime."],
   ["How does online ordering work on Pro?", "You choose. Link your existing DoorDash or Uber Eats pages for no extra fee, or connect your point-of-sale so customers order directly on your site. Direct online orders through your POS carry a 5% Lokly fee; there's no fee on orders placed through DoorDash or Uber Eats links."],
   ["Do I need Lokly Site if I'm on Pro?", "No. Your website is included with Lokly Pro."],
   ["Who replies to my reviews?", "Our team writes a personal reply to every Google review, in your voice, and follows the guidelines you set."],
-  ["What are thank-you gift credits?", "Pro includes monthly credits you can use to thank customers with a gift after a visit or order, a proven way to drive repeat business and reviews."],
+  ["Can you guarantee I'll rank #1?", "No one can honestly guarantee Google rankings, and we don't. Google decides rankings. We do the work that helps: an active, accurate profile, review replies, and a site built with local SEO best practices."],
   ["Does it work for my type of business?", "Lokly works for any local business: restaurants, salons, auto shops, retail, home services, fitness, professional services and more."],
 ];
 

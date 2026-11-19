@@ -33,6 +33,7 @@ export function AuthForm({ mode }: { mode: "signup" | "login" }) {
           <label>Password<input required type="password" minLength={8} value={f.password} onChange={e => setF({ ...f, password: e.target.value })} autoComplete={signup ? "new-password" : "current-password"} /></label>
           <button className="btn dark" disabled={busy}>{busy ? "One moment…" : signup ? "Create account" : "Log in"}</button>
           {err && <p className="err">{err}</p>}
+          {signup && <p className="tiny muted">By creating an account, you agree to our <a href="/terms">Terms</a> and <a href="/privacy">Privacy Policy</a>.</p>}
         </form>
         <p className="muted small">{signup ? <>Already have an account? <a href="/login">Log in</a></> : <>New to Lokly? <a href="/signup">Create an account</a></>}</p>
       </section>

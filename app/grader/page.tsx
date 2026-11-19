@@ -81,7 +81,7 @@ export default function Page() {
           <h1>How visible is your business online?</h1>
           <p className="muted">Find your business on Google Maps for a free score covering your Google listing, website and local ranking, plus the exact fixes.</p>
           <div className="search">
-            <input autoFocus placeholder="Search your business name and city…" value={q} onChange={e => setQ(e.target.value)} />
+            <input autoFocus aria-label="Search your business name and city" placeholder="Search your business name and city…" value={q} onChange={e => setQ(e.target.value)} />
             {searching && <span className="spin" />}
           </div>
           {hits.length > 0 && (

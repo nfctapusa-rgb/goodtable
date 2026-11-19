@@ -29,6 +29,7 @@ export function PlanCards({ context, compact }: { context?: Record<string, unkno
         ))}
       </div>
       {err && <p className="err center">{err}</p>}
+      <p className="tiny muted center agree">By purchasing, you agree to our <a href="/terms">Terms</a> and <a href="/privacy">Privacy Policy</a>. Rankings aren't guaranteed.</p>
     </>
   );
 }

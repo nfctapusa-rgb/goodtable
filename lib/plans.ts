@@ -11,7 +11,7 @@ export interface Plan {
 export const PLANS: Plan[] = [
   {
     id: "site", name: "Lokly Site", price: 150, cents: 15000, interval: "once",
-    blurb: "A fast, custom website built to rank #1 in local search.",
+    blurb: "A fast, custom website built for local search.",
     cta: "Get my website",
     features: [
       "Custom website built from your Google profile",
@@ -44,10 +44,9 @@ export const PLANS: Plan[] = [
       "Everything in Lokly Local",
       "Your Lokly website included, hosted & updated",
       "Online ordering: link DoorDash / Uber Eats, or connect your POS (5% of online sales)",
-      "Lokly AI assistant",
-      "Review request & customer win-back tools",
-      "Monthly thank-you gift credits for your customers",
-      "Priority support",
+      "Lokly AI assistant (coming soon)",
+      "Review request & customer win-back tools (coming soon)",
+            "Priority support",
     ],
   },
 ];

@@ -40,3 +40,17 @@
 .qrhow{font-size:14px;color:var(--gray);margin:14px 0 18px}.qrfoot{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:14px;font-size:14px}
 .qrfoot b{display:flex;gap:8px;align-items:center}
 @media print{.nav,.foot,.noprint{display:none!important}.qrcard{box-shadow:none}}
+.legal h1{font-size:40px;letter-spacing:-.03em}.legal h2{font-size:20px;margin:32px 0 8px}.legal p,.legal li{line-height:1.65;color:#3c434d}.legal ul{padding-left:20px;display:grid;gap:8px}.legal a{color:var(--ink)}
+/* accessibility + modern polish */
+:root{color-scheme:light;--gray:#6B7280}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{text-rendering:optimizeLegibility}
+h1,h2,h3,.mega,.big{text-wrap:balance}p,.lead{text-wrap:pretty}
+:focus-visible{outline:3px solid #1a73e8;outline-offset:3px;border-radius:6px}
+.skip{position:absolute;left:-9999px;top:8px;background:var(--ink);color:#fff;padding:10px 14px;border-radius:8px;z-index:100}.skip:focus{left:12px}
+.btn,.link,a{transition:background-color .15s,color .15s,transform .12s}
+.btn:hover{filter:brightness(.96)}
+.tier,.plancard,.promises li,.week li{transition:transform .2s,box-shadow .2s}
+@media(hover:hover){.tier:hover,.plancard:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(16,19,24,.08)}}
+.agree{margin-top:14px}.agree a{color:inherit}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
