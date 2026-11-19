@@ -10,14 +10,17 @@ export interface Plan {
 
 export const PLANS: Plan[] = [
   { id: "local", name: "Google Management", price: 25, cents: 2500, interval: "month",
-    blurb: "We run your Google Business Profile so you show up and stand out. Includes a free tap-to-review NFC card for your counter.", cta: "Start for $25/mo" },
-  { id: "pro", name: "Lokly Pro", price: 89, cents: 8900, interval: "month", highlight: true,
-    blurb: "Your website, Google profile and marketing, handled for one monthly price.", cta: "Start Lokly Pro" },
-  { id: "site", name: "Website only", price: 150, cents: 15000, interval: "once",
-    blurb: "A fast website built for local search. Yours to keep.", cta: "Get a website" },
+    blurb: "We run your Google profile: review replies, weekly posts and offers, fresh photos, plus a monthly email with your numbers and what we're improving. Free NFC review card.", cta: "Start for $25/mo" },
+  { id: "site", name: "Website Package", price: 299, cents: 29900, interval: "once", highlight: true,
+    blurb: "We build your website and optimize your Google profile. Your first 3 months of management are free, then $25/mo covers management, hosting and 3 to 5 changes a week.", cta: "Get my website" },
+  { id: "pro", name: "Lokly Pro", price: 89, cents: 8900, interval: "month",
+    blurb: "Everything in management plus your website, online ordering, a live analytics dashboard and our marketing tools.", cta: "Start Lokly Pro" },
   { id: "ads", name: "Lokly Ads", price: 149, cents: 14900, interval: "month", addon: true,
     blurb: "Done-for-you ads on Instagram, Facebook and Google. Ad budget paid separately to the ad platforms.", cta: "Add Lokly Ads" },
 ];
+// Website Package: after the build, $25/mo starts once the free months end.
+export const SITE_FREE_MONTHS = 3;
+export const SITE_MONTHLY_CENTS = 2500;
 
 // Postcard mailers: price per campaign, printed and mailed by our print partner.
 export const MAILERS = [
@@ -34,13 +37,15 @@ export const FEATURES: { group: string; rows: [string, string, Avail, Avail][] }
     ["Every review answered", "A personal reply to each Google review, in your voice.", "yes", "yes"],
     ["Weekly posts & offers", "Specials, news and offers published to your profile on a schedule you approve.", "yes", "yes"],
     ["Fresh photos", "New photos added regularly so your profile stays active.", "yes", "yes"],
-    ["Free NFC review card", "A tap-to-review card for your counter. Customers tap it with their phone and land on your Google review page. Shipped free when you sign up.", "yes", "yes"],
-    ["Monthly report", "Calls, direction requests, profile views and where you show up.", "yes", "yes"],
+    ["Free NFC review card", "A tap-to-review card for your counter. Customers tap it with their phone and land on your Google review page.", "yes", "yes"],
+  ]},
+  { group: "Reporting", rows: [
+    ["Monthly email report", "Calls, direction requests, profile views, and what we're improving next.", "yes", "yes"],
+    ["Live analytics dashboard", "Your Google numbers any time, with month-over-month trends.", "no", "yes"],
   ]},
   { group: "Website", rows: [
     ["Custom website", "Built from your Google profile and photos, mobile-first and fast.", "no", "yes"],
-    ["Local SEO setup", "Titles, descriptions, business schema, sitemap and local keywords.", "no", "yes"],
-    ["Hosting, SSL & updates", "We host it and make your changes. Just text us.", "no", "yes"],
+    ["Hosting & 3 to 5 changes a week", "We host it and make your changes. Just text us.", "no", "yes"],
     ["Online ordering & booking", "Link your DoorDash, Uber Eats or booking page, or connect your POS (5% on direct online orders).", "no", "yes"],
   ]},
 ];

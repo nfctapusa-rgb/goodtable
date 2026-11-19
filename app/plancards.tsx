@@ -17,6 +17,7 @@ export function PlanCards({ context, compact }: { context?: { businessName?: str
           <div key={p.id} className={`plancard ${p.highlight ? "hl" : ""}`}>
             <h3 className="pname">{p.name}</h3>
             <div className="price"><b>${p.price}</b><span>{p.interval === "month" ? " a month" : " one-time"}</span></div>
+            {p.id === "site" && <p className="pnote">3 months of management free, then $25/mo</p>}
             <p className="pblurb">{p.blurb}</p>
             <a className={`btn ${p.highlight ? "lime" : "dark"} wide`} href={q(p.id)}>{p.cta}</a>
           </div>

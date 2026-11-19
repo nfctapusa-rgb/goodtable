@@ -87,9 +87,10 @@ export default function Home() {
       <section className="wrap sh-plans">
         <h2 className="sh-h2">Pick what you need.</h2>
         <dl className="menu">
-          <div><dt>Website</dt><dd className="pr">$150 once</dd><dd className="ds">A fast site with the right titles, descriptions and local keywords.</dd></div>
-          <div className="pop"><dt>Google profile management</dt><dd className="pr">$25 a month</dd><dd className="ds"><span className="tag">Most shops start here</span> Review replies, weekly posts and offers, fresh photos. <b>Free NFC review card</b> for your counter.</dd></div>
-          <div><dt>Lokly Pro</dt><dd className="pr">$89 a month</dd><dd className="ds">Everything in Google management, plus your website, hosted, with online ordering.</dd></div>
+          
+          <div><dt>Google management</dt><dd className="pr">$25 a month</dd><dd className="ds">Review replies, weekly posts and offers, fresh photos, and a monthly email with your numbers. <b>Free NFC review card</b> for your counter.</dd></div>
+          <div className="pop"><dt>Website package</dt><dd className="pr">$299 once</dd><dd className="ds"><span className="tag">Most shops start here</span> We build your site and optimize your Google profile. <b>3 months of management free</b>, then $25 a month for management, hosting and 3 to 5 changes a week.</dd></div>
+          <div><dt>Lokly Pro</dt><dd className="pr">$89 a month</dd><dd className="ds">Management plus your website, online ordering, a live analytics dashboard and our marketing tools.</dd></div>
         </dl>
         <p className="sh-fine">Month to month. Cancel anytime. <a href="/pricing">See everything included</a></p>
       </section>

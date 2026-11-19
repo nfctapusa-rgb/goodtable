@@ -43,7 +43,7 @@ export default function Preview() {
         <div className="pvctl">
           <div className="seg"><button className={view === "mobile" ? "on" : ""} onClick={() => setView("mobile")}>Mobile</button>
             <button className={view === "desktop" ? "on" : ""} onClick={() => setView("desktop")}>Desktop</button></div>
-          <a href="/pricing" className="btn lime">Launch this site · $150</a>
+          <a href="/start?plan=site" className="btn lime">Launch this site · $299</a>
         </div>
       </div>
 
@@ -126,7 +126,7 @@ export default function Preview() {
             ["Mobile first", "Fast, responsive, tap-to-call"], ["Local keywords", `Built around “${m.tagline}”`], ["FAQ section", "Answers Google and AI assistants can quote"]]
             .map(([a, b]) => <div key={a} className="card feat"><h3>✓ {a}</h3><p className="muted">{b}</p></div>)}
         </div>
-        <div className="center" style={{ marginTop: 28 }}><a href="/pricing" className="btn dark lg">Launch my site for $150</a></div>
+        <div className="center" style={{ marginTop: 28 }}><a href="/start?plan=site" className="btn dark lg">Launch my site for $299, 3 months free</a></div>
       </div>
     </main>
   );

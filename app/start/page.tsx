@@ -66,7 +66,7 @@ export default function Start() {
           ))}
         </div>
         <form onSubmit={submit} className="form">
-          {FIELDS.filter(x => (!x.pro || plan !== "local") && (!x.card || plan !== "site")).map(x => (
+          {FIELDS.filter(x => !x.pro || plan !== "local").map(x => (
             <label key={x.k}>{x.label}{!x.req && <span className="opt"> (optional)</span>}
               {x.k === "notes" ? <textarea rows={3} placeholder={x.ph} value={f[x.k] ?? ""} onChange={set(x.k)} />
                 : <input type={x.type ?? "text"} required={x.req} placeholder={x.ph} value={f[x.k] ?? ""} onChange={set(x.k)} autoComplete={x.k === "email" ? "email" : x.k === "phone" ? "tel" : x.k === "contactName" ? "name" : x.k === "businessName" ? "organization" : "off"} />}

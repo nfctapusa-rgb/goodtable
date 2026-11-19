@@ -264,7 +264,7 @@ function Plan({ r, pct, issues, compact }: { r: Report; pct: number; issues: num
     } catch (e) { setErr((e as Error).message); setBusy(false); }
   }
   if (compact) return (
-    <a href="#plan" className="card nudge"><b>Fix all {issues} issues, websites from $150</b><span>See plans →</span></a>
+    <a href="#plan" className="card nudge"><b>Fix all {issues} issues, websites from $299 with 3 months free</b><span>See plans →</span></a>
   );
   return (
     <div id="plan" className="card plan">

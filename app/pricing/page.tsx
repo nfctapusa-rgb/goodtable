@@ -1,7 +1,7 @@
 import { PlanCards } from "../plancards";
 import { FEATURES, MAILERS, type Avail } from "@/lib/plans";
 
-export const metadata = { title: "Pricing | Lokly", description: "Google Business Profile management $25/mo. Lokly Pro $89/mo with your website and marketing. Websites $150." };
+export const metadata = { title: "Pricing | Lokly", description: "Google Business Profile management $25/mo. Website package $299 with 3 months of management free. Lokly Pro $89/mo." };
 
 const FAQ = [
   ["What do I have to do?", "Send us your website, Google profile and any ordering links, and approve your offers. We handle the rest. If something changes, like hours or a special, just text us."],
@@ -37,7 +37,7 @@ export default function Pricing() {
       <section className="wrap pr-table">
         <h2 className="sh-h2">What's included</h2>
         <div className="ftable" role="table" aria-label="Plan comparison">
-          <div className="frow fhead" role="row"><span role="columnheader">Feature</span><span role="columnheader">Google<small>$25/mo</small></span><span role="columnheader">Pro<small>$89/mo</small></span></div>
+          <div className="frow fhead" role="row"><span role="columnheader">Feature</span><span role="columnheader">Management<small>$25/mo</small></span><span role="columnheader">Pro<small>$89/mo</small></span></div>
           {FEATURES.map(g => (
             <div key={g.group} role="rowgroup">
               <div className="fgroup" role="row"><span role="cell">{g.group}</span></div>
@@ -56,7 +56,7 @@ export default function Pricing() {
           <div><dt>Lokly Ads</dt><dd className="pr">$149 a month</dd><dd className="ds">We make and run your ads on Instagram, Facebook and Google, pause what isn't working, and send you a monthly results report. Your ad budget is paid directly to the ad platforms. <a href="/start?plan=ads">Add Lokly Ads</a></dd></div>
           <div><dt>Postcard mailers</dt><dd className="pr">from ${MAILERS[0].price}</dd><dd className="ds">{MAILERS.map(m => `${m.qty.toLocaleString()} homes $${m.price}`).join(", ")}. Design, printing, postage and a tracked QR code. <a href="/mailers">Design your postcard</a></dd></div>
         </dl>
-        <p className="sh-fine">Just need a site? A website on its own is $150 one-time, and you can add Google Management anytime.</p>
+        <p className="sh-fine">Website package: $299 for the build and Google profile optimization, 3 months of management free, then $25 a month for management, hosting and 3 to 5 changes a week. Cancel anytime after that.</p>
       </section>
 
       <section className="wrap narrow pr-faq">

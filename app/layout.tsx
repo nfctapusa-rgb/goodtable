@@ -11,7 +11,7 @@ import { Nav, Footer } from "./ui";
 
 export const metadata: Metadata = {
   title: "Lokly | Get found by the people on your block",
-  description: "Lokly builds local business websites and manages Google Business Profiles in Los Angeles. Websites from $150, Google profile management $25/mo.",
+  description: "Lokly builds local business websites and manages Google Business Profiles in Los Angeles. Google profile management $25/mo. Website packages $299 with 3 months of management free.",
 };
 export const viewport: Viewport = { width: "device-width", initialScale: 1 };
 

@@ -253,3 +253,4 @@ html{-webkit-text-size-adjust:100%}
 .res-bars small{font-size:12px;color:var(--gray)}
 .res-facts{margin:0;padding-left:18px;color:var(--graphite);display:grid;gap:4px}
 @media(max-width:800px){.res-grid{grid-template-columns:1fr}.res{box-shadow:5px 5px 0 var(--ink)}.res-big b{font-size:46px}.sh-results{padding-top:56px}}
+.pnote{margin:-4px 0 0;font-weight:700;font-size:14px;color:var(--palm)}
