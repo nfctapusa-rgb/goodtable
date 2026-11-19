@@ -37,6 +37,14 @@ export async function getPlace(id: string): Promise<Place> {
   return (await r.json()) as Place;
 }
 
+// Up to 5 recent Google reviews (for social post drafts).
+export async function getReviews(id: string): Promise<{ author: string; rating: number; text: string }[]> {
+  const r = await fetch(`${BASE}/places/${encodeURIComponent(id)}`, { headers: { "X-Goog-Api-Key": placesKey(), "X-Goog-FieldMask": "reviews" }, next: { revalidate: 86400 } } as any);
+  if (!r.ok) return [];
+  const j = await r.json();
+  return (j.reviews ?? []).map((v: any) => ({ author: v.authorAttribution?.displayName ?? "A customer", rating: v.rating ?? 0, text: v.text?.text ?? v.originalText?.text ?? "" })).filter((v: any) => v.text);
+}
+
 export const cityOf = (p: Place) =>
   p.addressComponents?.find(c => c.types.includes("locality"))?.longText
   ?? p.addressComponents?.find(c => c.types.includes("sublocality"))?.longText;

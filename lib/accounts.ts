@@ -22,6 +22,7 @@ const SITE = [
 const PRO = [
   { key: "ordering", title: "Send your ordering or booking link", who: "owner" },
   { key: "tools", title: "Pick your marketing tools", who: "owner" },
+  { key: "social", title: "Add Lokly as a partner on your Facebook & Instagram", who: "owner" },
 ];
 export function tasksFor(plan: string) {
   const list = [...BASE, ...(plan === "site" || plan === "pro" ? SITE : []), ...(plan === "pro" ? PRO : [])];

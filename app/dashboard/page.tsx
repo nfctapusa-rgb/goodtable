@@ -81,6 +81,20 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
           </div>
         )}
 
+        {tasks.some(t => t.key === "social" && !t.done) && (
+          <div className="card" id="social">
+            <b>Connect your Facebook & Instagram (5 minutes)</b>
+            <p className="muted small">This lets us post for you. You stay the owner and can remove us anytime.</p>
+            <ol className="steps-sm">
+              <li>On your phone, open <a href="https://business.facebook.com/settings/partners" target="_blank" rel="noreferrer">business.facebook.com → Settings → Partners</a>.</li>
+              <li>Tap <b>Add</b>, then <b>Give a partner access to your assets</b>.</li>
+              <li>Paste Lokly's Business ID: <code>{process.env.META_BUSINESS_ID ?? "we'll text it to you"}</code></li>
+              <li>Turn on your <b>Facebook Page</b> and <b>Instagram account</b> with <b>Content</b> access, then save.</li>
+            </ol>
+            <p className="small muted">Instagram must be a Business account linked to your Facebook Page (Instagram → Settings → Account type). Stuck? Text us and we'll do it with you.</p>
+          </div>
+        )}
+
         {offers.length > 0 && paid && (
           <div className="offers">
             {offers.map(o => (
