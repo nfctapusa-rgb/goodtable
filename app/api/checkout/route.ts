@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     f.set("line_items[0][price_data][currency]", "usd");
     f.set("line_items[0][price_data][unit_amount]", "4999");
     f.set("line_items[0][price_data][recurring][interval]", "month");
-    f.set("line_items[0][price_data][product_data][name]", "GoodTable Growth — all tools");
+    f.set("line_items[0][price_data][product_data][name]", "Lokly Growth — all tools");
   }
   if (body.email) f.set("customer_email", String(body.email).slice(0, 200));
   for (const k of ["businessName", "website", "placeId", "score"]) if (body[k] != null) f.set(`metadata[${k}]`, String(body[k]).slice(0, 400));

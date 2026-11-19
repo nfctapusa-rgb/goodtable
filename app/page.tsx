@@ -43,7 +43,7 @@ export default function Home() {
 
       <section className="wrap sec">
         <h2 className="h2">One platform. Your whole online business.</h2>
-        <p className="lead">GoodTable replaces the website builder, booking app, ordering service, CRM and marketing tools you're paying for separately.</p>
+        <p className="lead">Lokly replaces the website builder, booking app, ordering service, CRM and marketing tools you're paying for separately.</p>
         <div className="grid4">
           {STEPS.map(([n, t, d]) => <div key={n} className="card step"><span className="num">{n}</span><h3>{t}</h3><p className="muted">{d}</p></div>)}
         </div>
@@ -53,7 +53,7 @@ export default function Home() {
       <section className="wrap sec split">
         <div>
           <h2 className="h2">Built for your industry, not forced into a template.</h2>
-          <p className="lead">Tell us what you do and GoodTable sets up the right tools automatically.</p>
+          <p className="lead">Tell us what you do and Lokly sets up the right tools automatically.</p>
           <ul className="ticks">
             <li><b>Restaurants:</b> menus, pickup and delivery, catering, QR ordering</li>
             <li><b>Appointments:</b> staff calendars, deposits, reminders, no-show protection</li>
@@ -62,7 +62,7 @@ export default function Home() {
           </ul>
         </div>
         <div className="card dark price-teaser">
-          <p className="eyebrow lime-t">GoodTable Growth</p>
+          <p className="eyebrow lime-t">Lokly Growth</p>
           <div className="price"><b>$49.99</b><span>/month</span></div>
           <p className="muted">Every tool. No contracts. No commission on your sales.</p>
           <a href="/pricing" className="btn lime wide">See pricing</a>

@@ -23,7 +23,7 @@ export function AuthForm({ mode }: { mode: "signup" | "login" }) {
   return (
     <main className="narrow">
       <section className="hero authbox">
-        <h1>{signup ? "Create your free GoodTable account" : "Log in to GoodTable"}</h1>
+        <h1>{signup ? "Create your free Lokly account" : "Log in to Lokly"}</h1>
         {report ? <p className="note">We'll save the report for <b>{report.businessName}</b> to your dashboard.</p>
           : signup && <p className="muted">Track your score, see what to fix, and manage your business in one place.</p>}
         <form onSubmit={submit} className="form">
@@ -34,7 +34,7 @@ export function AuthForm({ mode }: { mode: "signup" | "login" }) {
           <button className="btn dark" disabled={busy}>{busy ? "One moment…" : signup ? "Create account" : "Log in"}</button>
           {err && <p className="err">{err}</p>}
         </form>
-        <p className="muted small">{signup ? <>Already have an account? <a href="/login">Log in</a></> : <>New to GoodTable? <a href="/signup">Create an account</a></>}</p>
+        <p className="muted small">{signup ? <>Already have an account? <a href="/login">Log in</a></> : <>New to Lokly? <a href="/signup">Create an account</a></>}</p>
       </section>
     </main>
   );

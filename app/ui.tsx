@@ -8,7 +8,7 @@ export function Nav() {
   return (
     <nav className="nav">
       <div className="wrap navin">
-        <a href="/" className="logo"><span className="mark" />GoodTable</a>
+        <a href="/" className="logo"><span className="mark" />Lokly</a>
         <div className={`links ${open ? "open" : ""}`}>
           <a href="/how-it-works">How it works</a>
           <a href="/pricing">Pricing</a>
@@ -36,13 +36,13 @@ export function Footer() {
   return (
     <footer className="foot">
       <div className="wrap footin">
-        <div><a href="/" className="logo"><span className="mark" />GoodTable</a><p className="muted small">Everything your business needs to grow online.</p></div>
+        <div><a href="/" className="logo"><span className="mark" />Lokly</a><p className="muted small">Everything your business needs to grow online.</p></div>
         <div className="fcols">
           <div><b>Product</b><a href="/how-it-works">How it works</a><a href="/pricing">Pricing</a><a href="/grader">Free report</a></div>
-          <div><b>Company</b><a href="mailto:hello@goodtable.us">Contact</a></div>
+          <div><b>Company</b><a href="mailto:hello@lokly.us">Contact</a></div>
         </div>
       </div>
-      <div className="wrap muted small copy">© {new Date().getFullYear()} GoodTable</div>
+      <div className="wrap muted small copy">© {new Date().getFullYear()} Lokly</div>
     </footer>
   );
 }

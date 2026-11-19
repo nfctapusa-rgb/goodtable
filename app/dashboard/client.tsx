@@ -19,7 +19,7 @@ export function RescanButton({ businessId }: { businessId: string }) {
 export function BizSwitcher({ list, current }: { list: { id: string; name: string }[]; current: string }) {
   return (
     <div className="switcher">
-      <a href="/" className="logo"><span className="mark" />GoodTable</a>
+      <a href="/" className="logo"><span className="mark" />Lokly</a>
       <select value={current} onChange={e => e.target.value === "new" ? (location.href = "/grader") : (location.href = `/dashboard?b=${e.target.value}`)}>
         {list.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
         <option value="new">+ Add a business</option>

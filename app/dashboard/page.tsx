@@ -4,7 +4,7 @@ import { currentUser } from "@/lib/auth";
 import { RescanButton, BizSwitcher } from "./client";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Dashboard | GoodTable" };
+export const metadata = { title: "Dashboard | Lokly" };
 
 const TOOLS = [
   { k: "website", t: "Website", d: "AI-built site that fixes your SEO issues", plan: "growth" },
@@ -14,7 +14,7 @@ const TOOLS = [
   { k: "marketing", t: "Email & SMS", d: "Campaigns and automations", plan: "growth" },
   { k: "loyalty", t: "Loyalty", d: "Points and rewards", plan: "growth" },
   { k: "reviews", t: "Reviews", d: "Review requests and replies", plan: "growth" },
-  { k: "ai", t: "GoodTable AI", d: "Ask questions, make changes in plain English", plan: "growth" },
+  { k: "ai", t: "Lokly AI", d: "Ask questions, make changes in plain English", plan: "growth" },
 ];
 
 export default async function Dashboard({ searchParams }: { searchParams: Promise<{ b?: string }> }) {
@@ -54,7 +54,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
       <main className="dmain">
         <div className="dhead">
           <div><p className="eyebrow">{biz.address ?? biz.website ?? "Your business"}</p><h1>{biz.name}</h1></div>
-          <span className={`badge ${paid ? "paid" : ""}`}>{paid ? "GoodTable Growth" : "Free plan"}</span>
+          <span className={`badge ${paid ? "paid" : ""}`}>{paid ? "Lokly Growth" : "Free plan"}</span>
         </div>
 
         <div className="kpis">
@@ -72,7 +72,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         )}
 
         {!paid && (
-          <a href="/pricing" className="card nudge"><b>Let GoodTable fix {todo.length ? `all ${todo.length} issues` : "everything"} for $49.99/mo</b><span>See the plan →</span></a>
+          <a href="/pricing" className="card nudge"><b>Let Lokly fix {todo.length ? `all ${todo.length} issues` : "everything"} for $49.99/mo</b><span>See the plan →</span></a>
         )}
 
         <div className="card">

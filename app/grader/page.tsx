@@ -25,7 +25,7 @@ const TOOLS = [
   ["Customer CRM", "Every customer, order and booking in one place"],
   ["Email & SMS marketing", "Campaigns plus win-back, review-request and reminder automations"],
   ["Loyalty program", "Points and rewards that bring customers back"],
-  ["GoodTable AI assistant", "Ask questions about your business and make changes in plain English"],
+  ["Lokly AI assistant", "Ask questions about your business and make changes in plain English"],
 ];
 
 const tone = (got: number, max: number) => !max ? "muted" : got / max >= 0.8 ? "good" : got / max >= 0.5 ? "warn" : "bad";
@@ -124,7 +124,7 @@ export default function Page() {
 
       {step === "welcome" && (
         <section className="hero">
-          <h1>Welcome to GoodTable 🎉</h1>
+          <h1>Welcome to Lokly 🎉</h1>
           <p className="muted">Your subscription is active. We'll email you within one business day to start building your site and fixing your Google profile.</p>
           <a className="btn dark" href="/">Grade another business</a>
         </section>
@@ -209,7 +209,7 @@ function Plan({ r, pct, issues, compact }: { r: Report; pct: number; issues: num
   );
   return (
     <div id="plan" className="card plan">
-      <p className="eyebrow lime-t">GoodTable Growth</p>
+      <p className="eyebrow lime-t">Lokly Growth</p>
       <h3>Fix all {issues} issues and grow, for one monthly price.</h3>
       <div className="price"><b>$49.99</b><span>/month · cancel anytime</span></div>
       <ul className="tools">{TOOLS.map(([t, d]) => <li key={t}><i>✓</i><span>{t}<small>{d}</small></span></li>)}</ul>
