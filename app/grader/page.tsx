@@ -142,7 +142,7 @@ export default function Page() {
             </div>
           )}
           {err && <p className="err">{err}</p>}
-          {!(q.trim().length >= 3 && hits.length === 0) && <button className="link" onClick={goManual}>Can't find your business? Enter it manually</button>}
+          {q.trim().length < 3 && <button className="link" onClick={goManual}>Can't find your business? Enter it manually</button>}
         </section>
       )}
 
