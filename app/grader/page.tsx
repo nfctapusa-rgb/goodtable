@@ -189,7 +189,7 @@ function ReportView({ r, onReset }: { r: Report; onReset: () => void }) {
           : s.key === "local" && r.placesError ? `Google Maps error: ${r.placesError}` : undefined} />)}
 
       <div id="plan" className="planwrap"><h2 className="h2">Fix all {failed.length} issues with Lokly</h2>
-        <PlanCards compact context={{ businessName: r.businessName, website: r.url, placeId: r.placeId, score: pct }} /></div>
+        <PlanCards compact context={{ businessName: r.businessName, website: r.url, placeId: r.placeId }} /></div>
       <button className="btn ghost" onClick={onReset}>Grade another business</button>
     </section>
   );

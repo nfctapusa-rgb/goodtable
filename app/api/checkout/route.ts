@@ -23,9 +23,10 @@ export async function POST(req: Request) {
     if (recurring) f.set("line_items[0][price_data][recurring][interval]", "month");
     f.set("line_items[0][price_data][product_data][name]", plan.name);
   }
+  f.set("phone_number_collection[enabled]", "true");
   if (body.email) f.set("customer_email", String(body.email).slice(0, 200));
   f.set("metadata[plan]", plan.id);
-  for (const k of ["businessName", "website", "placeId", "score"]) if (body[k] != null) f.set(`metadata[${k}]`, String(body[k]).slice(0, 400));
+  for (const k of ["businessName", "contactName", "phone", "website", "googleProfile", "orderLink", "instagram", "notes", "placeId", "score"]) if (body[k] != null) f.set(`metadata[${k}]`, String(body[k]).slice(0, 400));
   const r = await fetch("https://api.stripe.com/v1/checkout/sessions", {
     method: "POST", headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/x-www-form-urlencoded" }, body: f,
   });
