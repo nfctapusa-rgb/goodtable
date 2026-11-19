@@ -62,9 +62,9 @@ export default function Home() {
           </ul>
         </div>
         <div className="card dark price-teaser">
-          <p className="eyebrow lime-t">Lokly Growth</p>
-          <div className="price"><b>$49.99</b><span>/month</span></div>
-          <p className="muted">Every tool. No contracts. No commission on your sales.</p>
+          <p className="eyebrow lime-t">Simple pricing</p>
+          <ul className="ticks dk"><li><b>$150</b> website built to rank #1</li><li><b>$49.99/mo</b> we run your Google profile</li><li><b>$99/mo</b> Pro: site, ordering & growth tools</li></ul>
+          <p className="muted">No contracts. Cancel anytime.</p>
           <a href="/pricing" className="btn lime wide">See pricing</a>
         </div>
       </section>

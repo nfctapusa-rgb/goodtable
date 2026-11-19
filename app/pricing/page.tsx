@@ -1,26 +1,15 @@
-export const metadata = { title: "Pricing | Lokly", description: "One simple plan for any business: $49.99/month, every tool included, no contracts." };
+import { PlanCards } from "../plancards";
 
-const INCLUDED = [
-  ["AI-optimized website", "Built to rank on Google, with custom domain and SSL included."],
-  ["Online sales & booking", "Ordering, appointments, checkout, quotes and deposits for your industry."],
-  ["Google profile management", "Posts, photos, hours and review replies kept current."],
-  ["Automated SEO pages", "Local landing pages that rank for the areas you serve."],
-  ["Customer CRM", "Every customer, order, booking and conversation in one timeline."],
-  ["Loyalty & rewards", "A points program that drives repeat business, like the big chains."],
-  ["Email & SMS marketing", "Done-for-you campaigns and automations that send on their own."],
-  ["Reviews & reputation", "Automatic review requests and AI-drafted responses you approve."],
-  ["Lokly AI assistant", "Ask about your sales and make changes in plain English."],
-  ["Analytics", "Revenue, customers, traffic and rankings on one dashboard."],
-  ["Setup & migration", "We move your site, products and customers over for you."],
-  ["Real human support", "A team that knows your business, not a ticket queue."],
-];
+export const metadata = { title: "Pricing | Lokly", description: "Lokly pricing: a $150 website built to rank, $49.99/mo Google profile management, or $99/mo Lokly Pro." };
 
 const FAQ = [
-  ["Is there a contract?", "No. Lokly is month-to-month and you can cancel anytime from your dashboard."],
-  ["Do you take a cut of my sales?", "No. You pay $49.99/month and standard card processing through Stripe. Lokly takes no commission on your orders or bookings."],
-  ["Does it work for my type of business?", "Lokly is built for any business that sells products or services: restaurants, salons, retail, home services, fitness, auto, professional services and more. We configure the tools for your industry."],
-  ["What if I already have a website?", "We'll grade it for free and either migrate it onto Lokly or rebuild it so it ranks and converts better."],
-  ["How long does setup take?", "Most businesses are live within a week of starting."],
+  ["What's the difference between the plans?", "Lokly Site is a one-time $150 website built to rank #1 in local search. Lokly Local ($49.99/mo) is us running your Google Business Profile: review replies, posts, offers and photos. Lokly Pro ($99/mo) includes everything in Local plus your website, online ordering and growth tools."],
+  ["Is there a contract?", "No. Monthly plans are month-to-month and you can cancel anytime."],
+  ["How does online ordering work on Pro?", "You choose. Link your existing DoorDash or Uber Eats pages for no extra fee, or connect your point-of-sale so customers order directly on your site. Direct online orders through your POS carry a 5% Lokly fee; there's no fee on orders placed through DoorDash or Uber Eats links."],
+  ["Do I need Lokly Site if I'm on Pro?", "No. Your website is included with Lokly Pro."],
+  ["Who replies to my reviews?", "Our team writes a personal reply to every Google review, in your voice, and follows the guidelines you set."],
+  ["What are thank-you gift credits?", "Pro includes monthly credits you can use to thank customers with a gift after a visit or order, a proven way to drive repeat business and reviews."],
+  ["Does it work for my type of business?", "Lokly works for any local business: restaurants, salons, auto shops, retail, home services, fitness, professional services and more."],
 ];
 
 export default function Pricing() {
@@ -28,27 +17,10 @@ export default function Pricing() {
     <>
       <section className="hero2">
         <div className="wrap center">
-          <h1 className="display">Simple pricing that fits any business.</h1>
-          <p className="lead">Get the complete Lokly platform. Month-to-month, no long-term contracts, no commission on your sales.</p>
-          <div className="card plan solo">
-            <p className="eyebrow lime-t">Lokly Growth</p>
-            <div className="price"><b>$49.99</b><span>/month</span></div>
-            <p className="muted">Everything below, for one business location. Additional locations available.</p>
-            <a href="/grader" className="btn lime wide">Start with a free report</a>
-            <p className="tiny muted">Cancel anytime · Card processing billed by Stripe at standard rates</p>
-          </div>
-        </div>
-      </section>
-      <section className="wrap sec">
-        <h2 className="h2 center">Included in your plan</h2>
-        <div className="grid3">{INCLUDED.map(([t, d]) => <div key={t} className="card feat"><h3>{t}</h3><p className="muted">{d}</p></div>)}</div>
-      </section>
-      <section className="wrap sec">
-        <h2 className="h2 center">Why businesses choose Lokly</h2>
-        <div className="grid3">
-          <div className="card feat"><h3>Results over endless options</h3><p className="muted">You don't need 400 design settings. You need a system proven to get found and get paid. That's what we build.</p></div>
-          <div className="card feat"><h3>Big-company tech for small businesses</h3><p className="muted">Corporations have whole teams on AI, SEO and retention. With Lokly, you get the same capabilities for $49.99 a month.</p></div>
-          <div className="card feat"><h3>We win when you grow</h3><p className="muted">No commissions and no lock-in. We only keep you as a customer by growing your business.</p></div>
+          <h1 className="display">Get found. Get customers. Grow locally.</h1>
+          <p className="lead">Simple pricing for any local business. No contracts.</p>
+          <PlanCards />
+          <p className="tiny muted" style={{ marginTop: 16 }}>Card processing billed by Stripe at standard rates · Monthly plans cancel anytime</p>
         </div>
       </section>
       <section className="wrap sec narrow">
@@ -57,7 +29,7 @@ export default function Pricing() {
       </section>
       <section className="cta-band">
         <div className="wrap center">
-          <h2 className="h2">See what Lokly would fix for you.</h2>
+          <h2 className="h2">See where you rank, free.</h2>
           <a href="/grader" className="btn lime lg">Get my free report ↗</a>
         </div>
       </section>

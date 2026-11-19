@@ -38,7 +38,7 @@ export default function HowItWorks() {
       <section className="wrap sec">
         <h2 className="h2 center">Getting started takes one call.</h2>
         <div className="grid4">
-          {[["Get your free report", "See exactly where you're losing customers."], ["Start your plan", "$49.99/month, cancel anytime."], ["We build it", "Site, Google profile, checkout and automations, done for you."], ["You grow", "Track sales, customers and rankings from one dashboard."]].map(([t, d], i) =>
+          {[["Get your free report", "See exactly where you're losing customers."], ["Start your plan", "Website from $150, Google management from $49.99/mo."], ["We build it", "Site, Google profile, checkout and automations, done for you."], ["You grow", "Track sales, customers and rankings from one dashboard."]].map(([t, d], i) =>
             <div key={t} className="card step"><span className="num">{i + 1}</span><h3>{t}</h3><p className="muted">{d}</p></div>)}
         </div>
       </section>

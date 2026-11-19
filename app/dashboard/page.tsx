@@ -54,7 +54,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
       <main className="dmain">
         <div className="dhead">
           <div><p className="eyebrow">{biz.address ?? biz.website ?? "Your business"}</p><h1>{biz.name}</h1></div>
-          <span className={`badge ${paid ? "paid" : ""}`}>{paid ? "Lokly Growth" : "Free plan"}</span>
+          <span className={`badge ${paid ? "paid" : ""}`}>{paid ? (biz.plan === "pro" ? "Lokly Pro" : biz.plan === "local" ? "Lokly Local" : "Lokly") : "Free plan"}</span>
         </div>
 
         <div className="kpis">
@@ -72,7 +72,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         )}
 
         {!paid && (
-          <a href="/pricing" className="card nudge"><b>Let Lokly fix {todo.length ? `all ${todo.length} issues` : "everything"} for $49.99/mo</b><span>See the plan →</span></a>
+          <a href="/pricing" className="card nudge"><b>Let Lokly fix {todo.length ? `all ${todo.length} issues` : "everything"} from $49.99/mo</b><span>See the plan →</span></a>
         )}
 
         <div className="card">

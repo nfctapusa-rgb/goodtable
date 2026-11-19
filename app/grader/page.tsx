@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { PlanCards } from "../plancards";
 
 type Status = "pass" | "fail" | "unknown";
 interface Check { id: string; section: "search" | "experience" | "local"; group: string; title: string; why: string; status: Status; found?: string; expected?: string }
@@ -187,7 +188,8 @@ function ReportView({ r, onReset }: { r: Report; onReset: () => void }) {
         note={s.key === "local" && !r.placesConnected ? "Google Maps isn't connected yet, so listing and ranking checks were skipped."
           : s.key === "local" && r.placesError ? `Google Maps error: ${r.placesError}` : undefined} />)}
 
-      <Plan r={r} pct={pct} issues={failed.length} />
+      <div id="plan" className="planwrap"><h2 className="h2">Fix all {failed.length} issues with Lokly</h2>
+        <PlanCards compact context={{ businessName: r.businessName, website: r.url, placeId: r.placeId, score: pct }} /></div>
       <button className="btn ghost" onClick={onReset}>Grade another business</button>
     </section>
   );
@@ -208,7 +210,7 @@ function Plan({ r, pct, issues, compact }: { r: Report; pct: number; issues: num
     } catch (e) { setErr((e as Error).message); setBusy(false); }
   }
   if (compact) return (
-    <a href="#plan" className="card nudge"><b>Fix all {issues} issues for $49.99/mo</b><span>See what's included →</span></a>
+    <a href="#plan" className="card nudge"><b>Fix all {issues} issues, websites from $150</b><span>See plans →</span></a>
   );
   return (
     <div id="plan" className="card plan">

@@ -9,7 +9,7 @@ export interface SiteInput {
   city?: string;
   keyword?: string;
   address?: string | null;
-  profile?: { phone: string | null; rating: number | null; reviews: number; category: string | null; summary: string | null; hours: string[] | null; mapsUrl: string | null } | null;
+  profile?: { phone: string | null; rating: number | null; reviews: number; category: string | null; summary: string | null; hours: string[] | null; mapsUrl: string | null; photos?: string[] } | null;
 }
 
 export interface SiteModel {
@@ -18,6 +18,9 @@ export interface SiteModel {
   about: string; faq: [string, string][]; city: string; phone: string | null; address: string | null;
   hours: string[] | null; rating: number | null; reviews: number; mapsUrl: string | null;
   meta: { title: string; description: string }; schemaType: string;
+  eyebrow: string; headline2: string; offer: { when: string; title: string; sub: string };
+  highlightsLabel: string; highlightsTitle: [string, string]; highlights: { tag: string; title: string; desc: string }[];
+  aboutTitle: string; photos: string[];
 }
 
 const RULES: [Industry, RegExp][] = [
@@ -35,6 +38,27 @@ export function detectIndustry(text: string): Industry {
   for (const [k, re] of RULES) if (re.test(text)) return k;
   return "other";
 }
+
+const STYLE: Record<Industry, { tags: [string, string]; head2: string; offer: [string, string, string]; hl: string; hlt: [string, string]; items: [string, string, string][]; about: string }> = {
+  food: { tags: ["Fresh", "Made to order"], head2: "Fresh off the grill.", offer: ["Every day until 4 PM", "10% off your first online order", "Order direct and skip the delivery app fees."], hl: "Menu highlights", hlt: ["Real food.", "Real photos."],
+    items: [["Fan favorite", "House special", "Our most-ordered plate, made fresh to order."], ["Bowls", "Signature bowl", "A full meal, fast and fresh."], ["Plates", "Combo plate", "Two favorites on one plate."], ["Family", "Feed the group", "Big portions for the whole table."]], about: "built around flavor." },
+  beauty: { tags: ["Book online", "Walk-ins welcome"], head2: "Look your best this week.", offer: ["New clients", "15% off your first visit", "Book online in under a minute."], hl: "Services", hlt: ["Real work.", "Real results."],
+    items: [["Signature", "Signature service", "Our most-booked service."], ["Color", "Color & style", "From subtle to bold."], ["Grooming", "Finishing touches", "The details that make it."], ["Packages", "Gift cards", "The easiest gift to give."]], about: "where the details matter." },
+  auto: { tags: ["Honest pricing", "Fast turnaround"], head2: "Back on the road, fast.", offer: ["This month", "$20 off any service over $100", "Book online and mention this offer."], hl: "Services", hlt: ["Real work.", "Fair prices."],
+    items: [["Repair", "Diagnostics & repair", "We find it and fix it right."], ["Maintenance", "Oil & tune-ups", "Keep it running like new."], ["Tires", "Tires & brakes", "Safety you can feel."], ["Detail", "Detailing", "Inside and out."]], about: "you can trust with your car." },
+  health: { tags: ["New patients welcome", "Book online"], head2: "Care that fits your life.", offer: ["New patients", "Free first consultation", "Book online in minutes."], hl: "Services", hlt: ["Real care.", "Real people."],
+    items: [["Care", "Consultations", "We listen first."], ["Treatment", "Treatment plans", "Built around you."], ["Wellness", "Ongoing care", "Stay at your best."], ["Flexible", "Evening & weekend", "Times that work for you."]], about: "with care at the center." },
+  fitness: { tags: ["All levels", "First class free"], head2: "Your strongest year starts here.", offer: ["New members", "First class free", "Book your spot online."], hl: "Classes", hlt: ["Real training.", "Real results."],
+    items: [["Strength", "Strength", "Coached and progressive."], ["Cardio", "Conditioning", "Sweat with purpose."], ["Mobility", "Mobility", "Move better, feel better."], ["Coaching", "Personal training", "One-on-one focus."]], about: "built around community." },
+  home: { tags: ["Licensed & insured", "Free estimates"], head2: "Done right the first time.", offer: ["This month", "$50 off your first job", "Request a free estimate online."], hl: "Services", hlt: ["Real work.", "Upfront prices."],
+    items: [["Repair", "Repairs", "Fast, clean, guaranteed."], ["Install", "Installations", "Done to code."], ["Emergency", "Emergency service", "When it can't wait."], ["Estimates", "Free estimates", "Know the price first."]], about: "that shows up and does it right." },
+  pro: { tags: ["Trusted locally", "Free consultation"], head2: "Expert help, made simple.", offer: ["New clients", "Free 30-minute consultation", "Book a time online."], hl: "Services", hlt: ["Real expertise.", "Clear pricing."],
+    items: [["Consult", "Consultations", "Talk it through, no pressure."], ["Service", "Core services", "Tailored to you."], ["Support", "Ongoing support", "We're here after, too."], ["Pricing", "Clear pricing", "No surprises."]], about: "you can count on." },
+  retail: { tags: ["Shop local", "Shop online"], head2: "Find something you'll love.", offer: ["This week", "10% off your first order", "Shop online or visit us in store."], hl: "Featured", hlt: ["Real pieces.", "Real quality."],
+    items: [["New", "New arrivals", "Just landed this week."], ["Best sellers", "Customer favorites", "Our most-loved pieces."], ["Custom", "Custom orders", "Made just for you."], ["Gifts", "Gift cards", "Always the right size."]], about: "curated with care." },
+  other: { tags: ["Locally owned", "Easy booking"], head2: "Here when you need us.", offer: ["New customers", "10% off your first visit", "Reach out online to claim it."], hl: "What we do", hlt: ["Real service.", "Real people."],
+    items: [["Service", "Our services", "Quality work, every time."], ["Local", "Local & trusted", "Proudly serving our community."], ["Easy", "Easy booking", "Reach us in seconds."], ["Support", "Friendly support", "Real people who care."]], about: "proudly local." },
+};
 
 const PRESET: Record<Industry, { cta: string; cta2: string; services: (kw: string) => [string, string][]; verb: string; schema: string }> = {
   food: { cta: "Order online", cta2: "View menu", verb: "made fresh", schema: "Restaurant",
@@ -70,7 +94,7 @@ export function generateSite(i: SiteInput): SiteModel {
   return {
     name: i.businessName, industry, schemaType: p.schema,
     tagline: `${what} in ${city}`,
-    headline: `${city}'s ${what.toLowerCase()} ${p.verb}.`,
+    headline: `${what} in ${city}.`,
     sub: i.profile?.summary || `${i.businessName} is ${city}'s go-to for ${kw || "quality service"}. ${proof}`.trim(),
     cta: p.cta, ctaSecondary: p.cta2,
     services: p.services(kw).map(([title, desc]) => ({ title, desc })),
@@ -82,6 +106,13 @@ export function generateSite(i: SiteInput): SiteModel {
     ],
     city, phone: i.profile?.phone ?? null, address: i.address ?? null, hours: i.profile?.hours ?? null,
     rating, reviews, mapsUrl: i.profile?.mapsUrl ?? null,
+    eyebrow: [STYLE[industry].tags[0], STYLE[industry].tags[1], kw || what].join(" • ").toUpperCase(),
+    headline2: STYLE[industry].head2,
+    offer: { when: STYLE[industry].offer[0], title: STYLE[industry].offer[1], sub: STYLE[industry].offer[2] },
+    highlightsLabel: STYLE[industry].hl, highlightsTitle: STYLE[industry].hlt,
+    highlights: STYLE[industry].items.map(([tag, title, desc]) => ({ tag, title, desc })),
+    aboutTitle: `${what} ${STYLE[industry].about}`,
+    photos: (i.profile?.photos ?? []).map(n => `/api/photo?n=${encodeURIComponent(n)}`),
     meta: { title: `${i.businessName} | ${what} in ${city}`.slice(0, 65), description: `${i.businessName}: ${kw || "local business"} in ${city}. ${p.cta} online. ${proof}`.slice(0, 160) },
   };
 }

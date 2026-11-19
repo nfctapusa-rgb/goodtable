@@ -86,6 +86,7 @@ export async function POST(req: Request) {
       summary: local.place.editorialSummary?.text ?? null,
       hours: (local.place.regularOpeningHours as any)?.weekdayDescriptions ?? null,
       mapsUrl: local.place.googleMapsUri ?? null,
+      photos: ((local.place.photos as any[]) ?? []).slice(0, 8).map(p => p.name).filter(Boolean),
     } : null,
     gradedAt: new Date().toISOString(),
     scores: { search: score(checks, "search"), experience: score(checks, "experience"), local: score(checks, "local") },
