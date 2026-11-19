@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { PLANS, planById, type PlanId } from "@/lib/plans";
 
 const FIELDS: { k: string; label: string; ph: string; type?: string; req?: boolean; pro?: boolean }[] = [
-  { k: "businessName", label: "Business name", ph: "Flamebachi", req: true },
+  { k: "businessName", label: "Business name", ph: "Your business name", req: true },
   { k: "contactName", label: "Your name", ph: "First and last", req: true },
   { k: "email", label: "Email", ph: "you@business.com", type: "email", req: true },
   { k: "phone", label: "Mobile number", ph: "(213) 555-0100", type: "tel", req: true },

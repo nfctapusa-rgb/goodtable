@@ -3,11 +3,11 @@ import { SearchHero } from "./ui";
 // Real Lokly clients, shown as storefronts on one block. Awning colors are
 // ours, not their brand marks.
 const BLOCK = [
-  { name: "Flamebachi", kind: "Hibachi", awn: "#E5402F", sign: "#FFD23F", ink: "#142133" },
-  { name: "Clarity & Cut", kind: "Barbershop", awn: "#142133", sign: "#FFFFFF", ink: "#142133" },
-  { name: "Corleone Pizza", kind: "Pizza", awn: "#2F6B4F", sign: "#FFFFFF", ink: "#2F6B4F" },
+  { name: "Fire Grill", kind: "Hibachi", awn: "#E5402F", sign: "#FFD23F", ink: "#142133" },
+  { name: "Main St. Cuts", kind: "Barbershop", awn: "#142133", sign: "#FFFFFF", ink: "#142133" },
+  { name: "Slice House", kind: "Pizza", awn: "#2F6B4F", sign: "#FFFFFF", ink: "#2F6B4F" },
   { name: "Your shop", kind: "Here", awn: "#FFD23F", sign: "#FFFFFF", ink: "#142133", you: true },
-  { name: "Julio's", kind: "Jewelry repair", awn: "#22324A", sign: "#FFD23F", ink: "#142133" },
+  { name: "Corner Jewelry", kind: "Jewelry repair", awn: "#22324A", sign: "#FFD23F", ink: "#142133" },
 ];
 
 const WEEK: [string, string][] = [
@@ -48,17 +48,17 @@ export default function Home() {
 
       <section className="wrap sh-case">
         <div className="sh-case-text">
-          <h2 className="sh-h2">Flamebachi runs two locations. We run their Google.</h2>
-          <p>We built <a href="https://flamebachi.com" target="_blank" rel="noreferrer">flamebachi.com</a> and manage the Google profiles for Downtown LA and Jurupa Valley. Offers go out on a schedule, every review gets answered, and the photos stay current. They sit at <strong>4.9 stars across 150+ Google reviews</strong>.</p>
-          <a className="sh-link" href="https://flamebachi.com" target="_blank" rel="noreferrer">Visit flamebachi.com</a>
+          <h2 className="sh-h2">Example: a two-location grill. We run their Google.</h2>
+          <p>Here's what that looks like for a takeout spot with two locations: we build the website and manage both Google profiles. Offers go out on a schedule, every review gets answered, and the photos stay current.</p>
+          <a className="sh-link" href="/grader">See where your shop stands</a>
         </div>
         <figure className="sh-shot">
           <div className="sh-shot-hero">
-            <p>Good Frequency Energy.<br />Fresh off the grill.</p>
+            <p>Made to order.<br />Fresh off the grill.</p>
             <span>Order Online</span>
           </div>
-          <div className="sh-shot-offer">10% off all Bachi Bowls before 4 PM</div>
-          <figcaption>flamebachi.com, built by Lokly</figcaption>
+          <div className="sh-shot-offer">10% off all bowls before 4 PM</div>
+          <figcaption>Sample website built by Lokly</figcaption>
         </figure>
       </section>
 

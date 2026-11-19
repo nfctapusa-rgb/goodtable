@@ -109,7 +109,7 @@ export default function Page() {
           <h1>Tell us about your business</h1>
           <p className="muted">{mapsOff ? "Google Maps search isn't connected yet, so enter your details and we'll grade what we can." : "Not on Google Maps? That's the first thing we'll fix. Enter your details and we'll grade the rest."}</p>
           <form onSubmit={e => { e.preventDefault(); grade(form, "manual"); }} className="form">
-            <label>Business name<input required placeholder="Flamebachi" value={form.businessName} onChange={e => setForm({ ...form, businessName: e.target.value })} /></label>
+            <label>Business name<input required placeholder="Your business name" value={form.businessName} onChange={e => setForm({ ...form, businessName: e.target.value })} /></label>
             <label>Website <span className="muted">(optional)</span><input placeholder="yourbusiness.com" value={form.url} onChange={e => setForm({ ...form, url: e.target.value })} /></label>
             <div className="row">
               <label>City or area<input required placeholder="Downtown LA" value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} /></label>
