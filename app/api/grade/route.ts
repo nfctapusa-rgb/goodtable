@@ -34,6 +34,10 @@ export async function POST(req: Request) {
   let city = String(body.city ?? "").trim().slice(0, 80) || undefined;
   let keyword = String(body.keyword ?? "").trim().slice(0, 80) || undefined;
   const placeId = String(body.placeId ?? "").trim();
+  const manual = {
+    address: String(body.address ?? "").trim().slice(0, 160), phone: String(body.phone ?? "").trim().slice(0, 30),
+    hasGoogle: ["yes", "no", "unsure"].includes(body.hasGoogle) ? body.hasGoogle : null,
+  };
 
   let place: Place | undefined;
   if (placeId && placesKey()) {
@@ -91,8 +95,9 @@ export async function POST(req: Request) {
     } : null,
     gradedAt: new Date().toISOString(),
     scores: { search: score(checks, "search"), experience: score(checks, "experience"), local: score(checks, "local") },
+    manual: placeId ? null : manual,
     placesConnected: local.connected, placesError: local.error, rankings: local.rankings, checks,
   };
-  await saveLead({ kind: "report", source: String(body.src ?? "web"), businessName: out.businessName, website: out.url, placeId: out.placeId, city: out.city, score: reportScore(out as any) });
+  await saveLead({ kind: "report", source: String(body.src ?? "web"), businessName: out.businessName, website: out.url, placeId: out.placeId, city: out.city, phone: manual.phone || undefined, score: reportScore(out as any), data: placeId ? undefined : { ...manual, needsGoogleProfile: manual.hasGoogle !== "yes", keyword } });
   return NextResponse.json(out);
 }

@@ -11,7 +11,7 @@ interface Report {
   rankings: { query: string; position: number | null; top: string[] }[];
   checks: Check[];
 }
-interface Hit { id: string; name: string; address: string; website: string | null; rating: number | null; reviews: number }
+interface Hit { id: string; name: string; address: string; category: string | null; website: string | null; rating: number | null; reviews: number }
 
 const SECTIONS = [
   { key: "search", label: "Search listings" },
@@ -37,7 +37,11 @@ export default function Page() {
   const [hits, setHits] = useState<Hit[]>([]);
   const [searching, setSearching] = useState(false);
   const [mapsOff, setMapsOff] = useState(false);
-  const [form, setForm] = useState({ url: "", businessName: "", city: "", keyword: "" });
+  const [form, setForm] = useState({ url: "", businessName: "", city: "", keyword: "", address: "", phone: "", hasGoogle: "" });
+  const [near, setNear] = useState<{ lat: number; lng: number } | null>(null);
+  const [locating, setLocating] = useState(false);
+  const [searchErr, setSearchErr] = useState(false);
+  const [active, setActive] = useState(-1);
   const [loading, setLoading] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [r, setR] = useState<Report | null>(null);
@@ -55,12 +59,29 @@ export default function Page() {
     timer.current = setTimeout(async () => {
       setSearching(true);
       try {
-        const j = await (await fetch(`/api/places?q=${encodeURIComponent(q)}`)).json();
+        const loc = near ? `&lat=${near.lat}&lng=${near.lng}` : "";
+        const j = await (await fetch(`/api/places?q=${encodeURIComponent(q)}${loc}`)).json();
         if (j.connected === false) { setMapsOff(true); setStep("manual"); setForm(f => ({ ...f, businessName: q })); }
-        setHits(j.results ?? []);
-      } finally { setSearching(false); }
-    }, 350);
-  }, [q]);
+        setSearchErr(!!j.error); setHits(j.results ?? []); setActive(-1);
+      } catch { setSearchErr(true); setHits([]); }
+      finally { setSearching(false); }
+    }, 300);
+  }, [q, near]);
+
+  function useMyLocation() {
+    if (!navigator.geolocation) return;
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      p => { setNear({ lat: +p.coords.latitude.toFixed(3), lng: +p.coords.longitude.toFixed(3) }); setLocating(false); },
+      () => setLocating(false), { timeout: 8000, maximumAge: 600000 });
+  }
+  const goManual = () => { setStep("manual"); setForm(f => ({ ...f, businessName: f.businessName || q })); scrollTo(0, 0); };
+  function onKey(e: React.KeyboardEvent) {
+    if (!hits.length) return;
+    if (e.key === "ArrowDown") { e.preventDefault(); setActive(a => Math.min(a + 1, hits.length - 1)); }
+    if (e.key === "ArrowUp") { e.preventDefault(); setActive(a => Math.max(a - 1, 0)); }
+    if (e.key === "Enter" && active >= 0) { e.preventDefault(); grade({ placeId: hits[active].id }, hits[active].id); }
+  }
 
   async function grade(payload: object, label: string) {
     setLoading(label); setErr(null);
@@ -79,27 +100,41 @@ export default function Page() {
       {step === "find" && (
         <section className="hero">
           <h1>How visible is your business online?</h1>
-          <p className="muted">Find your business on Google Maps for a free score covering your Google listing, website and local ranking, plus the exact fixes.</p>
+          <p className="muted">Search for your business the way customers do. We'll score your Google listing, website and local ranking, and show the exact fixes.</p>
           <div className="search">
-            <input autoFocus aria-label="Search your business name and city" placeholder="Search your business name and city…" value={q} onChange={e => setQ(e.target.value)} />
+            <input autoFocus type="search" enterKeyHint="search" autoComplete="off" aria-label="Search your business name"
+              role="combobox" aria-expanded={hits.length > 0} aria-controls="hits" aria-activedescendant={active >= 0 ? `hit-${active}` : undefined}
+              placeholder="Business name, e.g. Main St. Cuts" value={q} onChange={e => setQ(e.target.value)} onKeyDown={onKey} />
             {searching && <span className="spin" />}
           </div>
+          <div className="gq-tools">
+            <button type="button" className="link" onClick={useMyLocation} disabled={locating || !!near}>
+              {near ? "Showing businesses near you" : locating ? "Finding you…" : "Search near my location"}
+            </button>
+            <span className="muted small">Tip: add the city or street if you have a common name.</span>
+          </div>
           {hits.length > 0 && (
-            <ul className="hits">
-              {hits.map(h => (
-                <li key={h.id}>
-                  <button disabled={!!loading} onClick={() => grade({ placeId: h.id }, h.id)}>
-                    <span className="pin">⌖</span>
-                    <span className="t">{h.name}<small>{h.address}</small></span>
+            <ul className="hits" id="hits" role="listbox">
+              {hits.map((h, i) => (
+                <li key={h.id} id={`hit-${i}`} role="option" aria-selected={i === active}>
+                  <button className={i === active ? "on" : ""} disabled={!!loading} onClick={() => grade({ placeId: h.id }, h.id)} onMouseEnter={() => setActive(i)}>
+                    <span className="pin" aria-hidden="true">⌖</span>
+                    <span className="t">{h.name}<small>{[h.category, h.address].filter(Boolean).join(" · ")}</small></span>
                     <span className="meta">{loading === h.id ? "Scanning…" : h.rating ? `★ ${h.rating} (${h.reviews})` : "No reviews"}</span>
                   </button>
                 </li>
               ))}
+              <li className="hit-add"><button onClick={goManual}><span className="pin" aria-hidden="true">+</span><span className="t">Not in the list?<small>Add your business by hand. If you're not on Google yet, we'll set that up too.</small></span></button></li>
             </ul>
           )}
-          {q.trim().length >= 3 && !searching && hits.length === 0 && <p className="muted small">No matches on Google Maps yet.</p>}
+          {q.trim().length >= 3 && !searching && hits.length === 0 && (
+            <div className="nohits">
+              <p><b>{searchErr ? "Google search didn't respond." : `No Google listing found for "${q.trim()}".`}</b> {searchErr ? "You can still get your score by entering your details." : "That's often the first thing holding a business back, and we can fix it."}</p>
+              <button className="btn dark" onClick={goManual}>Add my business</button>
+            </div>
+          )}
           {err && <p className="err">{err}</p>}
-          <button className="link" onClick={() => { setStep("manual"); setForm(f => ({ ...f, businessName: q })); }}>Can't find your business? Enter it manually →</button>
+          {!(q.trim().length >= 3 && hits.length === 0) && <button className="link" onClick={goManual}>Can't find your business? Enter it manually</button>}
         </section>
       )}
 
@@ -107,14 +142,23 @@ export default function Page() {
         <section className="hero">
           <button className="link back" onClick={() => setStep("find")}>← Back to Google Maps search</button>
           <h1>Tell us about your business</h1>
-          <p className="muted">{mapsOff ? "Google Maps search isn't connected yet, so enter your details and we'll grade what we can." : "Not on Google Maps? That's the first thing we'll fix. Enter your details and we'll grade the rest."}</p>
+          <p className="muted">{mapsOff ? "Google Maps search isn't connected yet, so enter your details and we'll grade what we can." : "Not showing up on Google? That's the first thing we fix. Enter your details and we'll grade the rest."}</p>
           <form onSubmit={e => { e.preventDefault(); grade(form, "manual"); }} className="form">
-            <label>Business name<input required placeholder="Your business name" value={form.businessName} onChange={e => setForm({ ...form, businessName: e.target.value })} /></label>
-            <label>Website <span className="muted">(optional)</span><input placeholder="yourbusiness.com" value={form.url} onChange={e => setForm({ ...form, url: e.target.value })} /></label>
+            <label>Business name<input required autoComplete="organization" placeholder="Your business name" value={form.businessName} onChange={e => setForm({ ...form, businessName: e.target.value })} /></label>
+            <label>What you sell<input required placeholder="e.g. tacos, haircuts, jewelry repair" value={form.keyword} onChange={e => setForm({ ...form, keyword: e.target.value })} /></label>
+            <label>Street address <span className="muted">(optional)</span><input autoComplete="street-address" placeholder="123 Main St" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} /></label>
             <div className="row">
-              <label>City or area<input required placeholder="Downtown LA" value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} /></label>
-              <label>What you sell<input required placeholder="hibachi" value={form.keyword} onChange={e => setForm({ ...form, keyword: e.target.value })} /></label>
+              <label>City or area<input required autoComplete="address-level2" placeholder="Downtown LA" value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} /></label>
+              <label>Business phone <span className="muted">(optional)</span><input type="tel" autoComplete="tel" placeholder="(213) 555-0100" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} /></label>
             </div>
+            <label>Website <span className="muted">(optional)</span><input inputMode="url" autoComplete="url" placeholder="yourbusiness.com" value={form.url} onChange={e => setForm({ ...form, url: e.target.value })} onBlur={e => { const v = e.target.value.trim(); if (v && !/^https?:\/\//.test(v)) setForm(f => ({ ...f, url: "https://" + v })); }} /></label>
+            <div className="gq-q" role="radiogroup" aria-label="Are you on Google Maps?">
+              <span>Do you have a Google Business Profile?</span>
+              {([["yes", "Yes"], ["no", "No"], ["unsure", "Not sure"]] as const).map(([v, l]) => (
+                <label key={v} className={form.hasGoogle === v ? "on" : ""}><input type="radio" name="hasGoogle" value={v} checked={form.hasGoogle === v} onChange={() => setForm({ ...form, hasGoogle: v })} />{l}</label>
+              ))}
+            </div>
+            {form.hasGoogle && form.hasGoogle !== "yes" && <p className="small muted">No problem. Creating and verifying your Google profile is included in Google Management ($25/mo). Your report will show what you're missing.</p>}
             <button className="btn dark" disabled={!!loading}>{loading ? "Scanning…" : "Get my free score"}</button>
             {err && <p className="err">{err}</p>}
           </form>
@@ -152,6 +196,9 @@ function ReportView({ r, onReset }: { r: Report; onReset: () => void }) {
         <div className={`dial ${tone(total, max)}`}><b>{pct}</b><span>/100</span></div>
       </div>
 
+      {(r as any).manual && (r as any).manual.hasGoogle !== "yes" && !r.placeId && (
+        <div className="nogbp"><b>You're not showing up on Google Maps yet.</b> When people nearby search for what you sell, you're not in the results. We'll create and verify your Google Business Profile as part of Google Management. <a href="#plan">Get set up</a></div>
+      )}
       <p className="upsell">Want us to fix these for you? Google management starts at $25/mo. <a href="#plan">See plans</a></p>
 
       <div className="scores">

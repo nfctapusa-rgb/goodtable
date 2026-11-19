@@ -15,11 +15,15 @@ export interface Place {
 
 export const placesKey = () => process.env.GOOGLE_PLACES_API_KEY || "";
 
-export async function searchPlaces(q: string, size = 20): Promise<Place[]> {
+const LEAN = ["id", "displayName", "formattedAddress", "rating", "userRatingCount", "websiteUri", "primaryTypeDisplayName"];
+
+// near: bias results toward the searcher (defaults to Los Angeles, where we sell).
+export async function searchPlaces(q: string, size = 20, near?: { lat: number; lng: number }, lean = false): Promise<Place[]> {
+  const c = near ?? { lat: 34.0522, lng: -118.2437 };
   const r = await fetch(`${BASE}/places:searchText`, {
     method: "POST", cache: "no-store",
-    headers: { "Content-Type": "application/json", "X-Goog-Api-Key": placesKey(), "X-Goog-FieldMask": F.map(f => "places." + f).join(",") },
-    body: JSON.stringify({ textQuery: q, pageSize: size }),
+    headers: { "Content-Type": "application/json", "X-Goog-Api-Key": placesKey(), "X-Goog-FieldMask": (lean ? LEAN : F).map(f => "places." + f).join(",") },
+    body: JSON.stringify({ textQuery: q, pageSize: size, locationBias: { circle: { center: { latitude: c.lat, longitude: c.lng }, radius: near ? 15000 : 50000 } } }),
   });
   if (!r.ok) throw new Error(`Places API ${r.status}: ${(await r.text()).slice(0, 200)}`);
   return ((await r.json()).places ?? []) as Place[];
