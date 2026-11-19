@@ -118,14 +118,8 @@ export default function Page() {
           <div className="search">
             <input autoFocus type="search" enterKeyHint="search" autoComplete="off" aria-label="Search your business name"
               role="combobox" aria-expanded={hits.length > 0} aria-controls="hits" aria-activedescendant={active >= 0 ? `hit-${active}` : undefined}
-              placeholder="Business name, e.g. Main St. Cuts" value={q} onChange={e => setQ(e.target.value)} onKeyDown={onKey} />
+              placeholder="Search your business name" value={q} onChange={e => setQ(e.target.value)} onKeyDown={onKey} />
             {searching && <span className="spin" />}
-          </div>
-          <div className="gq-tools">
-            <button type="button" className="link" onClick={useMyLocation} disabled={locating || !!near}>
-              {near ? "Showing businesses near you" : locating ? "Finding you…" : "Search near my location"}
-            </button>
-            <span className="muted small">Tip: add the city or street if you have a common name.</span>
           </div>
           {hits.length > 0 && (
             <ul className="hits" id="hits" role="listbox">
@@ -140,19 +134,6 @@ export default function Page() {
               ))}
               <li className="hit-add"><button onClick={goManual}><span className="pin" aria-hidden="true">+</span><span className="t">Not in the list?<small>Add your business by hand. If you're not on Google yet, we'll set that up too.</small></span></button></li>
             </ul>
-          )}
-          {mapsOff && dq && (
-            <div className="keyless">
-              <iframe title={`Google Maps results for ${dq}`} loading="lazy" referrerPolicy="no-referrer-when-downgrade"
-                src={`https://maps.google.com/maps?q=${encodeURIComponent(dq + (near ? "" : " Los Angeles"))}&output=embed`} />
-              <form onSubmit={useLink} className="keyless-form">
-                <label><b>See your business on the map?</b> Tap it, choose <b>Share → Copy link</b>, and paste it here.
-                  <input inputMode="url" placeholder="https://maps.app.goo.gl/…" value={link} onChange={e => setLink(e.target.value)} required /></label>
-                <button className="btn dark" disabled={!!loading}>{loading === "link" ? "Scanning…" : "That's my business"}</button>
-                {linkErr && <p className="err">{linkErr}</p>}
-              </form>
-              <p className="small muted">Not on the map? <button type="button" className="link" onClick={goManual}>Add your business by hand</button> and we'll get you on Google.</p>
-            </div>
           )}
           {!mapsOff && q.trim().length >= 3 && !searching && hits.length === 0 && (
             <div className="nohits">
