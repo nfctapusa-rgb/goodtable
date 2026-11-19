@@ -9,7 +9,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
   if (!dbReady()) return <main className="narrow"><section className="hero"><p>Database not connected.</p></section></main>;
   const sql = await db();
   const rows = await sql`SELECT * FROM leads ORDER BY created_at DESC LIMIT 300` as any[];
-  const clients = await sql`SELECT b.id, b.name, b.plan, b.stats_url, b.created_at, u.email FROM businesses b
+  const clients = await sql`SELECT b.id, b.name, b.plan, b.stats_url, b.leadsnap_id, b.created_at, u.email FROM businesses b
     LEFT JOIN memberships m ON m.business_id = b.id AND m.role = 'owner' LEFT JOIN users u ON u.id = m.user_id ORDER BY b.created_at DESC LIMIT 200` as any[];
   const signups = rows.filter(r => r.kind === "onboarding");
   const reports = rows.filter(r => r.kind === "report");
@@ -22,7 +22,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
       <p className="sh-sub">{signups.length} signups · {reports.length} free reports ({fromCard} from your business card)</p>
       <h2 className="ad-h" id="clients">Client accounts</h2>
       <div className="ad-table">
-        <div className="ad-row ad-head c3"><span>Business</span><span>Login email</span><span>Plan & Google stats link (Localo report)</span></div>
+        <div className="ad-row ad-head c3"><span>Business</span><span>Login email</span><span>Plan, LeadSnap location ID & optional report link</span></div>
         {clients.length === 0 && <p className="ad-empty">No accounts yet. Clients sign up at lokly.pro/signup.</p>}
         {clients.map(c => (
           <form key={c.id} className="ad-row c3" method="post" action="/api/admin/business">
@@ -31,7 +31,8 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
             <span className="ad-edit">
               <input type="hidden" name="key" value={key} /><input type="hidden" name="id" value={c.id} />
               <select name="plan" defaultValue={c.plan} aria-label="Plan"><option value="free">Free</option><option value="local">Google Management</option><option value="pro">Pro</option></select>
-              <input name="stats_url" defaultValue={c.stats_url ?? ""} placeholder="https://… Localo report link" aria-label="Google stats link" />
+              <input name="leadsnap_id" defaultValue={c.leadsnap_id ?? ""} placeholder="LeadSnap ID e.g. 105266" aria-label="LeadSnap location ID" inputMode="numeric" style={{maxWidth:"11rem"}} />
+              <input name="stats_url" defaultValue={c.stats_url ?? ""} placeholder="https://… report link (optional)" aria-label="Google stats link" />
               <button className="btn dark sm">Save</button>
             </span>
           </form>

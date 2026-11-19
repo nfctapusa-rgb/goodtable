@@ -142,3 +142,20 @@ body{font-stretch:100%}
 .ad-row.c3{grid-template-columns:1fr 1fr 2fr}.ad-edit{display:flex!important;gap:6px;flex-wrap:wrap}.ad-edit input,.ad-edit select{padding:8px;border:1px solid var(--line);border-radius:8px;font:14px inherit;flex:1;min-width:120px}
 .stats{display:flex;justify-content:space-between;align-items:center;gap:16px;border:2px solid var(--ink)}.stats p{margin:2px 0 0;max-width:46ch}
 .mailers{overflow-x:clip}.ml-grid>*{min-width:0}.card4x6{margin-right:8px}
+
+/* LeadSnap Google stats */
+.gstats{display:grid;gap:14px}
+.gs-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.gs-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.gs-kpis>div{background:#f4f6f9;border-radius:10px;padding:12px;display:grid;gap:2px}
+.gs-kpis strong{font-size:1.6rem;color:#142133;font-stretch:115%}
+.gs-kpis span{font-size:.82rem;color:#4a5566}
+.gs-kpis em{font-style:normal;font-weight:700;font-size:.8rem}
+.gs-kpis em.up{color:#2F6B4F}.gs-kpis em.down{color:#E5402F}
+.gs-chart{display:flex;gap:10px;align-items:flex-end;height:120px}
+.gs-chart>div{flex:1;display:grid;grid-template-columns:1fr 1fr;align-items:end;gap:2px;height:100%;position:relative;padding-bottom:18px}
+.gs-chart i{display:block;border-radius:3px 3px 0 0;min-height:2px}
+.gs-chart small{position:absolute;bottom:0;left:0;right:0;text-align:center;font-size:.72rem;color:#4a5566}
+.gs-chart .s,.gs-legend .s{background:#142133}.gs-chart .m,.gs-legend .m{background:#FFD23F}
+.gs-legend span{display:inline-block;width:10px;height:10px;border-radius:2px;margin:0 4px 0 10px;vertical-align:middle}
+.gs-legend span:first-child{margin-left:0}

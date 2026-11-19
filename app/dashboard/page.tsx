@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { googleStats } from "@/lib/leadsnap";
 import { db, dbReady } from "@/lib/db";
 import { currentUser } from "@/lib/auth";
 import { RescanButton, BizSwitcher } from "./client";
@@ -22,10 +23,11 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   const user = await currentUser();
   if (!user) redirect("/login");
   const sql = await db();
-  const bizList = await sql`SELECT b.id, b.name, b.plan, b.website, b.address, b.stats_url FROM businesses b
+  const bizList = await sql`SELECT b.id, b.name, b.plan, b.website, b.address, b.stats_url, b.leadsnap_id FROM businesses b
     JOIN memberships m ON m.business_id = b.id WHERE m.user_id = ${user.id} ORDER BY b.created_at`;
   const { b } = await searchParams;
   const biz = bizList.find(x => x.id === b) ?? bizList[0];
+  const gs = biz?.leadsnap_id ? await googleStats(biz.leadsnap_id) : null;
 
   if (!biz) return (
     <main className="narrow"><section className="hero"><h1>Welcome{user.name ? `, ${user.name}` : ""}</h1>
@@ -71,11 +73,33 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
           </div>
         )}
 
+        {gs ? (
+          <div className="card gstats">
+            <div className="gs-head"><b>Your Google stats</b><span className="muted small">Last 30 days vs the 30 before</span></div>
+            <div className="gs-kpis">
+              {([["Times you showed up", gs.appearances], ["Calls", gs.calls], ["Calls, clicks & directions", gs.actions]] as const).map(([label, k]) => (
+                <div key={label}><strong>{k.current.toLocaleString()}</strong><span>{label}</span>
+                  {k.change_pct != null && <em className={k.change_pct >= 0 ? "up" : "down"}>{k.change_pct >= 0 ? "+" : ""}{k.change_pct}%</em>}</div>
+              ))}
+              {gs.reviews && <div><strong>{gs.reviews.rating?.toFixed?.(1) ?? gs.reviews.rating}★</strong><span>{gs.reviews.count} reviews{gs.reviews.unreplied ? `, ${gs.reviews.unreplied} awaiting reply` : ", all replied"}</span></div>}
+            </div>
+            {gs.trend.length > 0 && (() => { const max = Math.max(...gs.trend.map(t => t.maps + t.search), 1); return (
+              <div className="gs-chart" aria-label="Monthly appearances on Google Search and Maps">
+                {gs.trend.map(t => <div key={t.period} title={`${t.period}: ${t.search} Search, ${t.maps} Maps`}>
+                  <i style={{ height: `${(t.search / max) * 100}%` }} className="s" /><i style={{ height: `${(t.maps / max) * 100}%` }} className="m" />
+                  <small>{new Date(t.period + "-02").toLocaleString("en-US", { month: "short" })}</small></div>)}
+              </div>); })()}
+            <p className="gs-legend small muted"><span className="s" /> Google Search <span className="m" /> Google Maps</p>
+            {gs.tips.map(t => <p key={t.title} className="small"><b>{t.title}.</b> {t.body}</p>)}
+            {biz.stats_url && <a className="btn dark sm" href={biz.stats_url} target="_blank" rel="noreferrer">Open full report</a>}
+          </div>
+        ) : (
         <div className="card stats">
-          <div><b>Your Google stats</b><p className="muted small">Calls, direction requests, profile views and where you rank in your area, updated by your Lokly team.</p></div>
+          <div><b>Your Google stats</b><p className="muted small">Calls, direction requests, and how often you show up on Google, updated by your Lokly team.</p></div>
           {biz.stats_url ? <a className="btn dark sm" href={biz.stats_url} target="_blank" rel="noreferrer">Open my Google stats</a>
             : <p className="muted small">We're connecting your Google profile. Your stats will show up here within 1 business day of signup.</p>}
         </div>
+        )}
 
         {!paid && (
           <a href="/pricing" className="card nudge"><b>Let Lokly fix {todo.length ? `all ${todo.length} issues` : "everything"} from $25/mo</b><span>See the plan →</span></a>
