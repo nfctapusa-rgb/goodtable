@@ -116,3 +116,4 @@ body{font-stretch:100%}
 .saved{border:2px solid var(--palm)}
 .planwrap{margin-top:40px}
 @media(max-width:700px){.savegrid{grid-template-columns:1fr}}
+.savegrid .btn{white-space:nowrap}
