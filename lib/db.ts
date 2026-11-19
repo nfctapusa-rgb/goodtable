@@ -51,6 +51,25 @@ async function migrate(sql: ReturnType<typeof neon>) {
     created_at timestamptz NOT NULL DEFAULT now())`;
   await sql`ALTER TABLE businesses ADD COLUMN IF NOT EXISTS stats_url text`;
   await sql`ALTER TABLE businesses ADD COLUMN IF NOT EXISTS leadsnap_id text`;
+  await sql`ALTER TABLE businesses ADD COLUMN IF NOT EXISTS status text NOT NULL DEFAULT 'active'`;
+  await sql`ALTER TABLE businesses ADD COLUMN IF NOT EXISTS stripe_subscription_id text`;
+  await sql`ALTER TABLE businesses ADD COLUMN IF NOT EXISTS trial_ends_at timestamptz`;
+  await sql`ALTER TABLE businesses ADD COLUMN IF NOT EXISTS setup jsonb`;
+  await sql`ALTER TABLE businesses ADD COLUMN IF NOT EXISTS phone text`;
+  await sql`CREATE TABLE IF NOT EXISTS tasks (
+    id bigserial PRIMARY KEY,
+    business_id uuid NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
+    key text NOT NULL,
+    title text NOT NULL,
+    who text NOT NULL DEFAULT 'team',
+    done boolean NOT NULL DEFAULT false,
+    done_at timestamptz,
+    sort int NOT NULL DEFAULT 0,
+    UNIQUE (business_id, key))`;
+  await sql`CREATE TABLE IF NOT EXISTS billing_events (
+    id text PRIMARY KEY,
+    type text NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now())`;
   await sql`CREATE INDEX IF NOT EXISTS reports_biz ON reports(business_id, created_at DESC)`;
   await sql`CREATE TABLE IF NOT EXISTS leads (
     id bigserial PRIMARY KEY,

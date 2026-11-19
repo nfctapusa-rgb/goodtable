@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { googleStats } from "@/lib/leadsnap";
 import { MARKETING_TOOLS, STATUS_LABEL } from "@/lib/tools";
+import { offersFor } from "@/lib/accounts";
+import { planById } from "@/lib/plans";
 import { db, dbReady } from "@/lib/db";
 import { currentUser } from "@/lib/auth";
 import { RescanButton, BizSwitcher } from "./client";
@@ -9,14 +11,14 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Dashboard | Lokly" };
 
 
-export default async function Dashboard({ searchParams }: { searchParams: Promise<{ b?: string; requested?: string }> }) {
+export default async function Dashboard({ searchParams }: { searchParams: Promise<{ b?: string; requested?: string; upgraded?: string; billing?: string }> }) {
   if (!dbReady()) return <main className="narrow"><section className="hero"><h1>Dashboard</h1><p className="note">The database isn't connected yet. Add a Postgres database to this Vercel project to turn on accounts.</p></section></main>;
   const user = await currentUser();
   if (!user) redirect("/login");
   const sql = await db();
-  const bizList = await sql`SELECT b.id, b.name, b.plan, b.website, b.address, b.place_id, b.stats_url, b.leadsnap_id FROM businesses b
+  const bizList = await sql`SELECT b.id, b.name, b.plan, b.website, b.address, b.place_id, b.stats_url, b.leadsnap_id, b.status, b.trial_ends_at, b.stripe_customer_id FROM businesses b
     JOIN memberships m ON m.business_id = b.id WHERE m.user_id = ${user.id} ORDER BY b.created_at`;
-  const { b, requested } = await searchParams;
+  const { b, requested, upgraded, billing } = await searchParams;
   const biz = bizList.find(x => x.id === b) ?? bizList[0];
   const gs = biz?.leadsnap_id ? await googleStats(biz.leadsnap_id) : null;
 
@@ -30,7 +32,12 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   const prev = reports[1];
   const checks: any[] = latest?.data?.checks ?? [];
   const todo = checks.filter(c => c.status === "fail").sort((a, b) => b.weight - a.weight);
-  const paid = biz.plan !== "free";
+  const paid = biz.plan !== "free" && biz.status !== "canceled";
+  const tasks = await sql`SELECT key, title, who, done FROM tasks WHERE business_id = ${biz.id} ORDER BY sort` as any[];
+  const doneN = tasks.filter(t => t.done).length;
+  const offers = offersFor(biz, latest?.score ?? null).slice(0, 2);
+  const planInfo = planById(biz.plan);
+  const STATUS: Record<string, string> = { pending: "Payment pending", active: "Active", trial: "Free months", past_due: "Payment failed", canceled: "Canceled" };
   const delta = latest && prev ? latest.score - prev.score : null;
 
   return (
@@ -48,8 +55,43 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
       <main className="dmain">
         <div className="dhead">
           <div><p className="eyebrow">{biz.address ?? biz.website ?? "Your business"}</p><h1>{biz.name}</h1></div>
-          <span className={`badge ${paid ? "paid" : ""}`}>{paid ? (biz.plan === "pro" ? "Lokly Pro" : biz.plan === "local" ? "Lokly Local" : "Lokly") : "Free plan"}</span>
+          <span className={`badge ${paid ? "paid" : ""}`}>{planInfo && biz.plan !== "free" ? planInfo.name : "Free plan"}</span>
         </div>
+
+        {upgraded && <p className="ok-note">Thanks! Your upgrade is being set up. We'll text you shortly.</p>}
+        {billing === "none" && <p className="ok-note">Billing isn't set up online yet. Text us and we'll take care of it.</p>}
+        {biz.status === "past_due" && <p className="err-note">Your last payment didn't go through. Update your card to keep your Google profile managed.</p>}
+
+        {planInfo && biz.plan !== "free" && (
+          <div className="card plancard-d">
+            <div>
+              <p className="eyebrow">Your plan</p>
+              <b>{planInfo.name}</b> <span className={`st ${biz.status === "active" ? "live" : biz.status === "trial" ? "managed" : "soon"}`}>{STATUS[biz.status] ?? biz.status}</span>
+              <p className="muted small">{biz.plan === "site" ? (biz.trial_ends_at ? `Free management until ${new Date(biz.trial_ends_at).toLocaleDateString("en-US", { month: "long", day: "numeric" })}, then $25/mo for management, hosting and weekly changes.` : "3 months of free management start when your site goes live.") : `$${planInfo.price}/mo, month to month.`}</p>
+            </div>
+            <form method="post" action="/api/billing"><input type="hidden" name="b" value={biz.id} /><button className="btn ghost sm">Billing & invoices</button></form>
+          </div>
+        )}
+
+        {tasks.length > 0 && doneN < tasks.length && (
+          <div className="card">
+            <div className="gs-head"><b>Getting set up</b><span className="muted small">{doneN} of {tasks.length} done</span></div>
+            <div className="prog"><i style={{ width: `${(doneN / tasks.length) * 100}%` }} /></div>
+            <ul className="tasks">{tasks.map(t => <li key={t.key} className={t.done ? "done" : ""}><span className="tk" aria-hidden="true">{t.done ? "✓" : ""}</span>{t.title}<em>{t.who === "owner" ? "You" : "Lokly"}</em></li>)}</ul>
+          </div>
+        )}
+
+        {offers.length > 0 && paid && (
+          <div className="offers">
+            {offers.map(o => (
+              <form key={o.id} className="card offer" method="post" action="/api/upsell">
+                <b>{o.title}</b><p className="muted small">{o.body}</p>
+                <input type="hidden" name="b" value={biz.id} /><input type="hidden" name="offer" value={o.id} />
+                <button className="btn dark sm">{o.cta} · {o.price}</button>
+              </form>
+            ))}
+          </div>
+        )}
 
         <div className="kpis">
           <div className="card kpi"><span>Visibility score</span><b>{latest ? latest.score : "—"}<small>/100</small></b>
@@ -125,7 +167,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
           )}
           <div className="toolgrid">
             {MARKETING_TOOLS.map(t => {
-              const has = t.status !== "soon" && (t.included === "local" ? paid : t.included === "pro" ? biz.plan === "pro" : false);
+              const has = t.status !== "soon" && (t.included === "local" ? paid : t.included === "pro" ? biz.plan === "pro" && paid : false);
               return (
                 <form key={t.id} className="tool" method="post" action="/api/tools">
                   <span className={`st ${t.status}`}>{STATUS_LABEL[t.status]}</span>

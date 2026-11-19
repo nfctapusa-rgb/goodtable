@@ -9,8 +9,10 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
   if (!dbReady()) return <main className="narrow"><section className="hero"><p>Database not connected.</p></section></main>;
   const sql = await db();
   const rows = await sql`SELECT * FROM leads ORDER BY created_at DESC LIMIT 300` as any[];
-  const clients = await sql`SELECT b.id, b.name, b.plan, b.stats_url, b.leadsnap_id, b.created_at, u.email FROM businesses b
+  const clients = await sql`SELECT b.id, b.name, b.plan, b.stats_url, b.leadsnap_id, b.status, b.trial_ends_at, b.setup, b.phone, b.created_at, u.email FROM businesses b
     LEFT JOIN memberships m ON m.business_id = b.id AND m.role = 'owner' LEFT JOIN users u ON u.id = m.user_id ORDER BY b.created_at DESC LIMIT 200` as any[];
+  const allTasks = await sql`SELECT business_id, key, title, who, done FROM tasks ORDER BY sort` as any[];
+  const tasksOf = (id: string) => allTasks.filter(t => t.business_id === id);
   const signups = rows.filter(r => r.kind === "onboarding");
   const reports = rows.filter(r => r.kind === "report");
   const toolReqs = rows.filter(r => r.kind === "tool");
@@ -38,6 +40,25 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
             </span>
           </form>
         ))}
+      </div>
+      <h2 className="ad-h">Onboarding</h2>
+      <div className="ad-table">
+        {clients.filter(c => c.plan !== "free").map(c => {
+          const ts = tasksOf(c.id);
+          return (
+            <div key={c.id} className="ad-onb">
+              <div><b>{c.name}</b> <span className={`st ${c.status === "active" ? "live" : c.status === "trial" ? "managed" : "soon"}`}>{c.status}</span> <small>{c.plan}{c.phone ? ` · ${c.phone}` : ""}{c.email ? ` · ${c.email}` : ""}</small>
+                {c.setup?.shipTo && <small style={{ color: "#E30A23", fontWeight: 700 }}>NFC card → {c.setup.shipTo}</small>}
+              </div>
+              <div className="ad-status">{["pending", "active", "trial", "past_due", "canceled"].map(st => (
+                <form key={st} method="post" action="/api/admin/task"><input type="hidden" name="key" value={key} /><input type="hidden" name="b" value={c.id} /><input type="hidden" name="status" value={st} />
+                  <button className={`chip ${c.status === st ? "on" : ""}`}>{st}</button></form>))}</div>
+              <div className="ad-tasks">{ts.map(t => (
+                <form key={t.key} method="post" action="/api/admin/task"><input type="hidden" name="key" value={key} /><input type="hidden" name="b" value={c.id} /><input type="hidden" name="task" value={t.key} />
+                  <button className={`chip ${t.done ? "on" : ""}`} title={t.who === "owner" ? "Client task" : "Lokly task"}>{t.done ? "✓ " : ""}{t.title}</button></form>))}</div>
+            </div>
+          );
+        })}
       </div>
       <h2 className="ad-h">Signups to call</h2>
       <div className="ad-table">

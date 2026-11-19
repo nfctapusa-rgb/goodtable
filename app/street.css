@@ -275,3 +275,25 @@ html{-webkit-text-size-adjust:100%}
 .toolpick label.on{background:#FFFBEA}
 .toolpick input{width:20px;height:20px;margin-top:2px;flex:0 0 auto;accent-color:var(--ink)}
 .toolpick em{font-style:normal;color:var(--gray);font-size:14px}
+
+/* Account lifecycle */
+.welcome .wl-badge{display:inline-block;background:#DDF0E5;color:var(--palm);font-weight:700;padding:4px 10px;border-radius:4px;margin:0 0 12px}
+.wl-box{border:2px solid var(--ink);background:#fff;padding:18px;margin:20px 0}.wl-box ol{margin:8px 0;padding-left:20px;display:grid;gap:4px}
+.wl-offer{border:2px solid var(--ink);background:var(--sign);padding:20px;display:grid;gap:8px;box-shadow:6px 6px 0 var(--ink)}
+.wl-offer b{font-stretch:75%;font-weight:900;font-size:28px;line-height:1.05}.wl-offer p{margin:0}
+.wl-tag{font-size:13px;font-weight:700}
+.wl-actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:6px}
+.plancard-d{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}.plancard-d b{font-size:20px}
+.prog{height:8px;background:var(--sky);border-radius:99px;overflow:hidden;margin:10px 0 12px}.prog i{display:block;height:100%;background:var(--palm)}
+.tasks{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.tasks li{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.tasks li em{margin-left:auto;font-style:normal;font-size:12px;color:var(--gray)}
+.tasks .tk{width:20px;height:20px;border:2px solid var(--ink);border-radius:4px;display:grid;place-items:center;font-size:13px;font-weight:900;flex:0 0 auto}
+.tasks li.done{color:var(--gray)}.tasks li.done .tk{background:var(--palm);border-color:var(--palm);color:#fff}
+.offers{display:grid;grid-template-columns:1fr 1fr;gap:16px}.offer{display:grid;gap:6px;align-content:start;border:2px solid var(--ink)}.offer .btn{justify-self:start}
+@media(max-width:700px){.offers{grid-template-columns:1fr}}
+.err-note{background:#FFF1EF;color:#B3261E;font-weight:700;padding:10px 12px;border-radius:6px}
+.ad-onb{display:grid;gap:8px;padding:14px;border-bottom:1px solid var(--line)}.ad-onb small{display:block;color:var(--gray)}
+.ad-status,.ad-tasks{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--ink);background:#fff;border-radius:99px;padding:5px 10px;font-size:12px;cursor:pointer}
+.chip.on{background:var(--ink);color:#fff}

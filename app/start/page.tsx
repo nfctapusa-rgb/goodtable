@@ -8,6 +8,7 @@ const FIELDS: { k: string; label: string; ph: string; type?: string; req?: boole
   { k: "contactName", label: "Your name", ph: "First and last", req: true },
   { k: "email", label: "Email", ph: "you@business.com", type: "email", req: true },
   { k: "phone", label: "Mobile number", ph: "(213) 555-0100", type: "tel", req: true },
+  { k: "password", label: "Create a password for your dashboard", ph: "At least 8 characters", type: "password", req: true },
   { k: "website", label: "Current website", ph: "yourbusiness.com (leave blank if none)" },
   { k: "googleProfile", label: "Google Business Profile link", ph: "Paste your Google Maps link" },
   { k: "orderLink", label: "Ordering or booking link", ph: "DoorDash, Uber Eats, Square, Vagaro…", pro: true },
@@ -39,6 +40,7 @@ export default function Start() {
       const res = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan, ...f }) });
       const j = await res.json();
       if (!res.ok) throw new Error(j.error);
+      if (j.next) { location.href = j.next; return; }
       if (j.manual) { setDone(true); scrollTo(0, 0); return; }
       location.href = j.url;
     } catch (e) { setErr((e as Error).message); setBusy(false); }
@@ -70,7 +72,7 @@ export default function Start() {
           {FIELDS.filter(x => !x.pro || plan !== "local").map(x => (
             <label key={x.k}>{x.label}{!x.req && <span className="opt"> (optional)</span>}
               {x.k === "notes" ? <textarea rows={3} placeholder={x.ph} value={f[x.k] ?? ""} onChange={set(x.k)} />
-                : <input type={x.type ?? "text"} required={x.req} placeholder={x.ph} value={f[x.k] ?? ""} onChange={set(x.k)} autoComplete={x.k === "email" ? "email" : x.k === "phone" ? "tel" : x.k === "contactName" ? "name" : x.k === "businessName" ? "organization" : "off"} />}
+                : <input type={x.type ?? "text"} required={x.req} placeholder={x.ph} value={f[x.k] ?? ""} onChange={set(x.k)} minLength={x.k === "password" ? 8 : undefined} autoComplete={x.k === "password" ? "new-password" : x.k === "email" ? "email" : x.k === "phone" ? "tel" : x.k === "contactName" ? "name" : x.k === "businessName" ? "organization" : "off"} />}
             </label>
           ))}
           <div className="toolpick" role="group" aria-label="Marketing tools"><p className="tp-h">Which marketing tools do you want? <span className="opt">(optional)</span></p>
