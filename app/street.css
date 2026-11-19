@@ -141,3 +141,4 @@ body{font-stretch:100%}
 .addons-h{margin-top:72px}.menu .ds a{color:var(--ink);font-weight:700}
 .ad-row.c3{grid-template-columns:1fr 1fr 2fr}.ad-edit{display:flex!important;gap:6px;flex-wrap:wrap}.ad-edit input,.ad-edit select{padding:8px;border:1px solid var(--line);border-radius:8px;font:14px inherit;flex:1;min-width:120px}
 .stats{display:flex;justify-content:space-between;align-items:center;gap:16px;border:2px solid var(--ink)}.stats p{margin:2px 0 0;max-width:46ch}
+.mailers{overflow-x:clip}.ml-grid>*{min-width:0}.card4x6{margin-right:8px}
