@@ -1,5 +1,6 @@
 import { PlanCards } from "../plancards";
 import { FEATURES, MAILERS, type Avail } from "@/lib/plans";
+import { MARKETING_TOOLS, STATUS_LABEL } from "@/lib/tools";
 
 export const metadata = { title: "Pricing | Lokly", description: "Google Business Profile management $25/mo. Website package $299 with 3 months of management free. Lokly Pro $89/mo." };
 
@@ -48,6 +49,18 @@ export default function Pricing() {
                   <span role="cell"><Mark v={b} /></span>
                 </div>
               ))}
+            </div>
+          ))}
+        </div>
+        <h2 className="sh-h2 addons-h">Marketing tools</h2>
+        <p className="sh-sub">Turn on what you need. "Done for you" means our team runs it today while we finish the automation.</p>
+        <div className="mtools">
+          {MARKETING_TOOLS.map(t => (
+            <div key={t.id} className="mtool">
+              <span className={`st ${t.status}`}>{STATUS_LABEL[t.status]}</span>
+              <b>{t.name}</b>
+              <p>{t.desc}</p>
+              <small>{t.included === "local" ? "Included in every plan" : t.included === "pro" ? "Included in Pro" : `Add-on, ${t.price}`}</small>
             </div>
           ))}
         </div>

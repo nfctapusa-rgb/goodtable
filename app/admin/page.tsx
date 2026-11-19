@@ -13,6 +13,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
     LEFT JOIN memberships m ON m.business_id = b.id AND m.role = 'owner' LEFT JOIN users u ON u.id = m.user_id ORDER BY b.created_at DESC LIMIT 200` as any[];
   const signups = rows.filter(r => r.kind === "onboarding");
   const reports = rows.filter(r => r.kind === "report");
+  const toolReqs = rows.filter(r => r.kind === "tool");
   const mailers = rows.filter(r => r.kind === "mailer");
   const fromCard = reports.filter(r => String(r.source).startsWith("card")).length;
   const when = (d: string) => new Date(d).toLocaleString("en-US", { timeZone: "America/Los_Angeles", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
@@ -48,7 +49,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
             <span><b>{r.business_name}</b>{r.website && <a href={/^https?:/.test(r.website) ? r.website : `https://${r.website}`} target="_blank" rel="noreferrer">{r.website}</a>}</span>
             <span>{r.contact_name}<a href={`tel:${r.phone}`}>{r.phone}</a><a href={`mailto:${r.email}`}>{r.email}</a></span>
             <span>{r.plan}</span>
-            <span className="ad-notes">{r.data?.nfcCard && <b style={{color:"#E30A23"}}>Mail NFC card → {r.data.shipTo}</b>}{r.data?.googleProfile && <a href={r.data.googleProfile} target="_blank" rel="noreferrer">Google profile</a>}{r.data?.orderLink && <a href={r.data.orderLink} target="_blank" rel="noreferrer">Ordering link</a>}{r.data?.instagram && <span>{r.data.instagram}</span>}{r.data?.notes && <em>{r.data.notes}</em>}</span>
+            <span className="ad-notes">{r.data?.tools?.length > 0 && <span>Wants: {r.data.tools.join(", ")}</span>}{r.data?.nfcCard && <b style={{color:"#E30A23"}}>Mail NFC card → {r.data.shipTo}</b>}{r.data?.googleProfile && <a href={r.data.googleProfile} target="_blank" rel="noreferrer">Google profile</a>}{r.data?.orderLink && <a href={r.data.orderLink} target="_blank" rel="noreferrer">Ordering link</a>}{r.data?.instagram && <span>{r.data.instagram}</span>}{r.data?.notes && <em>{r.data.notes}</em>}</span>
           </div>
         ))}
       </div>
@@ -63,6 +64,16 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
             <span>{r.contact_name}<a href={`tel:${r.phone}`}>{r.phone}</a><a href={`mailto:${r.email}`}>{r.email}</a></span>
             <span>{r.plan}<small>{r.data?.status}</small></span>
             <span className="ad-notes"><b>{r.data?.headline}</b><em>{r.data?.detail}</em><span>{r.data?.area}{r.data?.zips ? `: ${r.data.zips}` : ""}</span></span>
+          </div>
+        ))}
+      </div>
+      <h2 className="ad-h">Tool requests</h2>
+      <div className="ad-table">
+        {toolReqs.length === 0 && <p className="ad-empty">No tool requests yet. Clients request tools from their dashboard.</p>}
+        {toolReqs.map(r => (
+          <div key={r.id} className="ad-row r4">
+            <span>{when(r.created_at)}</span><span><b>{r.business_name}</b></span><span>{r.data?.toolName}</span>
+            <span>{r.plan}{r.email && <a href={`mailto:${r.email}`}>{r.email}</a>}</span>
           </div>
         ))}
       </div>

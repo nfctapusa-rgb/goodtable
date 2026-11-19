@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { googleStats } from "@/lib/leadsnap";
+import { MARKETING_TOOLS, STATUS_LABEL } from "@/lib/tools";
 import { db, dbReady } from "@/lib/db";
 import { currentUser } from "@/lib/auth";
 import { RescanButton, BizSwitcher } from "./client";
@@ -7,25 +8,15 @@ import { RescanButton, BizSwitcher } from "./client";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Dashboard | Lokly" };
 
-const TOOLS = [
-  { k: "website", t: "Website", d: "AI-built site that fixes your SEO issues", plan: "growth" },
-  { k: "catalog", t: "Products & services", d: "Everything you sell, with prices and photos", plan: "growth" },
-  { k: "orders", t: "Orders & bookings", d: "Take orders and appointments directly", plan: "growth" },
-  { k: "customers", t: "Customers", d: "CRM with every customer and purchase", plan: "growth" },
-  { k: "marketing", t: "Email & SMS", d: "Campaigns and automations", plan: "growth" },
-  { k: "loyalty", t: "Loyalty", d: "Points and rewards", plan: "growth" },
-  { k: "reviews", t: "Reviews", d: "Review requests and replies", plan: "growth" },
-  { k: "ai", t: "Lokly AI", d: "Ask questions, make changes in plain English", plan: "growth" },
-];
 
-export default async function Dashboard({ searchParams }: { searchParams: Promise<{ b?: string }> }) {
+export default async function Dashboard({ searchParams }: { searchParams: Promise<{ b?: string; requested?: string }> }) {
   if (!dbReady()) return <main className="narrow"><section className="hero"><h1>Dashboard</h1><p className="note">The database isn't connected yet. Add a Postgres database to this Vercel project to turn on accounts.</p></section></main>;
   const user = await currentUser();
   if (!user) redirect("/login");
   const sql = await db();
-  const bizList = await sql`SELECT b.id, b.name, b.plan, b.website, b.address, b.stats_url, b.leadsnap_id FROM businesses b
+  const bizList = await sql`SELECT b.id, b.name, b.plan, b.website, b.address, b.place_id, b.stats_url, b.leadsnap_id FROM businesses b
     JOIN memberships m ON m.business_id = b.id WHERE m.user_id = ${user.id} ORDER BY b.created_at`;
-  const { b } = await searchParams;
+  const { b, requested } = await searchParams;
   const biz = bizList.find(x => x.id === b) ?? bizList[0];
   const gs = biz?.leadsnap_id ? await googleStats(biz.leadsnap_id) : null;
 
@@ -48,7 +39,8 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         <BizSwitcher list={bizList.map(x => ({ id: x.id, name: x.name }))} current={biz.id} />
         <nav>
           <a className="on" href={`/dashboard?b=${biz.id}`}>Overview</a>
-          {TOOLS.map(t => <span key={t.k} className="soon" title="In development">{t.t}<em>Soon</em></span>)}
+          <a href={`/dashboard?b=${biz.id}#tools`}>Marketing tools</a>
+          <a href="/mailers">Postcards</a>
         </nav>
         <form action="/api/auth/logout" method="post"><button className="link">Log out</button></form>
       </aside>
@@ -117,10 +109,37 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
           </ol>
         </div>
 
-        <div className="card">
-          <p className="eyebrow">Your tools</p>
+        <div className="card" id="tools">
+          <p className="eyebrow">Marketing tools</p>
+          {requested && <p className="ok-note">Got it. We'll text you within one business day to set that up.</p>}
+          {biz.place_id && (
+            <div className="rkit">
+              <div>
+                <b>Your Google review link</b>
+                <p className="muted small">Text it to happy customers or print the QR code for your counter.</p>
+                <input readOnly value={`https://search.google.com/local/writereview?placeid=${biz.place_id}`} aria-label="Google review link" onFocus={undefined} />
+                <p className="small">Copy and send: <i>"Thanks for coming in! If you have a sec, a quick Google review helps us a ton: https://search.google.com/local/writereview?placeid={biz.place_id}"</i></p>
+              </div>
+              <img src={`https://quickchart.io/qr?size=220&margin=1&text=${encodeURIComponent(`https://search.google.com/local/writereview?placeid=${biz.place_id}`)}`} alt="QR code that opens your Google review page" width={140} height={140} />
+            </div>
+          )}
           <div className="toolgrid">
-            {TOOLS.map(t => <div key={t.k} className="tool"><b>{t.t}</b><p className="muted">{t.d}</p><span className="soon-tag">In development</span></div>)}
+            {MARKETING_TOOLS.map(t => {
+              const has = t.status !== "soon" && (t.included === "local" ? paid : t.included === "pro" ? biz.plan === "pro" : false);
+              return (
+                <form key={t.id} className="tool" method="post" action="/api/tools">
+                  <span className={`st ${t.status}`}>{STATUS_LABEL[t.status]}</span>
+                  <b>{t.name}</b>
+                  <p className="muted">{t.desc}</p>
+                  <input type="hidden" name="tool" value={t.id} /><input type="hidden" name="b" value={biz.id} />
+                  {t.id === "reviews" ? <span className="small muted">{biz.place_id ? "Ready above" : "Run your free report to connect your Google profile"}</span>
+                    : t.id === "mailers" ? <a className="btn dark sm" href="/mailers">Design a postcard</a>
+                    : t.status === "soon" ? <button className="btn ghost sm">Notify me</button>
+                    : has ? <button className="btn dark sm">Set it up</button>
+                    : <button className="btn ghost sm">{t.included === "addon" ? `Add it (${t.price})` : "Upgrade to Pro"}</button>}
+                </form>
+              );
+            })}
           </div>
         </div>
       </main>

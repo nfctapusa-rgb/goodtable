@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { PLANS, planById, type PlanId } from "@/lib/plans";
+import { MARKETING_TOOLS, STATUS_LABEL } from "@/lib/tools";
 
 const FIELDS: { k: string; label: string; ph: string; type?: string; req?: boolean; pro?: boolean; card?: boolean }[] = [
   { k: "businessName", label: "Business name", ph: "Your business name", req: true },
@@ -72,6 +73,14 @@ export default function Start() {
                 : <input type={x.type ?? "text"} required={x.req} placeholder={x.ph} value={f[x.k] ?? ""} onChange={set(x.k)} autoComplete={x.k === "email" ? "email" : x.k === "phone" ? "tel" : x.k === "contactName" ? "name" : x.k === "businessName" ? "organization" : "off"} />}
             </label>
           ))}
+          <div className="toolpick" role="group" aria-label="Marketing tools"><p className="tp-h">Which marketing tools do you want? <span className="opt">(optional)</span></p>
+            {MARKETING_TOOLS.filter(t => t.id !== "reviews").map(t => (
+              <label key={t.id} className={(f.tools ?? "").split(",").includes(t.id) ? "on" : ""}>
+                <input type="checkbox" checked={(f.tools ?? "").split(",").includes(t.id)} onChange={e => { const cur = (f.tools ?? "").split(",").filter(Boolean); setF({ ...f, tools: (e.target.checked ? [...cur, t.id] : cur.filter(x => x !== t.id)).join(",") }); }} />
+                <span><b>{t.name}</b> <em>{STATUS_LABEL[t.status]}{t.price ? `, ${t.price}` : t.included === "pro" ? ", in Pro" : ""}</em></span>
+              </label>
+            ))}
+          </div>
           <label className="check"><input type="checkbox" required checked={ok} onChange={e => setOk(e.target.checked)} />
             <span>I own or am authorized to manage this business and its Google profile, and I agree to the <a href="/terms" target="_blank">Terms</a> and <a href="/privacy" target="_blank">Privacy Policy</a>.</span></label>
           <button className="btn dark" disabled={busy}>{busy ? "Opening secure checkout…" : `Continue to payment: ${chosen.name}, $${chosen.price}${chosen.interval === "month" ? "/mo" : ""}`}</button>

@@ -254,3 +254,24 @@ html{-webkit-text-size-adjust:100%}
 .res-facts{margin:0;padding-left:18px;color:var(--graphite);display:grid;gap:4px}
 @media(max-width:800px){.res-grid{grid-template-columns:1fr}.res{box-shadow:5px 5px 0 var(--ink)}.res-big b{font-size:46px}.sh-results{padding-top:56px}}
 .pnote{margin:-4px 0 0;font-weight:700;font-size:14px;color:var(--palm)}
+
+/* Marketing tools */
+.st{display:inline-block;font-size:12px;font-weight:700;padding:3px 8px;border-radius:4px;justify-self:start;width:max-content}
+.st.live{background:#DDF0E5;color:var(--palm)}.st.managed{background:var(--sign);color:var(--ink)}.st.soon{background:var(--sky);color:var(--graphite)}
+.mtools{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:0;border:2px solid var(--ink);background:#fff;margin-top:20px}
+.mtool{display:grid;gap:6px;align-content:start;padding:18px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.mtool b{font-size:18px}.mtool p{margin:0;color:var(--graphite);font-size:15px;line-height:1.45}.mtool small{color:var(--gray);font-weight:600}
+.toolgrid .tool{display:grid;gap:6px;align-content:start}
+.toolgrid .tool .btn{justify-self:start;margin-top:4px}
+.btn.ghost{background:transparent;border:2px solid var(--ink);color:var(--ink)}
+.rkit{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center;border:2px solid var(--ink);padding:16px;margin:10px 0 18px;background:#FFFBEA}
+.rkit input{width:100%;font-size:14px;padding:10px;margin:8px 0;border:1px solid var(--line);border-radius:8px;background:#fff}
+.rkit img{border:2px solid var(--ink);background:#fff}
+.ok-note{background:#DDF0E5;color:var(--palm);font-weight:700;padding:10px 12px;border-radius:6px}
+@media(max-width:600px){.rkit{grid-template-columns:1fr}.rkit img{justify-self:center}}
+.toolpick{display:grid;gap:8px}
+.tp-h{margin:0;font-weight:600}
+.toolpick label{display:flex!important;gap:10px;align-items:flex-start;border:2px solid var(--ink);padding:12px;background:#fff;cursor:pointer;font-weight:400}
+.toolpick label.on{background:#FFFBEA}
+.toolpick input{width:20px;height:20px;margin-top:2px;flex:0 0 auto;accent-color:var(--ink)}
+.toolpick em{font-style:normal;color:var(--gray);font-size:14px}
