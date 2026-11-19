@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { runWebsiteChecks, score, type Check } from "@/lib/checks";
 import { runLocalChecks, getPlace, cityOf, placesKey, type Place } from "@/lib/places";
+import { saveLead, reportScore } from "@/lib/leads";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -75,7 +76,7 @@ export async function POST(req: Request) {
 
   const local = await runLocalChecks({ businessName, city, keyword, siteUrl: finalUrl ?? undefined, place });
   const checks = [...site, ...local.checks];
-  return NextResponse.json({
+  const out = {
     url: finalUrl, businessName, city, keyword, placeId: local.place?.id ?? null,
     address: local.place?.formattedAddress ?? null,
     profile: local.place ? {
@@ -91,5 +92,7 @@ export async function POST(req: Request) {
     gradedAt: new Date().toISOString(),
     scores: { search: score(checks, "search"), experience: score(checks, "experience"), local: score(checks, "local") },
     placesConnected: local.connected, placesError: local.error, rankings: local.rankings, checks,
-  });
+  };
+  await saveLead({ kind: "report", source: String(body.src ?? "web"), businessName: out.businessName, website: out.url, placeId: out.placeId, city: out.city, score: reportScore(out as any) });
+  return NextResponse.json(out);
 }

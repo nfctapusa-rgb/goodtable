@@ -18,6 +18,7 @@ export default function Start() {
   const [plan, setPlan] = useState<PlanId>("local");
   const [f, setF] = useState<Record<string, string>>({});
   const [ok, setOk] = useState(false);
+  const [done, setDone] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
@@ -36,11 +37,19 @@ export default function Start() {
       const res = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan, ...f }) });
       const j = await res.json();
       if (!res.ok) throw new Error(j.error);
+      if (j.manual) { setDone(true); scrollTo(0, 0); return; }
       location.href = j.url;
     } catch (e) { setErr((e as Error).message); setBusy(false); }
   }
 
   const chosen = planById(plan)!;
+  if (done) return (
+    <main className="narrow start"><section className="hero">
+      <h1 className="sh-h2">You're on the list, {f.contactName?.split(" ")[0] || "thanks"}.</h1>
+      <p className="sh-lead">We got everything for {f.businessName}. We'll call or text you at {f.phone} within one business day to finish setup and payment for {chosen.name}.</p>
+      <a className="btn dark" href="/">Back to Lokly</a>
+    </section></main>
+  );
   return (
     <main className="narrow start">
       <section className="hero">

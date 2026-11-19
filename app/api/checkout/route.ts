@@ -1,12 +1,15 @@
 import { NextResponse } from "next/server";
 import { planById } from "@/lib/plans";
+import { saveLead } from "@/lib/leads";
 
 export async function POST(req: Request) {
-  const key = process.env.STRIPE_SECRET_KEY;
-  if (!key) return NextResponse.json({ error: "Payments aren't connected yet. Add STRIPE_SECRET_KEY in Vercel." }, { status: 503 });
   const body = await req.json().catch(() => ({}));
   const plan = planById(String(body.plan ?? "local"));
   if (!plan) return NextResponse.json({ error: "Unknown plan." }, { status: 400 });
+  await saveLead({ kind: "onboarding", source: body.src ?? "web", businessName: body.businessName, website: body.website, placeId: body.placeId, contactName: body.contactName, email: body.email, phone: body.phone, plan: plan.id, data: { googleProfile: body.googleProfile, orderLink: body.orderLink, instagram: body.instagram, notes: body.notes } });
+  const key = process.env.STRIPE_SECRET_KEY;
+  // Until online payments are connected, the signup is saved and we follow up personally.
+  if (!key) return NextResponse.json({ ok: true, manual: true });
   const origin = new URL(req.url).origin;
   const f = new URLSearchParams();
   const recurring = plan.interval === "month";

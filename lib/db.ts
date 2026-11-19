@@ -50,6 +50,22 @@ async function migrate(sql: ReturnType<typeof neon>) {
     data jsonb NOT NULL,
     created_at timestamptz NOT NULL DEFAULT now())`;
   await sql`CREATE INDEX IF NOT EXISTS reports_biz ON reports(business_id, created_at DESC)`;
+  await sql`CREATE TABLE IF NOT EXISTS leads (
+    id bigserial PRIMARY KEY,
+    kind text NOT NULL,
+    source text,
+    business_name text,
+    website text,
+    place_id text,
+    city text,
+    score int,
+    contact_name text,
+    email text,
+    phone text,
+    plan text,
+    data jsonb,
+    created_at timestamptz NOT NULL DEFAULT now())`;
+  await sql`CREATE INDEX IF NOT EXISTS leads_created ON leads(created_at DESC)`;
   await sql`CREATE TABLE IF NOT EXISTS audit_log (
     id bigserial PRIMARY KEY,
     business_id uuid,
