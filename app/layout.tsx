@@ -2,15 +2,19 @@ import "./globals.css";
 import "./dash.css";
 import "./preview.css";
 import "./home.css";
+import "./street.css";
 import type { Metadata, Viewport } from "next";
+import { Archivo } from "next/font/google";
+
+const archivo = Archivo({ subsets: ["latin"], axes: ["wdth"], variable: "--font-archivo", display: "swap" });
 import { Nav, Footer } from "./ui";
 
 export const metadata: Metadata = {
-  title: "Lokly — Everything your business needs to grow online",
-  description: "The AI platform any business uses to get found on Google, sell and book directly, and bring customers back. Websites from $150.",
+  title: "Lokly | Get found by the people on your block",
+  description: "Lokly builds local business websites and manages Google Business Profiles in Los Angeles. Websites from $150, Google profile management $25/mo.",
 };
 export const viewport: Viewport = { width: "device-width", initialScale: 1 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return <html lang="en"><body><Nav /><div id="main">{children}</div><Footer /></body></html>;
+  return <html lang="en" className={archivo.variable}><body><Nav /><div id="main">{children}</div><Footer /></body></html>;
 }

@@ -27,7 +27,7 @@ export function SearchHero({ cta = "Get my free report" }: { cta?: string }) {
   return (
     <form className="herosearch" onSubmit={e => { e.preventDefault(); location.href = `/grader${q ? `?q=${encodeURIComponent(q)}` : ""}`; }}>
       <input aria-label="Business name" autoComplete="organization" placeholder="Find your business name" value={q} onChange={e => setQ(e.target.value)} />
-      <button className="btn lime">{cta} ↗</button>
+      <button className="btn lime">{cta}</button>
     </form>
   );
 }
@@ -37,7 +37,7 @@ export function Footer() {
   return (
     <footer className="foot">
       <div className="wrap footin">
-        <div><a href="/" className="logo"><span className="mark" />Lokly</a><p className="muted small">Everything your business needs to grow online.</p></div>
+        <div><a href="/" className="logo"><span className="mark" />Lokly</a><p className="muted small">Websites and Google profiles for local businesses. Downtown LA.</p></div>
         <div className="fcols">
           <div><b>Product</b><a href="/how-it-works">How it works</a><a href="/pricing">Pricing</a><a href="/grader">Free report</a></div>
           <div><b>Company</b><a href="mailto:hello@lokly.pro">Contact</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></div>
