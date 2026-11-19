@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 type Status = "pass" | "fail" | "unknown";
 interface Check { id: string; section: "search" | "experience" | "local"; group: string; title: string; why: string; status: Status; found?: string; expected?: string }
 interface Report {
-  url: string | null; businessName: string; city?: string; keyword?: string; placeId: string | null; address: string | null; gradedAt: string;
+  url: string | null; businessName: string; city?: string; keyword?: string; placeId: string | null; address: string | null; gradedAt: string; profile?: any;
   scores: Record<"search" | "experience" | "local", { got: number; max: number }>;
   placesConnected: boolean; placesError?: string;
   rankings: { query: string; position: number | null; top: string[] }[];
@@ -174,6 +174,9 @@ function ReportView({ r, onReset }: { r: Report; onReset: () => void }) {
           })}
         </div>
       )}
+
+      <div className="card aisite"><div><p className="eyebrow lime-t">New</p><b>See your AI website</b><p className="muted small">We built a new site for {r.businessName} that fixes every SEO issue above.</p></div>
+        <button className="btn lime sm" onClick={() => { try { sessionStorage.setItem("lokly_report", JSON.stringify(r)); } catch {} location.href = "/preview"; }}>Show me ↗</button></div>
 
       <div className="card save"><div><b>Track your score over time</b><p className="muted small">Create a free account to save this report and get your to-do list.</p></div>
         <button className="btn dark sm" onClick={() => { try { sessionStorage.setItem("kern_report", JSON.stringify(r)); } catch {} location.href = "/signup"; }}>Save report</button></div>

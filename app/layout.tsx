@@ -1,5 +1,6 @@
 import "./globals.css";
 import "./dash.css";
+import "./preview.css";
 import type { Metadata, Viewport } from "next";
 import { Nav, Footer } from "./ui";
 

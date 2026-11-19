@@ -78,6 +78,15 @@ export async function POST(req: Request) {
   return NextResponse.json({
     url: finalUrl, businessName, city, keyword, placeId: local.place?.id ?? null,
     address: local.place?.formattedAddress ?? null,
+    profile: local.place ? {
+      phone: local.place.nationalPhoneNumber ?? null,
+      rating: local.place.rating ?? null,
+      reviews: local.place.userRatingCount ?? 0,
+      category: local.place.primaryTypeDisplayName?.text ?? null,
+      summary: local.place.editorialSummary?.text ?? null,
+      hours: (local.place.regularOpeningHours as any)?.weekdayDescriptions ?? null,
+      mapsUrl: local.place.googleMapsUri ?? null,
+    } : null,
     gradedAt: new Date().toISOString(),
     scores: { search: score(checks, "search"), experience: score(checks, "experience"), local: score(checks, "local") },
     placesConnected: local.connected, placesError: local.error, rankings: local.rankings, checks,

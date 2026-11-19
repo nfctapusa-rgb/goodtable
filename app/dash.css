@@ -18,3 +18,4 @@
 @media(max-width:860px){.dash{grid-template-columns:1fr}.side{position:static;height:auto}.side nav{display:none}.dmain{padding:20px}.kpis,.toolgrid{grid-template-columns:1fr 1fr}}
 .wide{margin-top:8px}.summary{gap:12px}.btn{text-align:center}
 @media(max-width:520px){.row{grid-template-columns:1fr}}
+.aisite{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--ink);color:var(--paper);border:0}.aisite p{margin:2px 0 0}
