@@ -159,3 +159,34 @@ body{font-stretch:100%}
 .gs-chart .s,.gs-legend .s{background:#142133}.gs-chart .m,.gs-legend .m{background:#FFD23F}
 .gs-legend span{display:inline-block;width:10px;height:10px;border-radius:2px;margin:0 4px 0 10px;vertical-align:middle}
 .gs-legend span:first-child{margin-left:0}
+
+/* ---- Mobile polish ---- */
+@media(max-width:640px){
+  .sh-hero{padding-top:40px}
+  .sh-title{font-size:clamp(44px,13vw,64px)}
+  .street{margin-top:36px}
+  .block{scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-right:40px}
+  .block::-webkit-scrollbar{display:none}
+  .block>.shop{scroll-snap-align:start;flex:0 0 auto}
+  .sh-case{padding-top:56px;padding-bottom:56px;gap:28px}
+  .sh-shot{box-shadow:6px 6px 0 var(--ink)}
+  .sh-shot-hero{padding:32px 20px}
+  .sh-shot-offer{font-size:17px}
+  .sh-week,.sh-end{padding:60px 0}
+  .sh-plans{padding-top:60px;padding-bottom:60px}
+  .sh-h2{font-size:clamp(28px,8vw,40px)}
+  .sh-sub{font-size:16px;margin-bottom:24px}
+  .cal li{padding:12px 14px}
+  .ftable{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .btn{min-height:46px;display:inline-flex;align-items:center;justify-content:center}
+  .herosearch .btn,.sh-end .btn,.plancard .btn,form .btn{width:100%}
+  .dmain{padding:16px}
+  .kpis{grid-template-columns:1fr 1fr;gap:10px}
+  .gs-kpis{grid-template-columns:1fr 1fr}
+  .gs-kpis strong{font-size:1.3rem}
+}
+/* Inputs at 16px so iPhone Safari doesn't zoom in when tapped */
+@media(max-width:860px){input,select,textarea{font-size:16px!important}}
+/* Comfortable tap targets in the mobile menu and footer */
+@media(max-width:860px){.foot a,.nav a{min-height:44px;display:inline-flex;align-items:center}}
+html{-webkit-text-size-adjust:100%}
