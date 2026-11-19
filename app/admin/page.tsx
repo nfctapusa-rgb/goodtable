@@ -73,7 +73,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
         {reports.map(r => (
           <div key={r.id} className="ad-row r4">
             <span>{when(r.created_at)}</span>
-            <span><b>{r.business_name}</b>{r.city && <small>{r.city}</small>}{r.website && <a href={r.website} target="_blank" rel="noreferrer">{r.website}</a>}</span>
+            <span><b>{r.business_name}</b>{r.city && <small>{r.city}</small>}{r.data?.needsGoogleProfile && <small style={{color:"#E5402F",fontWeight:700}}>No Google profile, set one up{r.data.address ? ` · ${r.data.address}` : ""}</small>}{r.website && <a href={r.website} target="_blank" rel="noreferrer">{r.website}</a>}</span>
             <span>{r.score ?? "–"}/100</span>
             <span>{String(r.source).replace("card", "Business card").replace(":saved", " · saved")}{r.email && <a href={`mailto:${r.email}`}>{r.contact_name} {r.email}</a>}{r.phone && <a href={`tel:${r.phone}`}>{r.phone}</a>}</span>
           </div>
