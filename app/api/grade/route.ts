@@ -36,6 +36,7 @@ export async function POST(req: Request) {
   const placeId = String(body.placeId ?? "").trim();
   const manual = {
     address: String(body.address ?? "").trim().slice(0, 160), phone: String(body.phone ?? "").trim().slice(0, 30),
+    mapsUrl: /^https:\/\/(www\.)?google\.|^https:\/\/maps\./.test(String(body.mapsUrl ?? "")) ? String(body.mapsUrl).slice(0, 500) : "",
     hasGoogle: ["yes", "no", "unsure"].includes(body.hasGoogle) ? body.hasGoogle : null,
   };
 

@@ -42,6 +42,9 @@ export default function Page() {
   const [locating, setLocating] = useState(false);
   const [searchErr, setSearchErr] = useState(false);
   const [active, setActive] = useState(-1);
+  const [link, setLink] = useState("");
+  const [linkErr, setLinkErr] = useState<string | null>(null);
+  const [dq, setDq] = useState("");
   const [loading, setLoading] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [r, setR] = useState<Report | null>(null);
@@ -55,18 +58,29 @@ export default function Page() {
 
   useEffect(() => {
     clearTimeout(timer.current);
-    if (q.trim().length < 3) { setHits([]); return; }
+    if (q.trim().length < 3) { setHits([]); setDq(""); return; }
+    if (mapsOff) { timer.current = setTimeout(() => setDq(q.trim()), 600); return; }
     timer.current = setTimeout(async () => {
       setSearching(true);
       try {
         const loc = near ? `&lat=${near.lat}&lng=${near.lng}` : "";
         const j = await (await fetch(`/api/places?q=${encodeURIComponent(q)}${loc}`)).json();
-        if (j.connected === false) { setMapsOff(true); setStep("manual"); setForm(f => ({ ...f, businessName: q })); }
+        if (j.connected === false) setMapsOff(true);
         setSearchErr(!!j.error); setHits(j.results ?? []); setActive(-1);
       } catch { setSearchErr(true); setHits([]); }
       finally { setSearching(false); }
     }, 300);
-  }, [q, near]);
+  }, [q, near, mapsOff]);
+
+  async function useLink(e: React.FormEvent) {
+    e.preventDefault(); setLinkErr(null); setLoading("link");
+    try {
+      const j = await (await fetch(`/api/maplink?u=${encodeURIComponent(link)}`)).json();
+      if (j.error) throw new Error(j.error);
+      setLoading(null);
+      await grade({ businessName: j.name, mapsUrl: j.mapsUrl, hasGoogle: "yes", keyword: "" }, "link");
+    } catch (x) { setLinkErr((x as Error).message); setLoading(null); }
+  }
 
   function useMyLocation() {
     if (!navigator.geolocation) return;
@@ -127,7 +141,20 @@ export default function Page() {
               <li className="hit-add"><button onClick={goManual}><span className="pin" aria-hidden="true">+</span><span className="t">Not in the list?<small>Add your business by hand. If you're not on Google yet, we'll set that up too.</small></span></button></li>
             </ul>
           )}
-          {q.trim().length >= 3 && !searching && hits.length === 0 && (
+          {mapsOff && dq && (
+            <div className="keyless">
+              <iframe title={`Google Maps results for ${dq}`} loading="lazy" referrerPolicy="no-referrer-when-downgrade"
+                src={`https://maps.google.com/maps?q=${encodeURIComponent(dq + (near ? "" : " Los Angeles"))}&output=embed`} />
+              <form onSubmit={useLink} className="keyless-form">
+                <label><b>See your business on the map?</b> Tap it, choose <b>Share → Copy link</b>, and paste it here.
+                  <input inputMode="url" placeholder="https://maps.app.goo.gl/…" value={link} onChange={e => setLink(e.target.value)} required /></label>
+                <button className="btn dark" disabled={!!loading}>{loading === "link" ? "Scanning…" : "That's my business"}</button>
+                {linkErr && <p className="err">{linkErr}</p>}
+              </form>
+              <p className="small muted">Not on the map? <button type="button" className="link" onClick={goManual}>Add your business by hand</button> and we'll get you on Google.</p>
+            </div>
+          )}
+          {!mapsOff && q.trim().length >= 3 && !searching && hits.length === 0 && (
             <div className="nohits">
               <p><b>{searchErr ? "Google search didn't respond." : `No Google listing found for "${q.trim()}".`}</b> {searchErr ? "You can still get your score by entering your details." : "That's often the first thing holding a business back, and we can fix it."}</p>
               <button className="btn dark" onClick={goManual}>Add my business</button>
