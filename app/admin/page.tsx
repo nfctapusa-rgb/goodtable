@@ -11,6 +11,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
   const rows = await sql`SELECT * FROM leads ORDER BY created_at DESC LIMIT 300` as any[];
   const signups = rows.filter(r => r.kind === "onboarding");
   const reports = rows.filter(r => r.kind === "report");
+  const mailers = rows.filter(r => r.kind === "mailer");
   const fromCard = reports.filter(r => String(r.source).startsWith("card")).length;
   const when = (d: string) => new Date(d).toLocaleString("en-US", { timeZone: "America/Los_Angeles", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
   return (
@@ -28,6 +29,20 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
             <span>{r.contact_name}<a href={`tel:${r.phone}`}>{r.phone}</a><a href={`mailto:${r.email}`}>{r.email}</a></span>
             <span>{r.plan}</span>
             <span className="ad-notes">{r.data?.googleProfile && <a href={r.data.googleProfile} target="_blank" rel="noreferrer">Google profile</a>}{r.data?.orderLink && <a href={r.data.orderLink} target="_blank" rel="noreferrer">Ordering link</a>}{r.data?.instagram && <span>{r.data.instagram}</span>}{r.data?.notes && <em>{r.data.notes}</em>}</span>
+          </div>
+        ))}
+      </div>
+      <h2 className="ad-h">Postcard requests</h2>
+      <div className="ad-table">
+        <div className="ad-row ad-head"><span>When</span><span>Business</span><span>Contact</span><span>Order</span><span>Offer & area</span></div>
+        {mailers.length === 0 && <p className="ad-empty">No postcard requests yet.</p>}
+        {mailers.map(r => (
+          <div key={r.id} className="ad-row">
+            <span>{when(r.created_at)}</span>
+            <span><b>{r.business_name}</b><small>{r.data?.address}</small></span>
+            <span>{r.contact_name}<a href={`tel:${r.phone}`}>{r.phone}</a><a href={`mailto:${r.email}`}>{r.email}</a></span>
+            <span>{r.plan}<small>{r.data?.status}</small></span>
+            <span className="ad-notes"><b>{r.data?.headline}</b><em>{r.data?.detail}</em><span>{r.data?.area}{r.data?.zips ? `: ${r.data.zips}` : ""}</span></span>
           </div>
         ))}
       </div>

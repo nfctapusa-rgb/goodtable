@@ -1,11 +1,11 @@
 // Single source of truth for what Lokly sells. Pricing page, grader offer,
 // onboarding and Stripe checkout all read from here.
 
-export type PlanId = "site" | "local" | "pro";
+export type PlanId = "site" | "local" | "pro" | "ads";
 
 export interface Plan {
   id: PlanId; name: string; price: number; cents: number; interval: "once" | "month";
-  blurb: string; cta: string; highlight?: boolean;
+  blurb: string; cta: string; highlight?: boolean; addon?: boolean;
 }
 
 export const PLANS: Plan[] = [
@@ -15,6 +15,15 @@ export const PLANS: Plan[] = [
     blurb: "Your website, Google profile and marketing, handled for one monthly price.", cta: "Start Lokly Pro" },
   { id: "site", name: "Website only", price: 150, cents: 15000, interval: "once",
     blurb: "A fast website built for local search. Yours to keep.", cta: "Get a website" },
+  { id: "ads", name: "Lokly Ads", price: 149, cents: 14900, interval: "month", addon: true,
+    blurb: "Done-for-you ads on Instagram, Facebook and Google. Ad budget paid separately to the ad platforms.", cta: "Add Lokly Ads" },
+];
+
+// Postcard mailers: price per campaign, printed and mailed by our print partner.
+export const MAILERS = [
+  { qty: 250, price: 199 },
+  { qty: 500, price: 350 },
+  { qty: 1000, price: 599 },
 ];
 
 export type Avail = "yes" | "no" | "soon";
@@ -36,7 +45,6 @@ export const FEATURES: { group: string; rows: [string, string, Avail, Avail][] }
   { group: "Marketing", rows: [
     ["Review requests", "Ask happy customers for a Google review by text or email.", "no", "soon"],
     ["Email & text campaigns", "Promos, win-back and birthday messages sent for you.", "no", "soon"],
-    ["Local mailers", "Postcards to homes around your shop with a tracked QR code.", "no", "soon"],
     ["Lokly AI assistant", "Ask questions about your business and get marketing written for you.", "no", "soon"],
   ]},
 ];

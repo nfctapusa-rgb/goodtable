@@ -13,7 +13,7 @@ export function PlanCards({ context, compact }: { context?: { businessName?: str
   return (
     <>
       <div className={`plans ${compact ? "compact" : ""}`}>
-        {PLANS.map(p => (
+        {PLANS.filter(p => !p.addon).map(p => (
           <div key={p.id} className={`plancard ${p.highlight ? "hl" : ""}`}>
             <h3 className="pname">{p.name}</h3>
             <div className="price"><b>${p.price}</b><span>{p.interval === "month" ? " a month" : " one-time"}</span></div>

@@ -117,3 +117,25 @@ body{font-stretch:100%}
 .planwrap{margin-top:40px}
 @media(max-width:700px){.savegrid{grid-template-columns:1fr}}
 .savegrid .btn{white-space:nowrap}
+/* mailers */
+.ml-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;padding-top:48px;padding-bottom:96px;align-items:start}
+.ml-form .ad-h{margin:18px 0 0}.ml-form select{border:1px solid var(--line);background:#fff;border-radius:10px;padding:13px;font:16px inherit}
+.ml-form textarea{border:1px solid var(--line);background:#fff;border-radius:10px;padding:13px;font:16px inherit;resize:vertical}
+.qty{display:grid;grid-template-columns:repeat(3,1fr);border:2px solid var(--ink)}
+.qty label{display:grid;gap:2px;padding:14px;cursor:pointer;border-right:2px solid var(--ink);background:#fff;font-weight:400}.qty label:last-child{border-right:0}
+.qty label.on{background:var(--sign)}.qty input{position:absolute;opacity:0;pointer-events:none}.qty label:has(input:focus-visible){outline:3px solid #1a73e8;outline-offset:-3px}
+.qty b{font-size:17px}.qty span{font-size:13px;color:var(--graphite)}
+.ml-preview{position:sticky;top:90px;display:grid;gap:8px}.ml-cap{margin:8px 0 0;font-size:13px;font-weight:700;color:var(--gray)}
+.card4x6{aspect-ratio:6/4;border:2px solid var(--ink);box-shadow:8px 8px 0 var(--ink);padding:24px;display:flex;flex-direction:column}
+.front6{background:var(--sign);color:var(--ink)}
+.pc-name{font-stretch:62%;font-weight:900;font-size:22px;text-transform:uppercase}
+.front6 h3{font-stretch:62%;font-weight:900;font-size:clamp(34px,4.4vw,52px);line-height:.9;text-transform:uppercase;margin:auto 0 8px;overflow-wrap:anywhere}
+.front6 p{margin:0 0 12px;max-width:30ch}
+.pc-foot{display:flex;justify-content:space-between;align-items:flex-end;font-size:13px;font-weight:600}
+.pc-qr{width:58px;height:58px;background:conic-gradient(var(--ink) 25%,#fff 0 50%,var(--ink) 0 75%,#fff 0) 0 0/14px 14px;border:4px solid #fff;outline:2px solid var(--ink)}
+.back6{background:#fff;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.back6 p{margin:4px 0;font-size:13px}.pc-scan{font-weight:700}
+.pc-addr{border-left:2px solid var(--line);padding-left:16px;display:flex;flex-direction:column;justify-content:space-between}
+.pc-stamp{align-self:flex-end;border:2px dashed var(--gray);padding:10px 8px;font-size:11px;color:var(--gray)}
+@media(max-width:900px){.ml-grid{grid-template-columns:1fr}.ml-preview{position:static;order:-1}.qty{grid-template-columns:1fr}.qty label{border-right:0;border-bottom:2px solid var(--ink)}}
+.addons-h{margin-top:72px}.menu .ds a{color:var(--ink);font-weight:700}

@@ -13,6 +13,7 @@ export function Nav() {
         <div className={`links ${open ? "open" : ""}`}>
           <a href="/how-it-works">How it works</a>
           <a href="/pricing">Pricing</a>
+          <a href="/mailers">Mailers</a>
           <a href="/login">Log in</a>
           <a href="/grader" className="btn dark sm">Get my free report</a>
         </div>

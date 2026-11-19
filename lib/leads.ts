@@ -1,7 +1,7 @@
 import { db, dbReady, reportScore } from "./db";
 
 // Best-effort lead capture: never blocks or breaks the user-facing request.
-export async function saveLead(l: { kind: "report" | "onboarding"; source?: string | null; businessName?: string | null; website?: string | null; placeId?: string | null; city?: string | null; score?: number | null; contactName?: string | null; email?: string | null; phone?: string | null; plan?: string | null; data?: unknown }) {
+export async function saveLead(l: { kind: "report" | "onboarding" | "mailer"; source?: string | null; businessName?: string | null; website?: string | null; placeId?: string | null; city?: string | null; score?: number | null; contactName?: string | null; email?: string | null; phone?: string | null; plan?: string | null; data?: unknown }) {
   if (!dbReady()) return;
   try {
     const sql = await db();
