@@ -11,7 +11,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
   const rows = await sql`SELECT * FROM leads ORDER BY created_at DESC LIMIT 300` as any[];
   const signups = rows.filter(r => r.kind === "onboarding");
   const reports = rows.filter(r => r.kind === "report");
-  const fromCard = reports.filter(r => r.source === "card").length;
+  const fromCard = reports.filter(r => String(r.source).startsWith("card")).length;
   const when = (d: string) => new Date(d).toLocaleString("en-US", { timeZone: "America/Los_Angeles", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
   return (
     <main className="wrap admin">
@@ -40,7 +40,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
             <span>{when(r.created_at)}</span>
             <span><b>{r.business_name}</b>{r.city && <small>{r.city}</small>}{r.website && <a href={r.website} target="_blank" rel="noreferrer">{r.website}</a>}</span>
             <span>{r.score ?? "–"}/100</span>
-            <span>{r.source === "card" ? "Business card" : r.source}</span>
+            <span>{String(r.source).replace("card", "Business card").replace(":saved", " · saved")}{r.email && <a href={`mailto:${r.email}`}>{r.contact_name} {r.email}</a>}{r.phone && <a href={`tel:${r.phone}`}>{r.phone}</a>}</span>
           </div>
         ))}
       </div>

@@ -152,6 +152,8 @@ function ReportView({ r, onReset }: { r: Report; onReset: () => void }) {
         <div className={`dial ${tone(total, max)}`}><b>{pct}</b><span>/100</span></div>
       </div>
 
+      <p className="upsell">Want us to fix these for you? Google management starts at $25/mo. <a href="#plan">See plans</a></p>
+
       <div className="scores">
         {SECTIONS.map(s => {
           const sc = r.scores[s.key];
@@ -176,19 +178,16 @@ function ReportView({ r, onReset }: { r: Report; onReset: () => void }) {
         </div>
       )}
 
-      <div className="card aisite"><div><p className="eyebrow lime-t">New</p><b>See your AI website</b><p className="muted small">We built a new site for {r.businessName} that fixes every SEO issue above.</p></div>
-        <button className="btn lime sm" onClick={() => { try { sessionStorage.setItem("lokly_report", JSON.stringify(r)); } catch {} location.href = "/preview"; }}>Show me ↗</button></div>
+      <div className="card aisite"><div><b>See your AI-built website</b><p className="muted small">We built a new site for {r.businessName} that fixes every SEO issue above.</p></div>
+        <button className="btn lime sm" onClick={() => { try { sessionStorage.setItem("lokly_report", JSON.stringify(r)); } catch {} location.href = "/preview"; }}>Show me</button></div>
 
-      <div className="card save"><div><b>Track your score over time</b><p className="muted small">Create a free account to save this report and get your to-do list.</p></div>
-        <button className="btn dark sm" onClick={() => { try { sessionStorage.setItem("kern_report", JSON.stringify(r)); } catch {} location.href = "/signup"; }}>Save report</button></div>
-
-      <Plan r={r} pct={pct} issues={failed.length} compact />
+      <SaveReport r={r} pct={pct} />
 
       {SECTIONS.map(s => <SectionView key={s.key} id={s.key} label={s.label} checks={r.checks.filter(c => c.section === s.key)}
         note={s.key === "local" && !r.placesConnected ? "Google Maps isn't connected yet, so listing and ranking checks were skipped."
           : s.key === "local" && r.placesError ? `Google Maps error: ${r.placesError}` : undefined} />)}
 
-      <div id="plan" className="planwrap"><h2 className="h2">Fix all {failed.length} issues with Lokly</h2>
+      <div id="plan" className="planwrap"><h2 className="sh-h2">Let Lokly handle it</h2>
         <PlanCards compact context={{ businessName: r.businessName, website: r.url, placeId: r.placeId }} /></div>
       <button className="btn ghost" onClick={onReset}>Grade another business</button>
     </section>
@@ -261,5 +260,31 @@ function Item({ c }: { c: Check }) {
         </div>
       )}
     </div>
+  );
+}
+
+function SaveReport({ r, pct }: { r: Report; pct: number }) {
+  const [f, setF] = useState({ name: "", email: "", phone: "" });
+  const [state, setState] = useState<"idle" | "busy" | "done">("idle");
+  const [err, setErr] = useState<string | null>(null);
+  async function save(e: React.FormEvent) {
+    e.preventDefault(); setState("busy"); setErr(null);
+    const res = await fetch("/api/lead", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...f, businessName: r.businessName, website: r.url, placeId: r.placeId, city: r.city, score: pct, src: new URLSearchParams(location.search).get("src") ?? "web" }) });
+    if (res.ok) setState("done"); else { setErr((await res.json()).error ?? "Couldn't save. Try again."); setState("idle"); }
+  }
+  if (state === "done") return <div className="card saved"><b>Report saved.</b><p className="muted small">We'll send a copy to {f.email} and follow up with what to fix first.</p></div>;
+  return (
+    <form className="card savef" onSubmit={save}>
+      <div><b>Save this report</b><p className="muted small">We'll email you a copy and the three fixes that matter most.</p></div>
+      <div className="savegrid">
+        <input required aria-label="Your name" autoComplete="name" placeholder="Your name" value={f.name} onChange={e => setF({ ...f, name: e.target.value })} />
+        <input required type="email" aria-label="Email" autoComplete="email" placeholder="Email" value={f.email} onChange={e => setF({ ...f, email: e.target.value })} />
+        <input type="tel" aria-label="Mobile number" autoComplete="tel" placeholder="Mobile (optional)" value={f.phone} onChange={e => setF({ ...f, phone: e.target.value })} />
+        <button className="btn dark" disabled={state === "busy"}>{state === "busy" ? "Saving…" : "Save report"}</button>
+      </div>
+      {err && <p className="err">{err}</p>}
+      <p className="tiny muted">By saving, you agree we can contact you about your report. See our <a href="/privacy">Privacy Policy</a>.</p>
+    </form>
   );
 }
