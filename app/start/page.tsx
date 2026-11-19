@@ -22,6 +22,7 @@ export default function Start() {
   const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
+    document.title = "Get started | Lokly";
     const p = new URLSearchParams(location.search);
     const pl = p.get("plan"); if (pl && planById(pl)) setPlan(pl as PlanId);
     setF(x => ({ ...x, businessName: p.get("name") ?? "", website: p.get("website") ?? "", placeId: p.get("place") ?? "" }));
@@ -45,15 +46,15 @@ export default function Start() {
       <section className="hero">
         <h1 className="sh-h2">Tell us about your business.</h1>
         <p className="sh-lead">Send us your links and we'll take it from here. You'll approve everything before it goes live.</p>
-        <fieldset className="pickplan">
-          <legend>Your plan</legend>
+        <p className="pplabel" id="pplabel">Your plan</p>
+        <div className="pickplan" role="radiogroup" aria-labelledby="pplabel">
           {PLANS.map(p => (
             <label key={p.id} className={plan === p.id ? "on" : ""}>
               <input type="radio" name="plan" value={p.id} checked={plan === p.id} onChange={() => setPlan(p.id)} />
               <b>{p.name}</b><span>${p.price}{p.interval === "month" ? "/mo" : " one-time"}</span>
             </label>
           ))}
-        </fieldset>
+        </div>
         <form onSubmit={submit} className="form">
           {FIELDS.filter(x => !x.pro || plan !== "local").map(x => (
             <label key={x.k}>{x.label}{!x.req && <span className="opt"> (optional)</span>}

@@ -102,3 +102,4 @@ body{font-stretch:100%}
 .check{display:flex!important;gap:10px;align-items:flex-start;font-weight:400;font-size:14px;line-height:1.45}.check input{margin-top:3px;width:18px;height:18px}.check a{color:var(--ink)}
 @media(max-width:860px){.plans{grid-template-columns:1fr}.plancard{border-right:0;border-bottom:2px solid var(--ink)}.plancard:last-child{border-bottom:0}
  .steps3{grid-template-columns:1fr}.frow{grid-template-columns:1fr 84px 84px}.frow>span{padding:12px 10px}.pickplan{grid-template-columns:1fr}.pickplan label{border-right:0;border-bottom:2px solid var(--ink)}}
+.pplabel{font-weight:700;margin:16px 0 8px}.pickplan{margin-top:0}.sh-hero .wrap,.pr-hero .wrap{padding-inline:clamp(20px,4vw,48px)}
