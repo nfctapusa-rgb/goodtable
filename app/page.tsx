@@ -1,78 +1,111 @@
 import { SearchHero } from "./ui";
-import { Rotator } from "./rotator";
 
-const INDUSTRIES = ["Restaurants", "Salons & barbers", "Retail & ecommerce", "Home services", "Fitness studios", "Auto shops", "Jewelers", "Med spas & wellness", "Contractors", "Transportation", "Consultants", "Creators & courses"];
+const CLIENTS = [
+  ["Flamebachi", "Hibachi · Downtown LA & Jurupa Valley"],
+  ["Clarity & Cut", "Barbershop · Downtown LA"],
+  ["Corleone Pizza", "Pizza · Downtown LA"],
+  ["Julio's Jewelry Repair", "Jewelry repair · Downtown LA"],
+  ["Gold & Diamond Jewelers", "Jeweler · Costa Mesa"],
+  ["Jewels by Chris", "Fine rings"],
+  ["CU Transportation", "Chauffeur vans · Los Angeles"],
+];
 
-const STEPS = [
-  ["01", "Show up at the top of Google", "A website and Google profile tuned to rank for what customers search in your area."],
-  ["02", "Turn visitors into customers", "Online ordering, booking, checkout and quotes built in, with no third-party commission."],
-  ["03", "Bring customers back", "Your own customer database, loyalty rewards and a branded app experience."],
-  ["04", "Market on autopilot", "Email and text campaigns that run themselves: welcome, win-back, reviews and reminders."],
+const WEEK = [
+  ["Mon", "Weekly offer goes live", "“$10 off Mondays” posted to Google"],
+  ["Daily", "Every review answered", "Personal replies, in your voice"],
+  ["Wed", "Fresh photos", "New shots keep your profile active"],
+  ["Fri", "Weekend post", "Hours, specials, what's new"],
+  ["Monthly", "Your report", "Calls, direction requests, rank"],
 ];
 
 export default function Home() {
   return (
     <>
-      <section className="hero2">
-        <div className="wrap center">
-          <p className="pill">Free AI visibility report · 60 seconds</p>
-          <h1 className="display">The AI platform any business uses to <Rotator /></h1>
-          <p className="lead">Search your business and see exactly how you show up on Google, your website and local search, plus what to fix first.</p>
-          <SearchHero />
-          <div className="phone">
-            <div className="screen">
-              <p className="tiny muted">Example report</p>
-              <h3>Here's what's holding your business back on Google:</h3>
-              {[
-                ["Not ranking in nearby areas", "Missing local keywords that competitors are winning with."],
-                ["Title missing primary keyword", "Adding “Barber in Downtown LA” helps Google match local searches."],
-                ["Images missing alt tags", "Alt text boosts visibility on Google Maps and Google Images."],
-                ["Sending customers to third-party apps", "Booking through someone else costs fees and the customer relationship."],
-              ].map(([t, d]) => <div key={t} className="issue"><i>!</i><span>{t}<small>{d}</small></span></div>)}
-            </div>
+      <section className="h3ro">
+        <div className="wrap h3grid">
+          <div>
+            <p className="kicker">Downtown LA · Local SEO & Google profiles</p>
+            <h1 className="mega">When someone nearby searches for what you sell, <span className="hl">you show up first.</span></h1>
+            <p className="lead l">We build your website, run your Google Business Profile every week, and answer every review, so the customers walking past your block find you instead of the place next door.</p>
+            <SearchHero cta="Check my business free" />
+            <p className="tiny muted">Free report in about a minute. No sign-up.</p>
+          </div>
+          <div className="gcard" aria-label="Example of a Google profile we manage">
+            <p className="tiny muted">What your Google profile looks like with Lokly</p>
+            <div className="gtop"><b>Your Business</b><span className="gstars">★★★★★ <em>4.9</em></span><span className="gmeta">Open now · Closes 11 PM</span></div>
+            <div className="gbtns"><span>Order</span><span>Call</span><span>Directions</span></div>
+            <div className="gpost"><span className="gtag">Offer</span><b>10% off all bowls until 4 PM</b><small>Posted Monday by Lokly</small></div>
+            <div className="greview"><p>“Best spot downtown, the food comes out fast and hot.”</p><div className="greply"><b>Owner reply</b><span>Thank you! We'll have your usual ready next time. 🙏</span></div></div>
           </div>
         </div>
       </section>
 
-      <section className="band">
+      <section className="strip">
         <div className="wrap">
-          <p className="eyebrow center">Built for every kind of local and online business</p>
-          <div className="chips">{INDUSTRIES.map(i => <span key={i}>{i}</span>)}</div>
+          <p className="kicker dim">Local businesses we already work with</p>
+          <div className="clients">{CLIENTS.map(([n, d]) => <div key={n}><b>{n}</b><span>{d}</span></div>)}</div>
         </div>
       </section>
 
-      <section className="wrap sec">
-        <h2 className="h2">One platform. Your whole online business.</h2>
-        <p className="lead">Lokly replaces the website builder, booking app, ordering service, CRM and marketing tools you're paying for separately.</p>
-        <div className="grid4">
-          {STEPS.map(([n, t, d]) => <div key={n} className="card step"><span className="num">{n}</span><h3>{t}</h3><p className="muted">{d}</p></div>)}
-        </div>
-        <a href="/how-it-works" className="link">See how it works →</a>
-      </section>
-
-      <section className="wrap sec split">
+      <section className="wrap case">
         <div>
-          <h2 className="h2">Built for your industry, not forced into a template.</h2>
-          <p className="lead">Tell us what you do and Lokly sets up the right tools automatically.</p>
-          <ul className="ticks">
-            <li><b>Restaurants:</b> menus, pickup and delivery, catering, QR ordering</li>
-            <li><b>Appointments:</b> staff calendars, deposits, reminders, no-show protection</li>
-            <li><b>Retail & ecommerce:</b> catalog, inventory, shipping, abandoned-cart recovery</li>
-            <li><b>Services:</b> quote requests, estimates, invoices, client portal</li>
-          </ul>
+          <p className="kicker">Case study</p>
+          <h2 className="big">Flamebachi: two locations, one system.</h2>
+          <p className="lead l">We built <a href="https://flamebachi.com" target="_blank" rel="noreferrer">flamebachi.com</a> and run the Google profiles for both the Downtown LA and Jurupa Valley locations: offers posted on a schedule, every review answered, photos kept fresh, and an Order Now button on every page.</p>
+          <div className="stats">
+            <div><b>4.9★</b><span>on Google</span></div>
+            <div><b>150+</b><span>reviews</span></div>
+            <div><b>2</b><span>locations managed</span></div>
+          </div>
+          <a className="link" href="https://flamebachi.com" target="_blank" rel="noreferrer">See the live site →</a>
         </div>
-        <div className="card dark price-teaser">
-          <p className="eyebrow lime-t">Simple pricing</p>
-          <ul className="ticks dk"><li><b>$150</b> website built to rank #1</li><li><b>$49.99/mo</b> we run your Google profile</li><li><b>$99/mo</b> Pro: site, ordering & growth tools</li></ul>
-          <p className="muted">No contracts. Cancel anytime.</p>
-          <a href="/pricing" className="btn lime wide">See pricing</a>
+        <div className="mock">
+          <div className="mockbar"><i /><i /><i /><span>flamebachi.com</span></div>
+          <div className="mockhero">
+            <p>FRESH • MADE TO ORDER • HIBACHI</p>
+            <h3>Good Frequency Energy.<br />Fresh off the grill.</h3>
+            <div><span>Order Online</span><span className="o">View the Menu</span></div>
+          </div>
+          <div className="mockoffer"><small>EVERY DAY UNTIL 4 PM</small><b>10% OFF ALL BACHI BOWLS + FREE SODA</b></div>
         </div>
       </section>
 
-      <section className="cta-band">
-        <div className="wrap center">
-          <h2 className="h2">See how many customers you're missing.</h2>
-          <SearchHero />
+      <section className="wrap weekly">
+        <div className="wk-head">
+          <p className="kicker">Lokly Local · $49.99/mo</p>
+          <h2 className="big">What we do on your Google profile, every week.</h2>
+          <p className="lead l">You run the business. We keep your profile active, because Google ranks profiles that stay active.</p>
+        </div>
+        <ol className="week">{WEEK.map(([d, t, s]) => <li key={t}><span className="day">{d}</span><b>{t}</b><small>{s}</small></li>)}</ol>
+      </section>
+
+      <section className="wrap tiers">
+        <h2 className="big c">Three ways to work with us.</h2>
+        <div className="tgrid">
+          <div className="tier"><span className="tp">$150</span><span className="tu">one-time</span><h3>Website</h3><p>A fast site built to rank: the right titles, descriptions, schema and local keywords from day one.</p></div>
+          <div className="tier dark"><span className="tp">$49.99</span><span className="tu">per month</span><h3>Google profile management</h3><p>Review replies, daily and weekly posts, offers and photos, done for you.</p></div>
+          <div className="tier"><span className="tp">$99</span><span className="tu">per month</span><h3>Lokly Pro</h3><p>Everything above plus your website hosted, online ordering, and growth tools.</p></div>
+        </div>
+        <div className="c"><a href="/pricing" className="link">Compare plans →</a></div>
+      </section>
+
+      <section className="wrap human">
+        <div>
+          <h2 className="big">We're local. We'll come to you.</h2>
+          <p className="lead l">No call centers and no 40-page contracts. We meet you at your shop, set everything up, and you can text us when something changes, like new hours, a new special or a holiday closure.</p>
+        </div>
+        <ul className="promises">
+          <li><b>Month to month</b><span>Cancel anytime.</span></li>
+          <li><b>You own it</b><span>Your domain, your profile, your customers.</span></li>
+          <li><b>You approve offers</b><span>Nothing goes out you didn't OK.</span></li>
+        </ul>
+      </section>
+
+      <section className="final">
+        <div className="wrap c">
+          <h2 className="big">See where you rank on your block.</h2>
+          <p className="lead l c">Type your business name and get your free report in about a minute.</p>
+          <SearchHero cta="Check my business free" />
         </div>
       </section>
     </>
