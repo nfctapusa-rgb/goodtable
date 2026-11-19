@@ -5,7 +5,7 @@ import { runLocalChecks, getPlace, cityOf, placesKey, type Place } from "@/lib/p
 export const runtime = "nodejs";
 export const maxDuration = 30;
 
-const UA = "Mozilla/5.0 (compatible; LoklyGrader/1.0; +https://lokly.us)";
+const UA = "Mozilla/5.0 (compatible; LoklyGrader/1.0; +https://lokly.pro)";
 const isPublicHost = (h: string) =>
   !/^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|169\.254\.|0\.|\[?::1\]?|.*\.local$|.*\.internal$)/i.test(h);
 

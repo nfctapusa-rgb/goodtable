@@ -39,7 +39,7 @@ export function Footer() {
         <div><a href="/" className="logo"><span className="mark" />Lokly</a><p className="muted small">Everything your business needs to grow online.</p></div>
         <div className="fcols">
           <div><b>Product</b><a href="/how-it-works">How it works</a><a href="/pricing">Pricing</a><a href="/grader">Free report</a></div>
-          <div><b>Company</b><a href="mailto:hello@lokly.us">Contact</a></div>
+          <div><b>Company</b><a href="mailto:hello@lokly.pro">Contact</a></div>
         </div>
       </div>
       <div className="wrap muted small copy">© {new Date().getFullYear()} Lokly</div>
