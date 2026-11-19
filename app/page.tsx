@@ -72,7 +72,7 @@ export default function Home() {
 
       <section className="wrap weekly">
         <div className="wk-head">
-          <p className="kicker">Lokly Local · $49.99/mo</p>
+          <p className="kicker">Lokly Local · $25/mo</p>
           <h2 className="big">What we do on your Google profile, every week.</h2>
           <p className="lead l">You run the business. We keep your profile active, because active, accurate profiles tend to perform better on Google.</p>
         </div>
@@ -83,8 +83,8 @@ export default function Home() {
         <h2 className="big c">Three ways to work with us.</h2>
         <div className="tgrid">
           <div className="tier"><span className="tp">$150</span><span className="tu">one-time</span><h3>Website</h3><p>A fast site built for local search: the right titles, descriptions, schema and local keywords from day one.</p></div>
-          <div className="tier dark"><span className="tp">$49.99</span><span className="tu">per month</span><h3>Google profile management</h3><p>Review replies, daily and weekly posts, offers and photos, done for you.</p></div>
-          <div className="tier"><span className="tp">$99</span><span className="tu">per month</span><h3>Lokly Pro</h3><p>Everything above plus your website hosted, online ordering, and growth tools.</p></div>
+          <div className="tier dark"><span className="tp">$25</span><span className="tu">per month</span><h3>Google profile management</h3><p>Review replies, daily and weekly posts, offers and photos, done for you.</p></div>
+          <div className="tier"><span className="tp">$89</span><span className="tu">per month</span><h3>Lokly Pro</h3><p>Everything above plus your website hosted, online ordering, and growth tools.</p></div>
         </div>
         <div className="c"><a href="/pricing" className="link">Compare plans →</a></div>
       </section>

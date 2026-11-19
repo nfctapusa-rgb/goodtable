@@ -72,7 +72,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         )}
 
         {!paid && (
-          <a href="/pricing" className="card nudge"><b>Let Lokly fix {todo.length ? `all ${todo.length} issues` : "everything"} from $49.99/mo</b><span>See the plan →</span></a>
+          <a href="/pricing" className="card nudge"><b>Let Lokly fix {todo.length ? `all ${todo.length} issues` : "everything"} from $25/mo</b><span>See the plan →</span></a>
         )}
 
         <div className="card">

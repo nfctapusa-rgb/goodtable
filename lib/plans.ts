@@ -23,7 +23,7 @@ export const PLANS: Plan[] = [
     ],
   },
   {
-    id: "local", name: "Lokly Local", price: 49.99, cents: 4999, interval: "month", highlight: true,
+    id: "local", name: "Lokly Local", price: 25, cents: 2500, interval: "month", highlight: true,
     blurb: "We run your Google Business Profile so you show up and stand out.",
     cta: "Start Lokly Local",
     features: [
@@ -37,7 +37,7 @@ export const PLANS: Plan[] = [
     ],
   },
   {
-    id: "pro", name: "Lokly Pro", price: 99, cents: 9900, interval: "month",
+    id: "pro", name: "Lokly Pro", price: 89, cents: 8900, interval: "month",
     blurb: "Everything in Local, plus your website, online orders and growth tools.",
     cta: "Go Pro",
     features: [

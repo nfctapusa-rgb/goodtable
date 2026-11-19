@@ -1,9 +1,9 @@
 import { PlanCards } from "../plancards";
 
-export const metadata = { title: "Pricing | Lokly", description: "Lokly pricing: a $150 website built to rank, $49.99/mo Google profile management, or $99/mo Lokly Pro." };
+export const metadata = { title: "Pricing | Lokly", description: "Lokly pricing: a $150 website built for local search, $25/mo Google profile management, or $89/mo Lokly Pro." };
 
 const FAQ = [
-  ["What's the difference between the plans?", "Lokly Site is a one-time $150 website built for local search. Lokly Local ($49.99/mo) is us running your Google Business Profile: review replies, posts, offers and photos. Lokly Pro ($99/mo) includes everything in Local plus your website, online ordering and growth tools."],
+  ["What's the difference between the plans?", "Lokly Site is a one-time $150 website built for local search. Lokly Local ($25/mo) is us running your Google Business Profile: review replies, posts, offers and photos. Lokly Pro ($89/mo) includes everything in Local plus your website, online ordering and growth tools."],
   ["Is there a contract?", "No. Monthly plans are month-to-month and you can cancel anytime."],
   ["How does online ordering work on Pro?", "You choose. Link your existing DoorDash or Uber Eats pages for no extra fee, or connect your point-of-sale so customers order directly on your site. Direct online orders through your POS carry a 5% Lokly fee; there's no fee on orders placed through DoorDash or Uber Eats links."],
   ["Do I need Lokly Site if I'm on Pro?", "No. Your website is included with Lokly Pro."],

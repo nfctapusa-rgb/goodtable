@@ -216,11 +216,11 @@ function Plan({ r, pct, issues, compact }: { r: Report; pct: number; issues: num
     <div id="plan" className="card plan">
       <p className="eyebrow lime-t">Lokly Growth</p>
       <h3>Fix all {issues} issues and grow, for one monthly price.</h3>
-      <div className="price"><b>$49.99</b><span>/month · cancel anytime</span></div>
+      <div className="price"><b>$25</b><span>/month · cancel anytime</span></div>
       <ul className="tools">{TOOLS.map(([t, d]) => <li key={t}><i>✓</i><span>{t}<small>{d}</small></span></li>)}</ul>
       <form onSubmit={go} className="form">
         <input type="email" required placeholder="you@business.com" value={email} onChange={e => setEmail(e.target.value)} />
-        <button className="btn lime wide" disabled={busy}>{busy ? "Opening checkout…" : "Start for $49.99/mo"}</button>
+        <button className="btn lime wide" disabled={busy}>{busy ? "Opening checkout…" : "Start for $25/mo"}</button>
         {err && <p className="err">{err}</p>}
       </form>
     </div>
