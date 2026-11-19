@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { PLANS, planById, type PlanId } from "@/lib/plans";
 
-const FIELDS: { k: string; label: string; ph: string; type?: string; req?: boolean; pro?: boolean }[] = [
+const FIELDS: { k: string; label: string; ph: string; type?: string; req?: boolean; pro?: boolean; card?: boolean }[] = [
   { k: "businessName", label: "Business name", ph: "Your business name", req: true },
   { k: "contactName", label: "Your name", ph: "First and last", req: true },
   { k: "email", label: "Email", ph: "you@business.com", type: "email", req: true },
@@ -10,6 +10,7 @@ const FIELDS: { k: string; label: string; ph: string; type?: string; req?: boole
   { k: "website", label: "Current website", ph: "yourbusiness.com (leave blank if none)" },
   { k: "googleProfile", label: "Google Business Profile link", ph: "Paste your Google Maps link" },
   { k: "orderLink", label: "Ordering or booking link", ph: "DoorDash, Uber Eats, Square, Vagaro…", pro: true },
+  { k: "shipTo", label: "Where should we mail your free NFC review card?", ph: "Business mailing address", req: true, card: true },
   { k: "instagram", label: "Instagram", ph: "@yourbusiness" },
   { k: "notes", label: "Anything we should know?", ph: "Specials you run, hours changes, what makes you different" },
 ];
@@ -65,7 +66,7 @@ export default function Start() {
           ))}
         </div>
         <form onSubmit={submit} className="form">
-          {FIELDS.filter(x => !x.pro || plan !== "local").map(x => (
+          {FIELDS.filter(x => (!x.pro || plan !== "local") && (!x.card || plan !== "site")).map(x => (
             <label key={x.k}>{x.label}{!x.req && <span className="opt"> (optional)</span>}
               {x.k === "notes" ? <textarea rows={3} placeholder={x.ph} value={f[x.k] ?? ""} onChange={set(x.k)} />
                 : <input type={x.type ?? "text"} required={x.req} placeholder={x.ph} value={f[x.k] ?? ""} onChange={set(x.k)} autoComplete={x.k === "email" ? "email" : x.k === "phone" ? "tel" : x.k === "contactName" ? "name" : x.k === "businessName" ? "organization" : "off"} />}

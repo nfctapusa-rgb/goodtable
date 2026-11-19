@@ -223,3 +223,33 @@ html{-webkit-text-size-adjust:100%}
 .savegrid>*{min-width:0}.savegrid input{width:100%;min-width:0}
 @media(max-width:900px){.savegrid{grid-template-columns:1fr 1fr}.savegrid .btn{grid-column:1/-1}}
 @media(max-width:560px){.savegrid{grid-template-columns:1fr}}
+
+/* --- Fixes --- */
+.menu .pop dt::after{content:none}
+.menu .tag{display:inline-block;font-weight:700;font-size:12px;background:var(--sign);color:var(--ink);padding:3px 8px;border-radius:4px;margin-right:6px;vertical-align:1px;white-space:nowrap}
+.menu .ds b{color:var(--ink)}
+.burger{color:var(--ink);padding:8px;margin-right:-8px;line-height:0}
+.logo .mark{width:22px;height:28px}
+/* Comparison table fits on phones */
+@media(max-width:700px){
+  .frow{grid-template-columns:1fr 64px 64px}
+  .frow>span{padding:14px 10px}.frow>span:first-child{padding-left:14px}
+  .frow b{font-size:15px}.frow small{font-size:13px}
+  .fhead>span{font-size:14px}.fhead small{font-size:12px}
+  .ftable{overflow:visible}
+}
+/* Real results */
+.sh-results{padding-top:96px;padding-bottom:40px}
+.res-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.res{border:2px solid var(--ink);background:#fff;padding:22px;display:grid;gap:14px;box-shadow:8px 8px 0 var(--ink)}
+.res-kind{margin:0;font-weight:700;color:var(--graphite)}
+.res-big{margin:0;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.res-big b{font-stretch:75%;font-weight:900;font-size:56px;line-height:1;color:var(--palm)}
+.res-big span{color:var(--graphite)}
+.res-bars{display:flex;gap:8px;align-items:flex-end;height:110px}
+.res-bars>div{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px}
+.res-bars i{display:block;width:100%;background:#c9d6e3;border-radius:3px 3px 0 0;min-height:3px}
+.res-bars i.on{background:var(--pin)}
+.res-bars small{font-size:12px;color:var(--gray)}
+.res-facts{margin:0;padding-left:18px;color:var(--graphite);display:grid;gap:4px}
+@media(max-width:800px){.res-grid{grid-template-columns:1fr}.res{box-shadow:5px 5px 0 var(--ink)}.res-big b{font-size:46px}.sh-results{padding-top:56px}}

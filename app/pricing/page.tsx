@@ -8,7 +8,7 @@ const FAQ = [
   ["Is there a contract?", "No. Monthly plans are month to month and you can cancel anytime."],
   ["How does online ordering work on Pro?", "Link your existing DoorDash, Uber Eats or booking page for no extra fee, or connect your point-of-sale so customers order directly on your site. Direct online orders through your POS carry a 5% Lokly fee."],
   ["Can you guarantee I'll rank #1?", "No one can honestly guarantee Google rankings, and we don't. Google decides rankings. We do the work that helps: an active, accurate profile, review replies, and a site built with local SEO best practices."],
-  ["What does \"coming soon\" mean?", "Those tools are being built now. They'll be added to Pro at no extra cost when they launch, and you're not paying for them until then."],
+  ["What's the free review card?", "When you sign up for Google Management or Pro, we mail you a tap-to-review NFC card. Customers tap it with their phone and your Google review page opens. One card per business; more are available if you want one for every register."],
   ["Does it work for my type of business?", "Yes. Restaurants, barbers and salons, jewelers, auto shops, retail, home services, fitness and more."],
 ];
 
@@ -37,7 +37,7 @@ export default function Pricing() {
       <section className="wrap pr-table">
         <h2 className="sh-h2">What's included</h2>
         <div className="ftable" role="table" aria-label="Plan comparison">
-          <div className="frow fhead" role="row"><span role="columnheader">Feature</span><span role="columnheader">Google Management<small>$25/mo</small></span><span role="columnheader">Lokly Pro<small>$89/mo</small></span></div>
+          <div className="frow fhead" role="row"><span role="columnheader">Feature</span><span role="columnheader">Google<small>$25/mo</small></span><span role="columnheader">Pro<small>$89/mo</small></span></div>
           {FEATURES.map(g => (
             <div key={g.group} role="rowgroup">
               <div className="fgroup" role="row"><span role="cell">{g.group}</span></div>

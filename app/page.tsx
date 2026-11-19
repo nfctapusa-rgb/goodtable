@@ -10,6 +10,16 @@ const BLOCK = [
   { name: "Corner Jewelry", kind: "Jewelry repair", awn: "#22324A", sign: "#FFD23F", ink: "#142133" },
 ];
 
+// Anonymized results from Google Business Profile data (pulled Nov 2026).
+const RESULTS: { label: string; jump: number; months: [string, number][]; facts: string[] }[] = [
+  { label: "Hibachi takeout, Inland Empire", jump: 132,
+    months: [["May", 1464], ["Jun", 1223], ["Jul", 1100], ["Aug", 1284], ["Sep", 1781], ["Oct", 4125]],
+    facts: ["Calls from Google up 22% in the last 30 days", "Calls, website visits and directions up 37%", "4.9 stars"] },
+  { label: "Teppanyaki takeout, Downtown LA", jump: 57,
+    months: [["May", 8258], ["Jun", 7685], ["Jul", 8540], ["Aug", 9171], ["Sep", 9025], ["Oct", 14201]],
+    facts: ["15,189 Google views in the last 30 days", "Calls, website visits and directions up 15%", "5.0 stars across 170+ reviews"] },
+];
+
 const WEEK: [string, string][] = [
   ["Mon", "Your weekly offer goes up on Google"],
   ["Tue", "New reviews get a personal reply"],
@@ -46,20 +56,22 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="wrap sh-case">
-        <div className="sh-case-text">
-          <h2 className="sh-h2">Example: a two-location grill. We run their Google.</h2>
-          <p>Here's what that looks like for a takeout spot with two locations: we build the website and manage both Google profiles. Offers go out on a schedule, every review gets answered, and the photos stay current.</p>
-          <a className="sh-link" href="/grader">See where your shop stands</a>
+      <section className="wrap sh-results">
+        <h2 className="sh-h2">Real numbers from shops we manage.</h2>
+        <p className="sh-sub">Google's own data for two takeout locations we took over in mid-October. Owners asked us to keep their names private.</p>
+        <div className="res-grid">
+          {RESULTS.map(r => (
+            <article key={r.label} className="res">
+              <p className="res-kind">{r.label}</p>
+              <p className="res-big"><b>+{r.jump}%</b> <span>Google views, September to October</span></p>
+              <div className="res-bars" aria-label={`Monthly Google views: ${r.months.map(([m, v]) => `${m} ${v.toLocaleString()}`).join(", ")}`}>
+                {r.months.map(([m, v]) => <div key={m}><i style={{ height: `${(v / Math.max(...r.months.map(x => x[1]))) * 100}%` }} className={m === "Oct" ? "on" : ""} /><small>{m}</small></div>)}
+              </div>
+              <ul className="res-facts">{r.facts.map(f => <li key={f}>{f}</li>)}</ul>
+            </article>
+          ))}
         </div>
-        <figure className="sh-shot">
-          <div className="sh-shot-hero">
-            <p>Made to order.<br />Fresh off the grill.</p>
-            <span>Order Online</span>
-          </div>
-          <div className="sh-shot-offer">10% off all bowls before 4 PM</div>
-          <figcaption>Sample website built by Lokly</figcaption>
-        </figure>
+        <p className="sh-fine">Source: Google Business Profile performance data. Every business is different and Google decides rankings, so we can't promise the same results.</p>
       </section>
 
       <section className="sh-week">
@@ -76,8 +88,8 @@ export default function Home() {
         <h2 className="sh-h2">Pick what you need.</h2>
         <dl className="menu">
           <div><dt>Website</dt><dd className="pr">$150 once</dd><dd className="ds">A fast site with the right titles, descriptions and local keywords.</dd></div>
-          <div className="pop"><dt>Google profile management</dt><dd className="pr">$25 a month</dd><dd className="ds">Review replies, weekly posts and offers, fresh photos.</dd></div>
-          <div><dt>Lokly Pro</dt><dd className="pr">$89 a month</dd><dd className="ds">Profile management plus your website, hosted, with online ordering.</dd></div>
+          <div className="pop"><dt>Google profile management</dt><dd className="pr">$25 a month</dd><dd className="ds"><span className="tag">Most shops start here</span> Review replies, weekly posts and offers, fresh photos. <b>Free NFC review card</b> for your counter.</dd></div>
+          <div><dt>Lokly Pro</dt><dd className="pr">$89 a month</dd><dd className="ds">Everything in Google management, plus your website, hosted, with online ordering.</dd></div>
         </dl>
         <p className="sh-fine">Month to month. Cancel anytime. <a href="/pricing">See everything included</a></p>
       </section>

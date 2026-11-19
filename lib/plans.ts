@@ -10,7 +10,7 @@ export interface Plan {
 
 export const PLANS: Plan[] = [
   { id: "local", name: "Google Management", price: 25, cents: 2500, interval: "month",
-    blurb: "We run your Google Business Profile so you show up and stand out.", cta: "Start for $25/mo" },
+    blurb: "We run your Google Business Profile so you show up and stand out. Includes a free tap-to-review NFC card for your counter.", cta: "Start for $25/mo" },
   { id: "pro", name: "Lokly Pro", price: 89, cents: 8900, interval: "month", highlight: true,
     blurb: "Your website, Google profile and marketing, handled for one monthly price.", cta: "Start Lokly Pro" },
   { id: "site", name: "Website only", price: 150, cents: 15000, interval: "once",
@@ -34,6 +34,7 @@ export const FEATURES: { group: string; rows: [string, string, Avail, Avail][] }
     ["Every review answered", "A personal reply to each Google review, in your voice.", "yes", "yes"],
     ["Weekly posts & offers", "Specials, news and offers published to your profile on a schedule you approve.", "yes", "yes"],
     ["Fresh photos", "New photos added regularly so your profile stays active.", "yes", "yes"],
+    ["Free NFC review card", "A tap-to-review card for your counter. Customers tap it with their phone and land on your Google review page. Shipped free when you sign up.", "yes", "yes"],
     ["Monthly report", "Calls, direction requests, profile views and where you show up.", "yes", "yes"],
   ]},
   { group: "Website", rows: [
@@ -41,11 +42,6 @@ export const FEATURES: { group: string; rows: [string, string, Avail, Avail][] }
     ["Local SEO setup", "Titles, descriptions, business schema, sitemap and local keywords.", "no", "yes"],
     ["Hosting, SSL & updates", "We host it and make your changes. Just text us.", "no", "yes"],
     ["Online ordering & booking", "Link your DoorDash, Uber Eats or booking page, or connect your POS (5% on direct online orders).", "no", "yes"],
-  ]},
-  { group: "Marketing", rows: [
-    ["Review requests", "Ask happy customers for a Google review by text or email.", "no", "soon"],
-    ["Email & text campaigns", "Promos, win-back and birthday messages sent for you.", "no", "soon"],
-    ["Lokly AI assistant", "Ask questions about your business and get marketing written for you.", "no", "soon"],
   ]},
 ];
 
