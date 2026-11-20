@@ -480,3 +480,4 @@ body:has(.mn) .nav,body:has(.mn) .foot,body:has(.me) .foot{display:none}
 .me-offer{display:grid;grid-template-columns:36px 1fr auto;gap:10px;align-items:center;text-decoration:none;color:var(--ink);padding:10px;border-radius:12px;background:#fafbfc}
 .me-offer b{display:block}.me-offer small{color:var(--graphite);font-size:13px;line-height:1.35}.me-offer em{font-style:normal;font-weight:800;background:var(--ink);color:#fff;padding:6px 12px;border-radius:999px;font-size:13px}.me-ico{font-size:24px}
 .dmenu{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border:2px solid var(--palm)}.dmenu-act{display:flex;gap:8px;flex-wrap:wrap}
+.faq-i{border-bottom:1px solid var(--line);padding:14px 0}.faq-i summary{font-weight:800;font-size:19px;cursor:pointer}.faq-i p{margin:8px 0 0}

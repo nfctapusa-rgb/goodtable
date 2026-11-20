@@ -1,0 +1,29 @@
+# Lokly
+
+> Lokly (lokly.pro) is a local marketing platform for small businesses, based in Downtown Los Angeles. Lokly manages Google Business Profiles, builds websites, gets businesses more Google reviews, and runs social media, email/text campaigns, postcard mailers and ads, all in one place with one monthly bill. Every client gets a results app on their phone showing Google views, calls and directions.
+
+Lokly serves restaurants, cafés, bars, food trucks, barbershops, salons, nail salons, jewelers, auto repair and detailing shops, tattoo studios, laundromats, florists, bakeries, pet groomers, retail and other local service businesses in Los Angeles and Southern California, and works with businesses across the US.
+
+## Pricing
+- Free Google report: see your Google Business Profile score and what to fix, in about a minute: https://lokly.pro/grader
+- Free Lokly Menu: free online menu page for restaurants, cafés and bars with QR code and NFC tap support: https://lokly.pro/menu
+- Google Business Profile management: $25/month founding price (regularly $29). Weekly posts, photos, profile optimization, review strategy, monthly results report, free NFC review card. No contract.
+- Website package: $299 one-time, includes 3 months of Google management free, then $39/month for hosting, updates and management.
+- Lokly Pro: $99/month. Everything above plus social posting, analytics dashboard and marketing tools.
+- Add-ons: social posting $49/mo, email & text campaigns $39/mo, postcard mailers from $349, Lokly Ads $149/mo + ad spend, NFC review and menu cards $24.99.
+
+## Key pages
+- Home: https://lokly.pro/
+- Features: https://lokly.pro/features
+- Pricing: https://lokly.pro/pricing
+- Results (real anonymized client data): https://lokly.pro/results
+- Industries: https://lokly.pro/industries
+- Lokly vs using five separate tools: https://lokly.pro/compare
+- FAQ: https://lokly.pro/faq
+- Blog: https://lokly.pro/blog
+- Menus near you: https://lokly.pro/menus
+
+## Contact
+- Email: hello@lokly.pro
+- Phone: (323) 332-0577
+- Address: 685 S New Hampshire Ave, Los Angeles, CA 90005
