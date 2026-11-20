@@ -53,7 +53,8 @@
 @media (max-width:640px){.gc-table .ad-row{grid-template-columns:1.4fr repeat(5,1fr);font-size:13px}.gc-recent .ad-row{grid-template-columns:1fr}}
 
 /* Admin menu + Today */
-.adnav{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 6px;position:sticky;top:0;z-index:4;background:var(--paper);padding:8px 0}
+.adnav{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 10px;padding:8px 0}
+@media(max-width:700px){.adnav{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:-20px;padding-inline:20px;-webkit-overflow-scrolling:touch}.adnav::-webkit-scrollbar{display:none}.adnav>*{flex:none}}
 .adnav a{padding:9px 14px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--ink);text-decoration:none;font-size:14px;font-weight:600}
 .adnav a.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .td-kpi{text-decoration:none;color:var(--ink)}.td-kpi:hover{border-color:var(--ink)}

@@ -15,6 +15,13 @@ const GRADIENT: Record<string, string> = {
   other: "radial-gradient(120% 90% at 70% 20%,#4a5160 0%,#1b2028 50%,#08090b 100%)",
 };
 
+// Per-industry accent so every demo feels made for that business, not a template.
+const THEME: Record<string, { a: string; b: string }> = {
+  food: { a: "#C2410C", b: "#FDBA74" }, beauty: { a: "#9D4B5B", b: "#F5C6CF" }, auto: { a: "#1D4ED8", b: "#93C5FD" },
+  health: { a: "#0F766E", b: "#99F6E4" }, fitness: { a: "#4D7C0F", b: "#D9F99D" }, home: { a: "#B45309", b: "#FDE68A" },
+  pro: { a: "#3730A3", b: "#C7D2FE" }, retail: { a: "#8A6A2F", b: "#F3E2B8" }, other: { a: "#334155", b: "#CBD5E1" },
+};
+
 export default function Preview() {
   const [m, setM] = useState<SiteModel | null>(null);
   const [view, setView] = useState<"mobile" | "desktop">("mobile");
@@ -32,13 +39,13 @@ export default function Preview() {
   );
 
   const heroBg = m.photos[0] ? `linear-gradient(180deg,rgba(0,0,0,.25),rgba(0,0,0,.65)),url("${m.photos[0]}") center/cover` : GRADIENT[m.industry];
-  const word = m.name.toUpperCase();
-  const split = Math.ceil(word.length / 2);
+  const t = THEME[m.industry] ?? THEME.other;
+  const tel = m.phone ? `tel:${m.phone.replace(/[^\d+]/g, "")}` : null;
 
   return (
     <main className="pv">
       <div className="pvbar wrap">
-        <div><p className="eyebrow">Your AI website · preview</p><h1 className="pvh">{m.name}</h1>
+        <div><p className="eyebrow">Your website preview</p><h1 className="pvh">{m.name}</h1>
           <p className="muted small">Built from your Google profile, with every SEO issue from your report fixed. The offer and menu items are examples you can edit.</p></div>
         <div className="pvctl">
           <div className="seg"><button className={view === "mobile" ? "on" : ""} onClick={() => setView("mobile")}>Mobile</button>
@@ -47,10 +54,10 @@ export default function Preview() {
         </div>
       </div>
 
-      <div className={`frame ${view}`}>
+      <div className={`frame ${view}`} style={{ ["--fa" as any]: t.a, ["--fb" as any]: t.b }}>
         <div className="fb">
           <header className="fb-nav">
-            <b className="fb-logo"><span>{word.slice(0, split)}</span><i>{word.slice(split)}</i></b>
+            <b className="fb-logo">{m.name}</b>
             <a className="fb-pill dark">{m.cta}</a>
           </header>
 
@@ -115,9 +122,12 @@ export default function Preview() {
             {m.faq.map(([q, a]) => <details key={q} className="fb-faq"><summary>{q}</summary><p>{a}</p></details>)}
           </section>
 
-          <footer className="fb-foot"><b className="fb-logo light"><span>{word.slice(0, split)}</span><i>{word.slice(split)}</i></b><p>© {new Date().getFullYear()} {m.name} · {m.tagline}</p></footer>
+          <footer className="fb-foot"><b className="fb-logo light">{m.name}</b><p>© {new Date().getFullYear()} {m.name} · {m.tagline}</p><p className="fb-powered">Powered by Lokly.Pro</p></footer>
+          {tel && <a className="fb-callbar" href={tel}>Call {m.name}</a>}
         </div>
       </div>
+
+      <div className="pv-sticky"><div><b>Like it?</b><span>Live in 48 hours. 3 months of Google management free.</span></div><a href="/start?plan=site" className="btn lime">Launch · $299</a></div>
 
       <div className="wrap pvfix">
         <h2 className="h2">What's already fixed on this site</h2>

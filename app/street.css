@@ -316,7 +316,7 @@ html{-webkit-text-size-adjust:100%}
 .pd-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
 .pd{border:2px solid var(--ink);background:#fff;padding:14px;display:grid;gap:10px;align-content:start}
 .pd-top{display:flex;justify-content:space-between;align-items:baseline}
-.pd img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:6px;display:block}
+.pd img{width:100%;height:auto;object-fit:contain;border-radius:6px;display:block;background:var(--sky)}
 .pd-nophoto{aspect-ratio:3/1;display:grid;place-items:center;background:var(--sky);color:var(--gray);font-size:13px;border-radius:6px;text-align:center;padding:10px}
 .pd pre{white-space:pre-wrap;font:14px/1.45 inherit;margin:0;background:#F7F9FB;padding:10px;border-radius:6px;max-height:260px;overflow:auto}
 .pd .btn{justify-self:start}
@@ -365,3 +365,11 @@ html{-webkit-text-size-adjust:100%}
 .rapp-install{background:#FFFBEA;border-color:var(--sign)}.rapp-install .btn{justify-self:start}
 .rapp-foot{text-align:center;font-size:13px;color:var(--gray)}
 .magic{padding-top:0}
+
+/* Mobile polish */
+.ad-add label:has(input[type=checkbox]),label.small:has(input[type=checkbox]){display:flex;align-items:center;gap:10px;font-size:15px}
+input[type=checkbox]{width:20px;height:20px;flex:none;accent-color:var(--ink)}
+.ad-add input:not([type=checkbox]),.ad-add select{font-size:16px;padding:12px}
+@media(max-width:700px){.fixcta{flex-direction:column;align-items:stretch}.fixcta .btn{width:100%;text-align:center}
+ .ad-add{grid-template-columns:1fr}.pd-top{flex-direction:column;align-items:flex-start;gap:2px}
+ table{display:block;overflow-x:auto;max-width:100%}input,select,textarea{font-size:16px}}

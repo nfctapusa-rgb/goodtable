@@ -47,3 +47,24 @@
 .fb-foot{background:#0b0b0b;color:#fff;padding:32px 22px}.fb-foot p{opacity:.6;font-size:13px}
 .frame.mobile .fb-hero{min-height:620px}
 .fb-nav{gap:10px}.fb-nav .fb-pill{padding:9px 14px;font-size:13px;white-space:nowrap;flex:none}.fb-logo{font-size:18px;white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
+
+/* Themed demo: accent per industry, real business name as logo */
+.fb-logo{font-style:normal;letter-spacing:-.01em;color:#0b0b0b}.fb-logo.light{color:#fff}
+.fb-pill.dark{background:var(--fa,#0b0b0b);color:#fff}.fb-offer{background:var(--fa,#0b0b0b)}
+.fb-eyebrow.dark{color:var(--fa,#0b0b0b)}.fb-stars{color:#f5b301}.fb-num{color:var(--fa)}
+.fb-loc a,.fb-reviews a{color:var(--fa,#0b0b0b)}.fb-faq summary::marker{color:var(--fa)}
+.fb-powered{font-size:11px;opacity:.5;margin-top:14px}
+.fb-callbar{position:sticky;bottom:0;display:block;text-align:center;background:var(--fa,#0b0b0b);color:#fff;font-weight:800;padding:14px;text-decoration:none;z-index:3}
+.pv-sticky{display:none}
+/* On a real phone: drop the fake phone frame, show the site full-width like it will look live */
+@media(max-width:600px){
+  .pvbar{padding-top:16px;padding-bottom:12px}.pvh{font-size:24px}.pvctl{display:none}
+  .frame.mobile,.frame.desktop{max-width:none;height:auto;border:0;border-radius:0;box-shadow:none;margin:0 -0px}
+  .fb{height:auto;overflow:visible}.frame.mobile .fb-hero,.fb-hero{min-height:78vh;padding:48px 20px}
+  .fb-callbar{display:none}
+  .pv-sticky{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:50;gap:12px;align-items:center;justify-content:space-between;
+    background:var(--ink);color:#fff;padding:12px 16px calc(12px + env(safe-area-inset-bottom));box-shadow:0 -8px 24px rgba(0,0,0,.2)}
+  .pv-sticky div{display:grid;font-size:12px;line-height:1.3}.pv-sticky b{font-size:15px}.pv-sticky span{opacity:.75}
+  .pv-sticky .btn{flex:none;white-space:nowrap}
+  .pv{padding-bottom:110px}.pvfix .grid3{grid-template-columns:1fr}
+}
