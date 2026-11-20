@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { THEMES, defaultTheme } from "@/lib/menus";
 type Item = { name: string; desc?: string; price?: string; photo?: string; tags?: string[] };
 type Sec = { name: string; items: Item[] };
 
@@ -43,6 +44,20 @@ export function Editor({ token, initial, isNew }: { token: string; initial: any;
           <label className="me-up wide" style={m.banner ? { backgroundImage: `url("${m.banner}")` } : undefined}>{!m.banner && <span>+ Banner photo</span>}<input type="file" accept="image/*" onChange={pic("banner", 1400)} hidden /></label>
         </div>
         <label>Brand color <input type="color" value={m.color || "#E30A23"} onChange={e => set("color", e.target.value)} /></label>
+        <p className="ax-label" style={{ margin: 0 }}>Style</p>
+        <div className="me-themes">{(Object.keys(THEMES) as (keyof typeof THEMES)[]).map(t => (
+          <button key={t} type="button" className={`me-theme t-${t} ${(m.theme || defaultTheme(m.kind)) === t ? "on" : ""}`} style={{ ["--mc" as any]: m.color || "#E30A23" }} onClick={() => set("theme", t)}>
+            <i /><b>{THEMES[t].name}</b><small>{THEMES[t].note}</small></button>))}</div>
+      </section>
+
+      <section className="me-card me-grow">
+        <h2>Grow {m.name}</h2>
+        <a className="me-offer" href={`/api/buy?item=nfc_menu&qty=10&ref=menu-${m.slug}`}>
+          <span className="me-ico">📲</span><div><b>NFC tap menu cards</b><small>Guests tap their phone on the table and this menu opens. Works with your QR code too.</small></div><em>Order</em></a>
+        <a className="me-offer" href={`/start?plan=local&name=${encodeURIComponent(m.name)}&src=menu&email=${encodeURIComponent(m.email ?? "")}`}>
+          <span className="me-ico">📍</span><div><b>Get found on Google: $25/mo</b><small>We run your Google profile every week, link this menu to it, and get you more reviews. Free review card included.</small></div><em>Start</em></a>
+        <a className="me-offer" href={`/grader?q=${encodeURIComponent(`${m.name} ${m.city ?? ""}`.trim())}&src=menu`}>
+          <span className="me-ico">📊</span><div><b>Free Google report</b><small>See how {m.name} shows up on Google Maps and what to fix. 1 minute.</small></div><em>Check</em></a>
       </section>
 
       <section className="me-card"><h2>Details</h2>

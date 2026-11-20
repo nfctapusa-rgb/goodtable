@@ -123,6 +123,7 @@ async function migrate(sql: ReturnType<typeof neon>) {
   // Lokly's own social accounts (house posting) and small key/value settings.
   await sql`CREATE TABLE IF NOT EXISTS settings (key text PRIMARY KEY, value jsonb NOT NULL, updated_at timestamptz NOT NULL DEFAULT now())`;
   await sql`ALTER TABLE prospects ADD COLUMN IF NOT EXISTS menu_invited_at timestamptz`.catch(() => null);
+  await sql`ALTER TABLE menus ADD COLUMN IF NOT EXISTS theme text`.catch(() => null);
   await sql`CREATE TABLE IF NOT EXISTS menus (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     slug text UNIQUE NOT NULL,

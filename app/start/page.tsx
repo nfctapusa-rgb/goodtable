@@ -25,7 +25,7 @@ export default function Start() {
     document.title = "Get started | Lokly";
     const p = new URLSearchParams(location.search);
     const pl = p.get("plan"); if (pl && planById(pl)) setPlan(pl as PlanId);
-    setF(x => ({ ...x, businessName: p.get("name") ?? "", website: p.get("website") ?? "", placeId: p.get("place") ?? "" }));
+    setF(x => ({ ...x, businessName: p.get("name") ?? "", website: p.get("website") ?? "", placeId: p.get("place") ?? "", ...(p.get("email") ? { email: p.get("email")! } : {}) }));
   }, []);
 
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setF({ ...f, [k]: e.target.value });

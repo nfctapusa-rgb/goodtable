@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { db } from "@/lib/db";
-import type { MenuData } from "@/lib/menus";
+import { type MenuData, defaultTheme } from "@/lib/menus";
 
 export const dynamic = "force-dynamic";
 async function load(slug: string) {
@@ -29,7 +29,7 @@ export default async function Menu({ params }: { params: Promise<{ slug: string 
     url: `https://lokly.pro/m/${slug}`, hasMenu: { "@type": "Menu", hasMenuSection: d.sections.map(s => ({ "@type": "MenuSection", name: s.name,
       hasMenuItem: s.items.map(i => ({ "@type": "MenuItem", name: i.name, description: i.desc || undefined, offers: i.price ? { "@type": "Offer", price: i.price.replace(/[^\d.]/g, "") || undefined, priceCurrency: "USD" } : undefined })) })) } };
   return (
-    <main className="mn" style={{ ["--mc" as any]: m.color || "#E30A23" }}>
+    <main className={`mn t-${m.theme || defaultTheme(m.kind)}`} style={{ ["--mc" as any]: m.color || "#E30A23" }}>
       <header className="mn-hero" style={m.banner ? { backgroundImage: `linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.55)),url("${m.banner}")` } : undefined}>
         {m.logo && <img className="mn-logo" src={m.logo} alt={`${m.name} logo`} />}
         <h1>{m.name}</h1>

@@ -18,3 +18,14 @@ export function cleanData(d: any): MenuData {
   const specials = (Array.isArray(d?.specials) ? d.specials : []).slice(0, 10).map((x: any) => ({ title: str(x?.title, 80), desc: str(x?.desc, 240), when: str(x?.when, 60) })).filter((x: Special) => x.title);
   return { sections, specials, hours: str(d?.hours, 300), about: str(d?.about, 600), order: /^https:\/\//.test(d?.order ?? "") ? str(d.order, 300) : "", instagram: str(d?.instagram, 40).replace(/^@/, "") };
 }
+
+// Each menu gets its own look: layout, type and texture, not just a color.
+export const THEMES = {
+  classic: { name: "Classic", note: "Serif type, dotted price lines" },
+  bold: { name: "Bold", note: "Big condensed headings, color blocks" },
+  warm: { name: "Café", note: "Cream paper, soft cards" },
+  dark: { name: "Night", note: "Dark lounge look for bars" },
+  minimal: { name: "Minimal", note: "Clean white, photo-first" },
+} as const;
+export type ThemeId = keyof typeof THEMES;
+export const defaultTheme = (kind?: string | null): ThemeId => kind === "bar" ? "dark" : kind === "cafe" ? "warm" : kind === "food-truck" ? "bold" : "classic";

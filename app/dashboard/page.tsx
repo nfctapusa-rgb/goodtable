@@ -44,6 +44,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   const planInfo = planById(biz.plan);
   const STATUS: Record<string, string> = { pending: "Payment pending", active: "Active", trial: "Free months", past_due: "Payment failed", canceled: "Canceled" };
   const delta = latest && prev ? latest.score - prev.score : null;
+  const myMenus = await sql`SELECT slug, edit_token, name, views, (data->'specials') AS specials FROM menus WHERE lower(email) = lower(${user.email}) ORDER BY created_at` as any[];
 
   return (
     <div className="dash">
@@ -56,6 +57,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
           <a href={`/dashboard?b=${biz.id}#services`}>Add services</a>
           <a href={`/dashboard?b=${biz.id}#brand`}>Brand kit</a>
           <a href="/mailers">Postcards</a>
+          {myMenus.length > 0 && <a href={`/menu/edit/${myMenus[0].edit_token}`}>My menu</a>}
         </nav>
         <form action="/api/auth/logout" method="post"><button className="link">Log out</button></form>
       </aside>
@@ -66,6 +68,11 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
           <span className={`badge ${paid ? "paid" : ""}`}>{planInfo && biz.plan !== "free" ? planInfo.name : "Free plan"}</span>
         </div>
 
+        {myMenus.length > 0 && (
+          <div className="card dmenu" id="menu">
+            <div><b>Your Lokly Menu{myMenus.length > 1 ? "s" : ""}</b>{myMenus.map(mm => <p key={mm.slug} className="small"><a href={`/m/${mm.slug}`} target="_blank" rel="noreferrer">lokly.pro/m/{mm.slug}</a> · {mm.views} views · {(mm.specials ?? []).length} specials</p>)}</div>
+            <div className="dmenu-act"><a className="btn dark sm" href={`/menu/edit/${myMenus[0].edit_token}`}>Edit menu</a><a className="btn ghost sm" href={`/api/buy?item=nfc_menu&qty=10&b=${biz.id}`}>Order NFC menu cards</a></div>
+          </div>)}
         {upgraded && <p className="ok-note">Thanks! Your upgrade is being set up. We'll text you shortly.</p>}
         {billing === "none" && <p className="ok-note">Billing isn't set up online yet. Text us and we'll take care of it.</p>}
         {biz.status === "past_due" && <p className="err-note">Your last payment didn't go through. Update your card to keep your Google profile managed.</p>}
