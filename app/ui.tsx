@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 
 export function Nav() {
   const [open, setOpen] = useState(false);
-  { const p = usePathname() ?? ""; if (p.startsWith("/dashboard") || p.startsWith("/v/") || p.startsWith("/admin") || p === "/app") return null; }
+  { const p = usePathname() ?? ""; if (p.startsWith("/dashboard") || p.startsWith("/v/") || p.startsWith("/admin") || p.startsWith("/m/") || p.startsWith("/menu/edit") || p === "/app") return null; }
   return (
     <nav className="nav" aria-label="Main">
       <a href="#main" className="skip">Skip to content</a>
@@ -15,6 +15,7 @@ export function Nav() {
           <a href="/results">Results</a>
           <a href="/industries">Industries</a>
           <a href="/pricing">Pricing</a>
+          <a href="/menu">Free menu</a>
           <a href="/blog">Blog</a>
           <a href="/login">Log in</a>
           <a href="/grader" className="btn dark sm">Get my free report</a>
@@ -36,13 +37,13 @@ export function SearchHero({ cta = "Get my free report" }: { cta?: string }) {
 }
 
 export function Footer() {
-  { const p = usePathname() ?? ""; if (p.startsWith("/dashboard") || p.startsWith("/v/") || p.startsWith("/admin") || p === "/app") return null; }
+  { const p = usePathname() ?? ""; if (p.startsWith("/dashboard") || p.startsWith("/v/") || p.startsWith("/admin") || p.startsWith("/m/") || p.startsWith("/menu/edit") || p === "/app") return null; }
   return (
     <footer className="foot">
       <div className="wrap footin">
         <div><a href="/" className="logo"><svg className="mark" viewBox="0 0 40 52" aria-hidden="true"><ellipse cx="20" cy="49.5" rx="11" ry="2.2" fill="#D5DBE3"/><path fill="#E30A23" fill-rule="evenodd" d="M20 2C10.6 2 3.6 9.1 3.6 18.2c0 3.2.9 5.4 2.3 8.3L20 46l14.1-19.5c1.4-2.9 2.3-5.1 2.3-8.3C36.4 9.1 29.4 2 20 2zm0 8.6a7.6 7.6 0 1 1 0 15.2 7.6 7.6 0 0 1 0-15.2z"/></svg>Lokly</a><p className="muted small">Websites and Google profiles for local businesses. Downtown LA.</p></div>
         <div className="fcols">
-          <div><b>Product</b><a href="/features">Features</a><a href="/how-it-works">How it works</a><a href="/pricing">Pricing</a><a href="/compare">Lokly vs 5 tools</a><a href="/mailers">Postcards</a><a href="/grader">Free report</a><a href="/blog">Blog</a></div>
+          <div><b>Product</b><a href="/features">Features</a><a href="/how-it-works">How it works</a><a href="/pricing">Pricing</a><a href="/compare">Lokly vs 5 tools</a><a href="/mailers">Postcards</a><a href="/menu">Free digital menu</a><a href="/menus">Menus near you</a><a href="/grader">Free report</a><a href="/blog">Blog</a></div>
           <div><b>Proof</b><a href="/results">Results</a><a href="/industries/restaurants">Restaurants</a><a href="/industries/barbers-salons">Barbers &amp; salons</a><a href="/industries/jewelers">Jewelers</a><a href="/industries/studios-services">Services</a></div>
           <div><b>Company</b><a href="mailto:hello@lokly.pro">Contact</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></div>
         </div>

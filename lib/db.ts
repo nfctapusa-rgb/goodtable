@@ -122,6 +122,19 @@ async function migrate(sql: ReturnType<typeof neon>) {
     created_at timestamptz NOT NULL DEFAULT now())`;
   // Lokly's own social accounts (house posting) and small key/value settings.
   await sql`CREATE TABLE IF NOT EXISTS settings (key text PRIMARY KEY, value jsonb NOT NULL, updated_at timestamptz NOT NULL DEFAULT now())`;
+  await sql`CREATE TABLE IF NOT EXISTS menus (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    slug text UNIQUE NOT NULL,
+    edit_token text NOT NULL,
+    name text NOT NULL,
+    email text NOT NULL,
+    phone text, address text, city text, website text, kind text DEFAULT 'restaurant',
+    logo text, banner text, color text DEFAULT '#E30A23',
+    data jsonb NOT NULL DEFAULT '{"sections":[],"specials":[]}'::jsonb,
+    published boolean NOT NULL DEFAULT true,
+    views int NOT NULL DEFAULT 0,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    updated_at timestamptz NOT NULL DEFAULT now())`;
   await sql`CREATE TABLE IF NOT EXISTS house_posts (
     id bigserial PRIMARY KEY,
     kind text NOT NULL,

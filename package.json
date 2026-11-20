@@ -10,7 +10,8 @@
     "next": "^15.5.9",
     "react": "^19.1.2",
     "react-dom": "^19.1.2",
-    "@neondatabase/serverless": "^1.0.0"
+    "@neondatabase/serverless": "^1.0.0",
+    "qrcode": "^1.5.4"
   },
   "devDependencies": {
     "typescript": "^5.6.0",
