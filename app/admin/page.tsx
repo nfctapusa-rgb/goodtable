@@ -96,6 +96,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
             <span><b>{r.business_name}</b><small>{r.data?.address}</small></span>
             <span>{r.contact_name}<a href={`tel:${r.phone}`}>{r.phone}</a><a href={`mailto:${r.email}`}>{r.email}</a></span>
             <span>{r.plan}<small>{r.data?.status}{r.data?.scans ? ` · ${r.data.scans} scans` : ""}</small>
+              {process.env.SHOPIFY_STORE_DOMAIN && r.data?.qty && <a href={`/api/buy?item=mailer_${r.data.qty}&ref=${r.id}`} target="_blank" rel="noreferrer" title="Text this to the client after they approve the proof">Shopify pay link</a>}
               {r.data?.proofUrl ? <a href={r.data.proofUrl} target="_blank" rel="noreferrer">View proof PDF</a>
                 : process.env.LOB_API_KEY ? <form method="post" action="/api/admin/proof"><input type="hidden" name="key" value={key} /><input type="hidden" name="lead" value={r.id} /><button className="btn dark sm">Make proof</button></form> : <small>Add Lob key for proofs</small>}</span>
             <span className="ad-notes"><b>{r.data?.headline}</b><em>{r.data?.detail}</em><span>{r.data?.area}{r.data?.zips ? `: ${r.data.zips}` : ""}</span></span>

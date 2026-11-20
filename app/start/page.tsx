@@ -60,7 +60,7 @@ export default function Start() {
           {PLANS.filter(p => !p.addon).map(p => (
             <label key={p.id} className={plan === p.id ? "on" : ""}>
               <input type="radio" name="plan" value={p.id} checked={plan === p.id} onChange={() => setPlan(p.id)} />
-              <b>{p.name}</b><span>{p.id === "site" ? "$299 once, then $25/mo after 3 free months" : `$${p.price}/mo`}</span>
+              <b>{p.name}</b><span>{p.id === "site" ? "$299 once, then $39/mo after 3 free months" : p.listPrice ? `$${p.price}/mo founding price (reg. $${p.listPrice})` : `$${p.price}/mo`}</span>
             </label>
           ))}
         </div>

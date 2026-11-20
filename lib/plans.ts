@@ -4,29 +4,31 @@
 export type PlanId = "site" | "local" | "pro" | "ads";
 
 export interface Plan {
-  id: PlanId; name: string; price: number; cents: number; interval: "once" | "month";
+  id: PlanId; name: string; price: number; listPrice?: number; cents: number; interval: "once" | "month";
   blurb: string; cta: string; highlight?: boolean; addon?: boolean;
 }
 
 export const PLANS: Plan[] = [
-  { id: "local", name: "Google Management", price: 25, cents: 2500, interval: "month",
+  { id: "local", name: "Google Management", price: 25, listPrice: 29, cents: 2500, interval: "month",
     blurb: "We run your Google profile: review replies, weekly posts and offers, fresh photos, plus a monthly email with your numbers and what we're improving. Free NFC review card.", cta: "Start for $25/mo" },
   { id: "site", name: "Website Package", price: 299, cents: 29900, interval: "once", highlight: true,
-    blurb: "We build your website and optimize your Google profile. Your first 3 months of management are free, then $25/mo covers management, hosting and 3 to 5 changes a week.", cta: "Get my website" },
-  { id: "pro", name: "Lokly Pro", price: 89, cents: 8900, interval: "month",
+    blurb: "We build your website and optimize your Google profile. Your first 3 months of management are free, then $39/mo covers management, hosting and up to 3 changes a week.", cta: "Get my website" },
+  { id: "pro", name: "Lokly Pro", price: 99, cents: 9900, interval: "month",
     blurb: "Everything in management plus your website, online ordering, a live analytics dashboard and our marketing tools.", cta: "Start Lokly Pro" },
   { id: "ads", name: "Lokly Ads", price: 149, cents: 14900, interval: "month", addon: true,
     blurb: "Done-for-you ads on Instagram, Facebook and Google. Ad budget paid separately to the ad platforms.", cta: "Add Lokly Ads" },
 ];
-// Website Package: after the build, $25/mo starts once the free months end.
+// Website Package: after the build, $39/mo starts once the free months end.
 export const SITE_FREE_MONTHS = 3;
-export const SITE_MONTHLY_CENTS = 2500;
+export const SITE_MONTHLY_CENTS = 3900;
+// Google Management is $29/mo list; the first 50 clients lock in $25 for life.
+export const FOUNDING_NOTE = "Founding price, regularly $29. Locked in for life for our first 50 clients.";
 
 // Postcard mailers: price per campaign, printed and mailed by our print partner.
 export const MAILERS = [
-  { qty: 250, price: 199 },
-  { qty: 500, price: 350 },
-  { qty: 1000, price: 599 },
+  { qty: 250, price: 349 },
+  { qty: 500, price: 599 },
+  { qty: 1000, price: 999 },
 ];
 
 export type Avail = "yes" | "no" | "soon";

@@ -13,6 +13,7 @@ export async function POST(req: Request) {
   if (!biz) return new NextResponse("Not found", { status: 404 });
   const offer = offerById(biz, String(f.get("offer") ?? ""));
   if (!offer) return new NextResponse("Offer not available", { status: 400 });
+  if (offer.id === "nfc") return NextResponse.redirect(new URL(`/api/buy?item=nfc&qty=1&b=${bizId}`, req.url), 303);
   if (offer.href) return NextResponse.redirect(new URL(offer.href, req.url), 303);
   const origin = new URL(req.url).origin;
   if (!process.env.STRIPE_SECRET_KEY || !offer.cents) {

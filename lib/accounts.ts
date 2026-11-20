@@ -60,7 +60,7 @@ export function servicesFor(b: { plan: string; status?: string; addons?: string[
   const pro = b.plan === "pro", site = b.plan === "site" || pro;
   const out: Service[] = [
     { id: "site_member", name: "Website", desc: "Built from your Google profile, hosted, with weekly changes.", price: b.plan === "local" ? "$199 once" : undefined, cents: 19900, mode: "payment", newPlan: "site", state: site ? "included" : b.plan === "local" ? "available" : "available" },
-    { id: "pro", name: "Lokly Pro", desc: "Online ordering, live analytics, social posting and email & text campaigns in one plan.", price: "$89/mo", cents: 8900, mode: "subscription", newPlan: "pro", state: pro ? "active" : "available" },
+    { id: "pro", name: "Lokly Pro", desc: "Online ordering, live analytics, social posting and email & text campaigns in one plan.", price: "$99/mo", cents: 9900, mode: "subscription", newPlan: "pro", state: pro ? "active" : "available" },
   ];
   for (const t of MARKETING_TOOLS) {
     if (t.id === "reviews") continue;

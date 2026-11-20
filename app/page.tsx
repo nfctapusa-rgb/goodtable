@@ -77,7 +77,7 @@ export default function Home() {
       <section className="sh-week">
         <div className="wrap">
           <h2 className="sh-h2">A week on your Google profile.</h2>
-          <p className="sh-sub">This is the $25/month plan. You keep running the shop; we keep your profile active and accurate.</p>
+          <p className="sh-sub">This is the Google Management plan. You keep running the shop; we keep your profile active and accurate.</p>
           <ol className="cal">
             {WEEK.map(([d, t]) => <li key={d}><b>{d}</b><span>{t}</span></li>)}
           </ol>
@@ -88,9 +88,9 @@ export default function Home() {
         <h2 className="sh-h2">Pick what you need.</h2>
         <dl className="menu">
           
-          <div><dt>Google management</dt><dd className="pr">$25 a month</dd><dd className="ds">Review replies, weekly posts and offers, fresh photos, and a monthly email with your numbers. <b>Free NFC review card</b> for your counter.</dd></div>
-          <div className="pop"><dt>Website package</dt><dd className="pr">$299 once</dd><dd className="ds"><span className="tag">Most shops start here</span> We build your site and optimize your Google profile. <b>3 months of management free</b>, then $25 a month for management, hosting and 3 to 5 changes a week.</dd></div>
-          <div><dt>Lokly Pro</dt><dd className="pr">$89 a month</dd><dd className="ds">Management plus your website, online ordering, a live analytics dashboard and our marketing tools.</dd></div>
+          <div><dt>Google management</dt><dd className="pr">$25 a month <s>$29</s></dd><dd className="ds">Review replies, weekly posts and offers, fresh photos, and a monthly email with your numbers. <b>Free NFC review card</b> for your counter.</dd></div>
+          <div className="pop"><dt>Website package</dt><dd className="pr">$299 once</dd><dd className="ds"><span className="tag">Most shops start here</span> We build your site and optimize your Google profile. <b>3 months of management free</b>, then $39 a month for management, hosting and up to 3 changes a week.</dd></div>
+          <div><dt>Lokly Pro</dt><dd className="pr">$99 a month</dd><dd className="ds">Management plus your website, online ordering, a live analytics dashboard and our marketing tools.</dd></div>
         </dl>
         <p className="sh-fine">Month to month. Cancel anytime. <a href="/pricing">See everything included</a></p>
       </section>
