@@ -1,6 +1,7 @@
 import { db, dbReady } from "@/lib/db";
 import { AdminNav } from "./nav";
 import { Today } from "./today";
+import { shareUrl } from "@/lib/share";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Admin | Lokly", robots: { index: false, follow: false } };
@@ -30,129 +31,120 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
   const mailers = rows.filter(r => r.kind === "mailer");
   const fromCard = reports.filter(r => String(r.source).startsWith("card")).length;
   const when = (d: string) => new Date(d).toLocaleString("en-US", { timeZone: "America/Los_Angeles", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+  const live = clients.filter(c => c.plan !== "free");
+  const pill = (st: string) => <span className={`ax-pill ${st}`}>{st.replace("_", " ")}</span>;
   return (
-    <main className="wrap admin">
+    <main className="ax">
       <AdminNav k={key} on="" />
-      <h1 className="sh-h2">Today</h1>
+      <div className="ax-wrap">
+      <header className="ax-hello"><h1>Today</h1><p>{new Date().toLocaleDateString("en-US", { timeZone: "America/Los_Angeles", weekday: "long", month: "long", day: "numeric" })}</p></header>
       <Today k={key!} />
-      <h2 className="ad-h">Leads</h2>
-      <p className="sh-sub">{signups.length} signups · {reports.length} free reports ({fromCard} from your business card)</p>
-      {msg && <p className="ok-note" style={{ wordBreak: "break-all" }}>{msg}</p>}
-      <h2 className="ad-h" id="clients">Client accounts</h2>
-      <form className="card ad-add" method="post" action="/api/admin/client">
-        <b>Add an existing client</b>
-        <p className="muted small">For clients you already manage. They get a sign-in link to their results app, no password needed.</p>
-        <input type="hidden" name="key" value={key} />
-        <input name="business" placeholder="Business name" required />
-        <input name="owner" placeholder="Owner name" />
-        <input name="email" type="email" placeholder="Owner email" required />
-        <input name="phone" placeholder="Owner mobile (optional)" />
-        <input name="leadsnap" placeholder="LeadSnap ID, e.g. 105266" inputMode="numeric" />
-        <input name="website" placeholder="Website (optional)" />
-        <select name="plan" defaultValue="local"><option value="local">Google Management $25</option><option value="site">Website Package</option><option value="pro">Lokly Pro $99</option></select>
-        <label className="small"><input type="checkbox" name="send" value="1" defaultChecked /> Email them their sign-in link now</label>
-        <button className="btn dark sm">Add client</button>
-      </form>
-      <div className="ad-table">
-        <div className="ad-row ad-head c3"><span>Business</span><span>Login email</span><span>Plan, LeadSnap location ID & optional report link</span></div>
-        {clients.length === 0 && <p className="ad-empty">No accounts yet. Clients sign up at lokly.pro/signup.</p>}
-        {clients.map(c => (
-          <form key={c.id} className="ad-row c3" method="post" action="/api/admin/business">
-            <span><b>{c.name}</b><small>{when(c.created_at)}</small></span>
-            <span>{c.email}</span>
-            <span className="ad-edit">
-              <input type="hidden" name="key" value={key} /><input type="hidden" name="id" value={c.id} />
-              <select name="plan" defaultValue={c.plan} aria-label="Plan"><option value="free">Free</option><option value="local">Google Management</option><option value="pro">Pro</option></select>
-              <input name="leadsnap_id" defaultValue={c.leadsnap_id ?? ""} placeholder="LeadSnap ID e.g. 105266" aria-label="LeadSnap location ID" inputMode="numeric" style={{maxWidth:"11rem"}} />
-              <input name="stats_url" defaultValue={c.stats_url ?? ""} placeholder="https://… report link (optional)" aria-label="Google stats link" />
-              <button className="btn dark sm">Save</button>
-            </span>
+      {msg && <p className="ax-msg">{msg}</p>}
+
+      <section className="ax-sec" id="clients">
+        <div className="ax-sechead"><h2>Clients <span>{live.length}</span></h2></div>
+        <details className="ax-add">
+          <summary>+ Add client</summary>
+          <form className="ad-add" method="post" action="/api/admin/client">
+            <input type="hidden" name="key" value={key} />
+            <input name="business" placeholder="Business name" required />
+            <input name="owner" placeholder="Owner name" />
+            <input name="email" type="email" placeholder="Owner email" required />
+            <input name="phone" placeholder="Owner mobile (optional)" />
+            <input name="leadsnap" placeholder="LeadSnap ID, e.g. 105266" inputMode="numeric" />
+            <input name="website" placeholder="Website (optional)" />
+            <select name="plan" defaultValue="local"><option value="local">Google Management $25</option><option value="site">Website Package</option><option value="pro">Lokly Pro $99</option></select>
+            <label className="small"><input type="checkbox" name="send" value="1" defaultChecked /> Email them their sign-in link</label>
+            <button className="btn dark sm">Add client</button>
           </form>
-        ))}
-      </div>
-      <h2 className="ad-h" id="onboarding">Onboarding & results</h2>
-      <div className="ad-table">
-        {clients.filter(c => c.plan !== "free").map(c => {
-          const ts = tasksOf(c.id);
+        </details>
+        {clients.length === 0 && <p className="ax-empty">No clients yet.</p>}
+        <div className="ax-list">
+        {clients.map(c => {
+          const ts = tasksOf(c.id); const open = ts.filter(t => !t.done).length;
+          const link = shareUrl(c.id);
           return (
-            <div key={c.id} className="ad-onb">
-              <div><b>{c.name}</b> <span className={`st ${c.status === "active" ? "live" : c.status === "trial" ? "managed" : "soon"}`}>{c.status}</span> <small>{c.plan}{c.phone ? ` · ${c.phone}` : ""}{c.email ? ` · ${c.email}` : ""}</small>
-                {c.setup?.shipTo && <small style={{ color: "#E30A23", fontWeight: 700 }}>NFC card → {c.setup.shipTo}</small>}
+            <article key={c.id} className="ax-client">
+              <div className="ax-ctop">
+                <div><b>{c.name}</b><small>{c.plan === "local" ? "Google Mgmt" : c.plan === "pro" ? "Pro" : c.plan === "site" ? "Website" : "Free"}{c.leadsnap_id ? ` · LS ${c.leadsnap_id}` : ""}{c.email ? ` · ${c.email}` : ""}</small></div>
+                {pill(c.status ?? "pending")}
               </div>
-              <div className="ad-status">{["pending", "active", "trial", "past_due", "canceled"].map(st => (
-                <form key={st} method="post" action="/api/admin/task"><input type="hidden" name="key" value={key} /><input type="hidden" name="b" value={c.id} /><input type="hidden" name="status" value={st} />
-                  <button className={`chip ${c.status === st ? "on" : ""}`}>{st}</button></form>))}</div>
-              <div className="ad-status">{["social", "campaigns", "ads", "mailers"].map(a => (
-                <form key={a} method="post" action="/api/admin/task"><input type="hidden" name="key" value={key} /><input type="hidden" name="b" value={c.id} /><input type="hidden" name="addon" value={a} />
-                  <button className={`chip ${(c.addons ?? []).includes(a) ? "on" : ""}`} title="Paid add-on (tap to toggle)">+ {a}</button></form>))}</div>
-              <form className="ad-result" method="post" action="/api/admin/result">
-                <input type="hidden" name="key" value={key} /><input type="hidden" name="b" value={c.id} />
-                <select name="kind" aria-label="Type">{["Google post", "Review reply", "Social post", "Postcard", "Campaign", "Website", "Ads", "Update"].map(k => <option key={k}>{k}</option>)}</select>
-                <input name="title" placeholder="What we did, e.g. Posted this week's 10% off offer" required />
-                <input name="detail" placeholder="Result (optional), e.g. 312 views, 9 calls" />
-                <input name="url" placeholder="Link (optional)" />
-                <button className="btn dark sm">Log it</button>
-              </form>
-              <div className="ad-tasks">{ts.map(t => (
-                <form key={t.key} method="post" action="/api/admin/task"><input type="hidden" name="key" value={key} /><input type="hidden" name="b" value={c.id} /><input type="hidden" name="task" value={t.key} />
-                  <button className={`chip ${t.done ? "on" : ""}`} title={t.who === "owner" ? "Client task" : "Lokly task"}>{t.done ? "✓ " : ""}{t.title}</button></form>))}</div>
-            </div>
+              <div className="ax-actions">
+                <a className="ax-btn" href={link} target="_blank" rel="noreferrer">Open results</a>
+                <a className="ax-btn ghost" href={`sms:&body=${encodeURIComponent(`Your Google results are live: ${link}\nTip: add it to your home screen so you can check anytime.`)}`}>Text link</a>
+                {c.phone && <a className="ax-btn ghost" href={`tel:${c.phone}`}>Call</a>}
+              </div>
+              <details className="ax-more">
+                <summary>Manage{open ? ` · ${open} open task${open > 1 ? "s" : ""}` : ""}</summary>
+                <p className="ax-label">Status</p>
+                <div className="ad-status">{["pending", "active", "trial", "past_due", "canceled"].map(st => (
+                  <form key={st} method="post" action="/api/admin/task"><input type="hidden" name="key" value={key} /><input type="hidden" name="b" value={c.id} /><input type="hidden" name="status" value={st} />
+                    <button className={`chip ${c.status === st ? "on" : ""}`}>{st.replace("_", " ")}</button></form>))}</div>
+                <p className="ax-label">Paid add-ons</p>
+                <div className="ad-status">{["social", "campaigns", "ads", "mailers"].map(a => (
+                  <form key={a} method="post" action="/api/admin/task"><input type="hidden" name="key" value={key} /><input type="hidden" name="b" value={c.id} /><input type="hidden" name="addon" value={a} />
+                    <button className={`chip ${(c.addons ?? []).includes(a) ? "on" : ""}`}>{a}</button></form>))}</div>
+                {ts.length > 0 && <><p className="ax-label">Setup</p>
+                <div className="ad-tasks">{ts.map(t => (
+                  <form key={t.key} method="post" action="/api/admin/task"><input type="hidden" name="key" value={key} /><input type="hidden" name="b" value={c.id} /><input type="hidden" name="task" value={t.key} />
+                    <button className={`chip ${t.done ? "on" : ""}`}>{t.done ? "✓ " : ""}{t.title}</button></form>))}</div></>}
+                <p className="ax-label">Log work (shows in their results)</p>
+                <form className="ax-form" method="post" action="/api/admin/result">
+                  <input type="hidden" name="key" value={key} /><input type="hidden" name="b" value={c.id} />
+                  <select name="kind" aria-label="Type">{["Google post", "Review reply", "Social post", "Postcard", "Campaign", "Website", "Ads", "Update"].map(k => <option key={k}>{k}</option>)}</select>
+                  <input name="title" placeholder="What we did" required />
+                  <input name="detail" placeholder="Result (optional)" />
+                  <button className="btn dark sm">Log it</button>
+                </form>
+                <p className="ax-label">Details</p>
+                <form className="ax-form" method="post" action="/api/admin/business">
+                  <input type="hidden" name="key" value={key} /><input type="hidden" name="id" value={c.id} />
+                  <select name="plan" defaultValue={c.plan} aria-label="Plan"><option value="free">Free</option><option value="local">Google Management</option><option value="pro">Pro</option></select>
+                  <input name="leadsnap_id" defaultValue={c.leadsnap_id ?? ""} placeholder="LeadSnap ID" inputMode="numeric" />
+                  <input name="stats_url" defaultValue={c.stats_url ?? ""} placeholder="Report link (optional)" />
+                  <button className="btn dark sm">Save</button>
+                </form>
+                {c.setup?.shipTo && <p className="ax-flag">Mail NFC card → {c.setup.shipTo}</p>}
+              </details>
+            </article>
           );
         })}
-      </div>
-      <h2 className="ad-h">Signups to call</h2>
-      <div className="ad-table">
-        <div className="ad-row ad-head"><span>When</span><span>Business</span><span>Contact</span><span>Plan</span><span>Links & notes</span></div>
-        {signups.length === 0 && <p className="ad-empty">No signups yet.</p>}
-        {signups.map(r => (
-          <div key={r.id} className="ad-row">
-            <span>{when(r.created_at)}</span>
-            <span><b>{r.business_name}</b>{r.website && <a href={/^https?:/.test(r.website) ? r.website : `https://${r.website}`} target="_blank" rel="noreferrer">{r.website}</a>}</span>
-            <span>{r.contact_name}<a href={`tel:${r.phone}`}>{r.phone}</a><a href={`mailto:${r.email}`}>{r.email}</a></span>
-            <span>{r.plan}</span>
-            <span className="ad-notes">{r.data?.tools?.length > 0 && <span>Wants: {r.data.tools.join(", ")}</span>}{r.data?.nfcCard && <b style={{color:"#E30A23"}}>Mail NFC card → {r.data.shipTo}</b>}{r.data?.googleProfile && <a href={r.data.googleProfile} target="_blank" rel="noreferrer">Google profile</a>}{r.data?.orderLink && <a href={r.data.orderLink} target="_blank" rel="noreferrer">Ordering link</a>}{r.data?.instagram && <span>{r.data.instagram}</span>}{r.data?.notes && <em>{r.data.notes}</em>}</span>
-          </div>
-        ))}
-      </div>
-      <h2 className="ad-h" id="mailers">Postcard requests</h2>
-      <div className="ad-table">
-        <div className="ad-row ad-head"><span>When</span><span>Business</span><span>Contact</span><span>Order</span><span>Offer & area</span></div>
-        {mailers.length === 0 && <p className="ad-empty">No postcard requests yet.</p>}
-        {mailers.map(r => (
-          <div key={r.id} className="ad-row">
-            <span>{when(r.created_at)}</span>
-            <span><b>{r.business_name}</b><small>{r.data?.address}</small></span>
-            <span>{r.contact_name}<a href={`tel:${r.phone}`}>{r.phone}</a><a href={`mailto:${r.email}`}>{r.email}</a></span>
-            <span>{r.plan}<small>{r.data?.status}{r.data?.scans ? ` · ${r.data.scans} scans` : ""}</small>
-              {process.env.SHOPIFY_STORE_DOMAIN && r.data?.qty && <a href={`/api/buy?item=mailer_${r.data.qty}&ref=${r.id}`} target="_blank" rel="noreferrer" title="Text this to the client after they approve the proof">Shopify pay link</a>}
-              {r.data?.proofUrl ? <a href={r.data.proofUrl} target="_blank" rel="noreferrer">View proof PDF</a>
-                : process.env.LOB_API_KEY ? <form method="post" action="/api/admin/proof"><input type="hidden" name="key" value={key} /><input type="hidden" name="lead" value={r.id} /><button className="btn dark sm">Make proof</button></form> : <small>Add Lob key for proofs</small>}</span>
-            <span className="ad-notes"><b>{r.data?.headline}</b><em>{r.data?.detail}</em><span>{r.data?.area}{r.data?.zips ? `: ${r.data.zips}` : ""}</span></span>
-          </div>
-        ))}
-      </div>
-      <h2 className="ad-h">Tool requests</h2>
-      <div className="ad-table">
-        {toolReqs.length === 0 && <p className="ad-empty">No tool requests yet. Clients request tools from their dashboard.</p>}
-        {toolReqs.map(r => (
-          <div key={r.id} className="ad-row r4">
-            <span>{when(r.created_at)}</span><span><b>{r.business_name}</b></span><span>{r.data?.toolName}</span>
-            <span>{r.plan}{r.email && <a href={`mailto:${r.email}`}>{r.email}</a>}</span>
-          </div>
-        ))}
-      </div>
-      <h2 className="ad-h">Free reports</h2>
-      <div className="ad-table">
-        <div className="ad-row ad-head r4"><span>When</span><span>Business</span><span>Score</span><span>Source</span></div>
-        {reports.length === 0 && <p className="ad-empty">No reports yet.</p>}
-        {reports.map(r => (
-          <div key={r.id} className="ad-row r4">
-            <span>{when(r.created_at)}</span>
-            <span><b>{r.business_name}</b>{r.city && <small>{r.city}</small>}{r.data?.needsGoogleProfile && <small style={{color:"#E5402F",fontWeight:700}}>No Google profile, set one up{r.data.address ? ` · ${r.data.address}` : ""}</small>}{r.website && <a href={r.website} target="_blank" rel="noreferrer">{r.website}</a>}</span>
-            <span>{r.score ?? "–"}/100</span>
-            <span>{String(r.source).replace("card", "Business card").replace(":saved", " · saved")}{r.email && <a href={`mailto:${r.email}`}>{r.contact_name} {r.email}</a>}{r.phone && <a href={`tel:${r.phone}`}>{r.phone}</a>}</span>
-          </div>
-        ))}
+        </div>
+      </section>
+
+      {signups.length > 0 && <section className="ax-sec"><div className="ax-sechead"><h2>New signups <span>{signups.length}</span></h2></div>
+        <div className="ax-list">{signups.map(r => (
+          <article key={r.id} className="ax-client">
+            <div className="ax-ctop"><div><b>{r.business_name}</b><small>{when(r.created_at)} · {r.plan}{r.contact_name ? ` · ${r.contact_name}` : ""}</small></div></div>
+            <div className="ax-actions">{r.phone && <a className="ax-btn" href={`tel:${r.phone}`}>Call {r.phone}</a>}{r.email && <a className="ax-btn ghost" href={`mailto:${r.email}`}>Email</a>}</div>
+            {r.data?.nfcCard && <p className="ax-flag">Mail NFC card → {r.data.shipTo}</p>}
+          </article>))}</div></section>}
+
+      {mailers.length > 0 && <section className="ax-sec"><div className="ax-sechead"><h2>Postcard requests <span>{mailers.length}</span></h2></div>
+        <div className="ax-list">{mailers.map(r => (
+          <article key={r.id} className="ax-client">
+            <div className="ax-ctop"><div><b>{r.business_name}</b><small>{when(r.created_at)} · {r.plan} · {r.data?.status ?? "new"}</small></div></div>
+            <p className="ax-note"><b>{r.data?.headline}</b> {r.data?.detail} · {r.data?.area}</p>
+            <div className="ax-actions">
+              {r.phone && <a className="ax-btn ghost" href={`tel:${r.phone}`}>Call</a>}
+              {r.data?.proofUrl ? <a className="ax-btn ghost" href={r.data.proofUrl} target="_blank" rel="noreferrer">Proof PDF</a>
+                : process.env.LOB_API_KEY ? <form method="post" action="/api/admin/proof"><input type="hidden" name="key" value={key} /><input type="hidden" name="lead" value={r.id} /><button className="ax-btn">Make proof</button></form> : null}
+              {process.env.SHOPIFY_STORE_DOMAIN && r.data?.qty && <a className="ax-btn ghost" href={`/api/buy?item=mailer_${r.data.qty}&ref=${r.id}`} target="_blank" rel="noreferrer">Pay link</a>}
+            </div>
+          </article>))}</div></section>}
+
+      {toolReqs.length > 0 && <section className="ax-sec"><div className="ax-sechead"><h2>Tool requests <span>{toolReqs.length}</span></h2></div>
+        <div className="ax-rows">{toolReqs.map(r => <div key={r.id}><b>{r.business_name}</b><span>{r.data?.toolName}</span><small>{when(r.created_at)}</small></div>)}</div></section>}
+
+      <section className="ax-sec"><div className="ax-sechead"><h2>Free reports <span>{reports.length}</span></h2><small>{fromCard} from your card</small></div>
+        {reports.length === 0 ? <p className="ax-empty">No reports yet.</p> :
+        <div className="ax-rows">{reports.slice(0, 30).map(r => (
+          <div key={r.id}>
+            <b>{r.business_name}</b>
+            <span className={`ax-score ${(r.score ?? 0) >= 80 ? "hi" : (r.score ?? 0) >= 60 ? "mid" : "lo"}`}>{r.score ?? "–"}</span>
+            <small>{when(r.created_at)} · {String(r.source).replace("card", "business card").replace(":saved", " · saved")}{r.email ? ` · ${r.email}` : ""}</small>
+          </div>))}</div>}
+      </section>
       </div>
     </main>
   );

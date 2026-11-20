@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 
 export function Nav() {
   const [open, setOpen] = useState(false);
-  { const p = usePathname() ?? ""; if (p.startsWith("/dashboard") || p.startsWith("/v/") || p === "/app") return null; }
+  { const p = usePathname() ?? ""; if (p.startsWith("/dashboard") || p.startsWith("/v/") || p.startsWith("/admin") || p === "/app") return null; }
   return (
     <nav className="nav" aria-label="Main">
       <a href="#main" className="skip">Skip to content</a>
@@ -34,7 +34,7 @@ export function SearchHero({ cta = "Get my free report" }: { cta?: string }) {
 }
 
 export function Footer() {
-  { const p = usePathname() ?? ""; if (p.startsWith("/dashboard") || p.startsWith("/v/") || p === "/app") return null; }
+  { const p = usePathname() ?? ""; if (p.startsWith("/dashboard") || p.startsWith("/v/") || p.startsWith("/admin") || p === "/app") return null; }
   return (
     <footer className="foot">
       <div className="wrap footin">

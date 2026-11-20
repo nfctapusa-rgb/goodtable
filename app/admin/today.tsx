@@ -34,10 +34,10 @@ export async function Today({ k }: { k: string }) {
     ...(n(d.house_pending) ? [{ t: `${n(d.house_pending)} Lokly social posts waiting for your OK`, d: "Approve or skip", href: `/admin/social${q}` }] : []),
   ];
   const card = (label: string, value: string, sub: string, href: string) => (
-    <a key={label} href={href} className="card gc-kpi td-kpi"><span>{label}</span><b>{value}</b><small>{sub}</small></a>);
+    <a key={label} href={href} className="ax-kpi"><b>{value}</b><span>{label}</span><small>{sub}</small></a>);
   return (
-    <section className="today">
-      <div className="gc-kpis">
+    <section className="ax-today">
+      <div className="ax-kpis">
         {card("Free reports", String(n(d.reports_today)), `today · ${n(d.reports_week)} this week`, `/admin/growth${q}`)}
         {card("Sign-ups", String(n(d.signups_week)), "this week", `/admin${q}#clients`)}
         {card("Emails sent", String(n(d.sent_today)), `last 24h · ${n(d.p_queued)} queued`, `/admin/outreach${q}`)}
@@ -45,10 +45,10 @@ export async function Today({ k }: { k: string }) {
         {card("Paying clients", String(subs.filter(s => s.status === "active").length), `${money(mrr)}/mo · ${money(n(d.collected))} this month`, `/admin/growth${q}`)}
         {card("Lokly posts", String(n(d.house_sched)), `scheduled · ${n(d.ig_week)} IG leads this week`, `/admin/social${q}`)}
       </div>
-      <div className="card td-todo">
-        <b>Needs you</b>
-        {todo.length === 0 ? <p className="muted small">Nothing right now. New signups, replies and failed payments show up here.</p>
-          : <ul>{todo.slice(0, 12).map((x, i) => <li key={i}><a href={x.href}>{x.t}</a>{x.d && <small className="muted"> {x.d}</small>}</li>)}</ul>}
+      <div className="ax-todo">
+        <h2>Needs you {todo.length > 0 && <span>{todo.length}</span>}</h2>
+        {todo.length === 0 ? <p className="ax-empty">All clear. New signups, replies and failed payments show up here.</p>
+          : <ul>{todo.slice(0, 12).map((x, i) => <li key={i}><a href={x.href}><b>{x.t}</b>{x.d && <small>{x.d}</small>}</a></li>)}</ul>}
       </div>
     </section>
   );
