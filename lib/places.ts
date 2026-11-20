@@ -13,7 +13,33 @@ export interface Place {
   addressComponents?: { longText: string; types: string[] }[];
 }
 
-export const placesKey = () => process.env.GOOGLE_PLACES_API_KEY || "";
+const googleKey = () => process.env.GOOGLE_PLACES_API_KEY || "";
+const serpKey = () => process.env.SERPAPI_KEY || "";
+// True when any business-search provider is set up (Google Places, or SerpApi's free plan as fallback).
+export const placesKey = () => googleKey() || serpKey();
+
+// SerpApi reads public Google Maps listings. Used when Google isn't set up or is over its quota.
+async function serp(params: Record<string, string>) {
+  const u = new URL("https://serpapi.com/search.json");
+  for (const [k, v] of Object.entries({ engine: "google_maps", hl: "en", gl: "us", ...params, api_key: serpKey() })) u.searchParams.set(k, v);
+  const r = await fetch(u, { cache: "no-store" });
+  if (!r.ok) throw new Error(`SerpApi ${r.status}: ${(await r.text()).slice(0, 200)}`);
+  return r.json();
+}
+const fromSerp = (x: any): Place => ({
+  id: x.place_id, displayName: { text: x.title }, formattedAddress: x.address, rating: x.rating, userRatingCount: x.reviews,
+  websiteUri: x.website, primaryTypeDisplayName: x.type ? { text: x.type } : undefined, types: x.types,
+  regularOpeningHours: x.operating_hours ?? x.hours ?? undefined, nationalPhoneNumber: x.phone, editorialSummary: x.description ? { text: typeof x.description === "string" ? x.description : x.description.snippet ?? "" } : undefined,
+  photos: x.photos_count ? Array(Math.min(x.photos_count, 50)).fill(0) : x.images ?? (x.thumbnail ? [x.thumbnail] : []),
+  googleMapsUri: x.place_id ? `https://www.google.com/maps/place/?q=place_id:${x.place_id}` : undefined,
+});
+async function serpSearch(q: string, size: number, near?: { lat: number; lng: number }): Promise<Place[]> {
+  const c = near ?? { lat: 34.0522, lng: -118.2437 };
+  const j = await serp({ q, type: "search", ll: `@${c.lat},${c.lng},13z` });
+  const list = j.local_results ?? (j.place_results ? [j.place_results] : []);
+  return list.slice(0, size).map(fromSerp).filter((p: Place) => p.id);
+}
+const overQuota = (e: unknown) => /Places API (429|403)/.test(String((e as Error)?.message));
 
 const LEAN = ["id", "displayName", "formattedAddress", "rating", "userRatingCount", "websiteUri", "primaryTypeDisplayName"];
 
@@ -36,10 +62,16 @@ export async function searchPlaces(q: string, size = 20, near?: { lat: number; l
 }
 
 async function searchPlacesLive(q: string, size: number, near: { lat: number; lng: number } | undefined, lean: boolean): Promise<Place[]> {
+  if (!googleKey()) return serpSearch(q, size, near);
+  try { return await googleSearch(q, size, near, lean); }
+  catch (e) { if (serpKey() && overQuota(e)) return serpSearch(q, size, near); throw e; }
+}
+
+async function googleSearch(q: string, size: number, near: { lat: number; lng: number } | undefined, lean: boolean): Promise<Place[]> {
   const c = near ?? { lat: 34.0522, lng: -118.2437 };
   const r = await fetch(`${BASE}/places:searchText`, {
     method: "POST", cache: "no-store",
-    headers: { "Content-Type": "application/json", "X-Goog-Api-Key": placesKey(), "X-Goog-FieldMask": (lean ? LEAN : F).map(f => "places." + f).join(",") },
+    headers: { "Content-Type": "application/json", "X-Goog-Api-Key": googleKey(), "X-Goog-FieldMask": (lean ? LEAN : F).map(f => "places." + f).join(",") },
     body: JSON.stringify({ textQuery: q, pageSize: size, locationBias: { circle: { center: { latitude: c.lat, longitude: c.lng }, radius: near ? 15000 : 50000 } } }),
   });
   if (!r.ok) throw new Error(`Places API ${r.status}: ${(await r.text()).slice(0, 200)}`);
@@ -47,8 +79,18 @@ async function searchPlacesLive(q: string, size: number, near: { lat: number; ln
 }
 
 export async function getPlace(id: string): Promise<Place> {
+  if (!googleKey()) return serpPlace(id);
+  try { return await googlePlace(id); }
+  catch (e) { if (serpKey() && overQuota(e)) return serpPlace(id); throw e; }
+}
+async function serpPlace(id: string): Promise<Place> {
+  const j = await serp({ place_id: id });
+  if (!j.place_results) throw new Error("Place not found");
+  return { ...fromSerp(j.place_results), id };
+}
+async function googlePlace(id: string): Promise<Place> {
   const r = await fetch(`${BASE}/places/${encodeURIComponent(id)}`, {
-    cache: "no-store", headers: { "X-Goog-Api-Key": placesKey(), "X-Goog-FieldMask": F.join(",") },
+    cache: "no-store", headers: { "X-Goog-Api-Key": googleKey(), "X-Goog-FieldMask": F.join(",") },
   });
   if (!r.ok) throw new Error(`Places API ${r.status}: ${(await r.text()).slice(0, 200)}`);
   return (await r.json()) as Place;
@@ -56,7 +98,10 @@ export async function getPlace(id: string): Promise<Place> {
 
 // Up to 5 recent Google reviews (for social post drafts).
 export async function getReviews(id: string): Promise<{ author: string; rating: number; text: string }[]> {
-  const r = await fetch(`${BASE}/places/${encodeURIComponent(id)}`, { headers: { "X-Goog-Api-Key": placesKey(), "X-Goog-FieldMask": "reviews" }, next: { revalidate: 86400 } } as any);
+  if (!googleKey()) {
+    try { const j = await serp({ engine: "google_maps_reviews", place_id: id, sort_by: "newestFirst" }); return (j.reviews ?? []).map((v: any) => ({ author: v.user?.name ?? "A customer", rating: v.rating ?? 0, text: v.snippet ?? "" })).filter((v: any) => v.text).slice(0, 5); } catch { return []; }
+  }
+  const r = await fetch(`${BASE}/places/${encodeURIComponent(id)}`, { headers: { "X-Goog-Api-Key": googleKey(), "X-Goog-FieldMask": "reviews" }, next: { revalidate: 86400 } } as any);
   if (!r.ok) return [];
   const j = await r.json();
   return (j.reviews ?? []).map((v: any) => ({ author: v.authorAttribution?.displayName ?? "A customer", rating: v.rating ?? 0, text: v.text?.text ?? v.originalText?.text ?? "" })).filter((v: any) => v.text);
