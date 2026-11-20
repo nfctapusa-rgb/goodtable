@@ -50,7 +50,10 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         <BizSwitcher list={bizList.map(x => ({ id: x.id, name: x.name }))} current={biz.id} />
         <nav>
           <a className="on" href={`/dashboard?b=${biz.id}`}>Overview</a>
-          <a href={`/dashboard?b=${biz.id}#services`}>Services</a>
+          <a href={`/dashboard?b=${biz.id}#results`}>Results</a>
+          {socialOn && <a href={`/dashboard?b=${biz.id}#posts`}>Posts</a>}
+          <a href={`/dashboard?b=${biz.id}#services`}>Add services</a>
+          <a href={`/dashboard?b=${biz.id}#brand`}>Brand kit</a>
           <a href="/mailers">Postcards</a>
         </nav>
         <form action="/api/auth/logout" method="post"><button className="link">Log out</button></form>
@@ -66,95 +69,11 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         {billing === "none" && <p className="ok-note">Billing isn't set up online yet. Text us and we'll take care of it.</p>}
         {biz.status === "past_due" && <p className="err-note">Your last payment didn't go through. Update your card to keep your Google profile managed.</p>}
 
-        {planInfo && biz.plan !== "free" && (
-          <div className="card plancard-d">
-            <div>
-              <p className="eyebrow">Your plan</p>
-              <b>{planInfo.name}</b> <span className={`st ${biz.status === "active" ? "live" : biz.status === "trial" ? "managed" : "soon"}`}>{STATUS[biz.status] ?? biz.status}</span>
-              <p className="muted small">{biz.plan === "site" ? (biz.trial_ends_at ? `Free management until ${new Date(biz.trial_ends_at).toLocaleDateString("en-US", { month: "long", day: "numeric" })}, then $25/mo for management, hosting and weekly changes.` : "3 months of free management start when your site goes live.") : `$${planInfo.price}/mo, month to month.`}</p>
-            </div>
-            <form method="post" action="/api/billing"><input type="hidden" name="b" value={biz.id} /><button className="btn ghost sm">Billing & invoices</button></form>
-          </div>
-        )}
-
         {tasks.length > 0 && doneN < tasks.length && (
           <div className="card">
             <div className="gs-head"><b>Getting set up</b><span className="muted small">{doneN} of {tasks.length} done</span></div>
             <div className="prog"><i style={{ width: `${(doneN / tasks.length) * 100}%` }} /></div>
             <ul className="tasks">{tasks.map(t => <li key={t.key} className={t.done ? "done" : ""}><span className="tk" aria-hidden="true">{t.done ? "✓" : ""}</span>{t.title}<em>{t.who === "owner" ? "You" : "Lokly"}</em></li>)}</ul>
-          </div>
-        )}
-
-        {(biz.plan === "pro" || (biz.addons ?? []).includes("social")) && (
-          <div className="card" id="social">
-            <div className="gs-head"><b>Your social media</b><span className="muted small">Instagram, Facebook{autoSocial ? " and TikTok" : ""}</span></div>
-            {social === "linked" && <p className="ok-note">Connected. We'll start posting this week.</p>}
-            {social === "error" && <p className="err-note">That didn't connect. Try again or text us.</p>}
-            {autoSocial ? (
-              <form method="post" action="/api/social/connect"><input type="hidden" name="b" value={biz.id} />
-                <p className="muted small">{biz.social?.profileKey ? "Add or reconnect an account anytime." : "One tap: log in to your accounts on the secure page and you're done. You stay the owner."}</p>
-                <button className="btn dark sm">{biz.social?.profileKey ? "Manage connected accounts" : "Connect Instagram, Facebook & TikTok"}</button></form>
-            ) : (
-              <>
-                <p className="muted small">Add Lokly as a partner so we can post for you. You stay the owner and can remove us anytime. About 5 minutes.</p>
-                <ol className="steps-sm">
-                  <li>On your phone, open <a href="https://business.facebook.com/latest/settings/partners" target="_blank" rel="noreferrer">business.facebook.com → Settings → Partners</a>.</li>
-                  <li>Tap <b>Add</b>, then <b>Give a partner access to your assets</b>.</li>
-                  <li>Paste Lokly's Business ID: <code>{process.env.META_BUSINESS_ID ?? "we'll text it to you"}</code></li>
-                  <li>Turn on your <b>Facebook Page</b> and <b>Instagram account</b> with <b>Content</b> access, then save.</li>
-                </ol>
-                <p className="small muted">Instagram must be a Business account linked to your Facebook Page. Stuck? Text us and we'll do it with you.</p>
-              </>
-            )}
-          </div>
-        )}
-
-        {socialOn && (
-          <div className="card" id="posts">
-            <div className="gs-head"><b>This week's posts</b>
-              <form method="post" action="/api/posts" className="ap-toggle"><input type="hidden" name="b" value={biz.id} /><input type="hidden" name="action" value="autopilot" /><input type="hidden" name="on" value={biz.social?.autopilot ? "0" : "1"} />
-                <button className={`chip ${biz.social?.autopilot ? "on" : ""}`}>{biz.social?.autopilot ? "Autopilot on" : "I approve first"}</button></form>
-            </div>
-            <p className="muted small">{biz.social?.autopilot ? "We write and publish 3 posts a week to your Instagram and Facebook. Tap the button to approve them first instead." : "Every Monday we write 3 posts for you. Approve, edit, or skip each one. Tap the button to let them publish automatically."}</p>
-            {weekPosts.length === 0 ? <p className="small muted">Your first posts show up here on Monday.</p> : (
-              <div className="pd-grid">{weekPosts.map(p => (
-                <form key={p.id} className="pd" method="post" action="/api/posts">
-                  <div className="pd-top"><b>{p.kind}</b><span className="muted small">{new Date(p.scheduled_for).toLocaleString("en-US", { weekday: "short", hour: "numeric", timeZone: "America/Los_Angeles" })}</span></div>
-                  {p.photo && <img src={p.photo} alt="" loading="lazy" />}
-                  <input type="hidden" name="b" value={biz.id} /><input type="hidden" name="post" value={p.id} />
-                  {p.status === "pending" ? <>
-                    <textarea name="caption" defaultValue={p.caption} rows={6} aria-label="Caption" />
-                    <div className="pd-actions"><button className="btn dark sm" name="action" value="approve">Approve</button><button className="btn ghost sm" name="action" value="skip">Skip</button></div>
-                  </> : <>
-                    <pre>{p.caption}</pre>
-                    <span className={`st ${p.status === "error" ? "soon" : "live"}`}>{p.status === "scheduled" ? "Scheduled" : p.status === "approved" ? "Approved, we'll post it" : p.status === "skipped" ? "Skipped" : p.status === "error" ? "Couldn't post, we're on it" : p.status}</span>
-                  </>}
-                </form>
-              ))}</div>
-            )}
-          </div>
-        )}
-
-        <div className="card" id="results">
-          <div className="gs-head"><b>What we did for you</b><span className="muted small">Updated by your Lokly team</span></div>
-          {results.length === 0 ? <p className="small muted">Your posts, review replies, postcards and campaigns will show up here as we do them.</p> : (
-            <ul className="feed">{results.map((r, i) => (
-              <li key={i}><span className="feed-k">{r.kind}</span><div><b>{r.url ? <a href={r.url} target="_blank" rel="noreferrer">{r.title}</a> : r.title}</b>{r.detail && <p className="muted small">{r.detail}</p>}</div><time className="muted small">{new Date(r.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</time></li>
-            ))}</ul>
-          )}
-        </div>
-
-        <div className="kpis">
-          <div className="card kpi"><span>Visibility score</span><b>{latest ? latest.score : "—"}<small>/100</small></b>
-            {delta !== null && <em className={delta >= 0 ? "good" : "bad"}>{delta >= 0 ? "▲" : "▼"} {Math.abs(delta)} since last scan</em>}</div>
-          <div className="card kpi"><span>Issues to fix</span><b>{latest ? todo.length : "—"}</b><em className="muted">from your latest scan</em></div>
-          <div className="card kpi"><span>Last scanned</span><b className="sm">{latest ? new Date(latest.created_at).toLocaleDateString() : "Never"}</b><RescanButton businessId={biz.id} /></div>
-        </div>
-
-        {reports.length > 1 && (
-          <div className="card">
-            <p className="eyebrow">Score history</p>
-            <div className="spark">{[...reports].reverse().map(r => <div key={r.id} title={`${r.score} · ${new Date(r.created_at).toLocaleDateString()}`} style={{ height: `${Math.max(r.score, 4)}%` }} />)}</div>
           </div>
         )}
 
@@ -187,45 +106,68 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         )}
 
 
-        <div className="card">
-          <p className="eyebrow">Your to-do list</p>
-          {!latest && <p className="muted">No scan yet. Run one to build your list.</p>}
-          {latest && todo.length === 0 && <p>Nothing to fix. Nice work.</p>}
-          <ol className="todo">
-            {todo.slice(0, 15).map(c => (
-              <li key={c.id}><span className={`sev ${c.weight >= 2 ? "hi" : ""}`}>{c.weight >= 2 ? "High" : "Med"}</span>
-                <div><b>{c.title}</b><p className="muted">{c.why}</p>{c.found && <code>Found: {c.found}</code>}</div></li>
-            ))}
-          </ol>
+        <div className="card" id="results">
+          <div className="gs-head"><b>What we did for you</b><span className="muted small">Updated by your Lokly team</span></div>
+          {results.length === 0 ? <p className="small muted">Your posts, review replies, postcards and campaigns will show up here as we do them.</p> : (
+            <ul className="feed">{results.map((r, i) => (
+              <li key={i}><span className="feed-k">{r.kind}</span><div><b>{r.url ? <a href={r.url} target="_blank" rel="noreferrer">{r.title}</a> : r.title}</b>{r.detail && <p className="muted small">{r.detail}</p>}</div><time className="muted small">{new Date(r.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</time></li>
+            ))}</ul>
+          )}
         </div>
 
-        <div className="card" id="brand">
-          <div className="gs-head"><b>Your brand kit</b><span className="muted small">Used for your postcards and social posts</span></div>
-          <form method="post" action="/api/brandkit" className="bk-form">
-            <input type="hidden" name="b" value={biz.id} />
-            <input name="website" defaultValue={biz.website ?? ""} placeholder="yourbusiness.com" aria-label="Your website" inputMode="url" />
-            <button className="btn dark sm">{biz.assets ? "Refresh from my site" : "Pull from my website"}</button>
-          </form>
-          {biz.assets ? (
-            <div className="bk">
-              <div className="bk-row">
-                {biz.assets.logo && <img src={biz.assets.logo} alt="Your logo" className="bk-logo" />}
-                <div>
-                  <b>{biz.assets.title ?? biz.name}</b>
-                  {biz.assets.tagline && <p className="muted small">{biz.assets.tagline}</p>}
-                  <p className="small">{[biz.assets.color && `Color ${biz.assets.color}`, biz.assets.instagram && "Instagram found", biz.assets.facebook && "Facebook found", biz.assets.tiktok && "TikTok found"].filter(Boolean).join(" · ") || "No social links found on your site"}</p>
-                </div>
-                {biz.assets.color && <span className="bk-swatch" style={{ background: biz.assets.color }} aria-hidden="true" />}
-              </div>
-              {biz.assets.photos?.length > 0 ? <div className="bk-photos">{biz.assets.photos.slice(0, 8).map((p: string) => <img key={p} src={p} alt="" loading="lazy" />)}</div>
-                : <p className="small muted">No photos found yet. Text us 5 or more and we'll add them.</p>}
+        {socialOn && (
+          <div className="card" id="posts">
+            <div className="gs-head"><b>This week's posts</b>
+              <form method="post" action="/api/posts" className="ap-toggle"><input type="hidden" name="b" value={biz.id} /><input type="hidden" name="action" value="autopilot" /><input type="hidden" name="on" value={biz.social?.autopilot ? "0" : "1"} />
+                <button className={`chip ${biz.social?.autopilot ? "on" : ""}`}>{biz.social?.autopilot ? "Autopilot on" : "I approve first"}</button></form>
             </div>
-          ) : <p className="small muted">Add your website and we'll pull your logo, colors and photos. No website? Text us your logo and photos instead.</p>}
-        </div>
+            <p className="muted small">{biz.social?.autopilot ? "We write and publish 3 posts a week to your Instagram and Facebook. Tap the button to approve them first instead." : "Every Monday we write 3 posts for you. Approve, edit, or skip each one. Tap the button to let them publish automatically."}</p>
+            {weekPosts.length === 0 ? <p className="small muted">Your first posts show up here on Monday.</p> : (
+              <div className="pd-grid">{weekPosts.map(p => (
+                <form key={p.id} className="pd" method="post" action="/api/posts">
+                  <div className="pd-top"><b>{p.kind}</b><span className="muted small">{new Date(p.scheduled_for).toLocaleString("en-US", { weekday: "short", hour: "numeric", timeZone: "America/Los_Angeles" })}</span></div>
+                  {p.photo && <img src={p.photo} alt="" loading="lazy" />}
+                  <input type="hidden" name="b" value={biz.id} /><input type="hidden" name="post" value={p.id} />
+                  {p.status === "pending" ? <>
+                    <textarea name="caption" defaultValue={p.caption} rows={6} aria-label="Caption" />
+                    <div className="pd-actions"><button className="btn dark sm" name="action" value="approve">Approve</button><button className="btn ghost sm" name="action" value="skip">Skip</button></div>
+                  </> : <>
+                    <pre>{p.caption}</pre>
+                    <span className={`st ${p.status === "error" ? "soon" : "live"}`}>{p.status === "scheduled" ? "Scheduled" : p.status === "approved" ? "Approved, we'll post it" : p.status === "skipped" ? "Skipped" : p.status === "error" ? "Couldn't post, we're on it" : p.status}</span>
+                  </>}
+                </form>
+              ))}</div>
+            )}
+          </div>
+        )}
+
+        {(biz.plan === "pro" || (biz.addons ?? []).includes("social")) && (
+          <div className="card" id="social">
+            <div className="gs-head"><b>Your social media</b><span className="muted small">Instagram, Facebook{autoSocial ? " and TikTok" : ""}</span></div>
+            {social === "linked" && <p className="ok-note">Connected. We'll start posting this week.</p>}
+            {social === "error" && <p className="err-note">That didn't connect. Try again or text us.</p>}
+            {autoSocial ? (
+              <form method="post" action="/api/social/connect"><input type="hidden" name="b" value={biz.id} />
+                <p className="muted small">{biz.social?.profileKey ? "Add or reconnect an account anytime." : "One tap: log in to your accounts on the secure page and you're done. You stay the owner."}</p>
+                <button className="btn dark sm">{biz.social?.profileKey ? "Manage connected accounts" : "Connect Instagram, Facebook & TikTok"}</button></form>
+            ) : (
+              <>
+                <p className="muted small">Add Lokly as a partner so we can post for you. You stay the owner and can remove us anytime. About 5 minutes.</p>
+                <ol className="steps-sm">
+                  <li>On your phone, open <a href="https://business.facebook.com/latest/settings/partners" target="_blank" rel="noreferrer">business.facebook.com → Settings → Partners</a>.</li>
+                  <li>Tap <b>Add</b>, then <b>Give a partner access to your assets</b>.</li>
+                  <li>Paste Lokly's Business ID: <code>{process.env.META_BUSINESS_ID ?? "we'll text it to you"}</code></li>
+                  <li>Turn on your <b>Facebook Page</b> and <b>Instagram account</b> with <b>Content</b> access, then save.</li>
+                </ol>
+                <p className="small muted">Instagram must be a Business account linked to your Facebook Page. Stuck? Text us and we'll do it with you.</p>
+              </>
+            )}
+          </div>
+        )}
 
         <div className="card" id="services">
-          <p className="eyebrow">Services</p>
-          <p className="muted small">Add anything here and we handle it. You'll see the results above.</p>
+          <p className="eyebrow">Add services</p>
+          <p className="muted small">Tap to add. We do the work, and you'll see the results in "What we did for you."</p>
           {requested && <p className="ok-note">Got it. We'll text you within one business day to set that up.</p>}
           {biz.place_id && (
             <div className="rkit">
@@ -253,6 +195,67 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
             ))}
           </div>
         </div>
+        {planInfo && biz.plan !== "free" && (
+          <div className="card plancard-d">
+            <div>
+              <p className="eyebrow">Your plan</p>
+              <b>{planInfo.name}</b> <span className={`st ${biz.status === "active" ? "live" : biz.status === "trial" ? "managed" : "soon"}`}>{STATUS[biz.status] ?? biz.status}</span>
+              <p className="muted small">{biz.plan === "site" ? (biz.trial_ends_at ? `Free management until ${new Date(biz.trial_ends_at).toLocaleDateString("en-US", { month: "long", day: "numeric" })}, then $25/mo for management, hosting and weekly changes.` : "3 months of free management start when your site goes live.") : `$${planInfo.price}/mo, month to month.`}</p>
+            </div>
+            <form method="post" action="/api/billing"><input type="hidden" name="b" value={biz.id} /><button className="btn ghost sm">Billing & invoices</button></form>
+          </div>
+        )}
+
+        <div className="card" id="brand">
+          <div className="gs-head"><b>Your brand kit</b><span className="muted small">Used for your postcards and social posts</span></div>
+          <form method="post" action="/api/brandkit" className="bk-form">
+            <input type="hidden" name="b" value={biz.id} />
+            <input name="website" defaultValue={biz.website ?? ""} placeholder="yourbusiness.com" aria-label="Your website" inputMode="url" />
+            <button className="btn dark sm">{biz.assets ? "Refresh from my site" : "Pull from my website"}</button>
+          </form>
+          {biz.assets ? (
+            <div className="bk">
+              <div className="bk-row">
+                {biz.assets.logo && <img src={biz.assets.logo} alt="Your logo" className="bk-logo" />}
+                <div>
+                  <b>{biz.assets.title ?? biz.name}</b>
+                  {biz.assets.tagline && <p className="muted small">{biz.assets.tagline}</p>}
+                  <p className="small">{[biz.assets.color && `Color ${biz.assets.color}`, biz.assets.instagram && "Instagram found", biz.assets.facebook && "Facebook found", biz.assets.tiktok && "TikTok found"].filter(Boolean).join(" · ") || "No social links found on your site"}</p>
+                </div>
+                {biz.assets.color && <span className="bk-swatch" style={{ background: biz.assets.color }} aria-hidden="true" />}
+              </div>
+              {biz.assets.photos?.length > 0 ? <div className="bk-photos">{biz.assets.photos.slice(0, 8).map((p: string) => <img key={p} src={p} alt="" loading="lazy" />)}</div>
+                : <p className="small muted">No photos found yet. Text us 5 or more and we'll add them.</p>}
+            </div>
+          ) : <p className="small muted">Add your website and we'll pull your logo, colors and photos. No website? Text us your logo and photos instead.</p>}
+        </div>
+
+        <div className="kpis">
+          <div className="card kpi"><span>Visibility score</span><b>{latest ? latest.score : "—"}<small>/100</small></b>
+            {delta !== null && <em className={delta >= 0 ? "good" : "bad"}>{delta >= 0 ? "▲" : "▼"} {Math.abs(delta)} since last scan</em>}</div>
+          <div className="card kpi"><span>Issues to fix</span><b>{latest ? todo.length : "—"}</b><em className="muted">from your latest scan</em></div>
+          <div className="card kpi"><span>Last scanned</span><b className="sm">{latest ? new Date(latest.created_at).toLocaleDateString() : "Never"}</b><RescanButton businessId={biz.id} /></div>
+        </div>
+
+        {reports.length > 1 && (
+          <div className="card">
+            <p className="eyebrow">Score history</p>
+            <div className="spark">{[...reports].reverse().map(r => <div key={r.id} title={`${r.score} · ${new Date(r.created_at).toLocaleDateString()}`} style={{ height: `${Math.max(r.score, 4)}%` }} />)}</div>
+          </div>
+        )}
+
+        <div className="card">
+          <p className="eyebrow">Your to-do list</p>
+          {!latest && <p className="muted">No scan yet. Run one to build your list.</p>}
+          {latest && todo.length === 0 && <p>Nothing to fix. Nice work.</p>}
+          <ol className="todo">
+            {todo.slice(0, 15).map(c => (
+              <li key={c.id}><span className={`sev ${c.weight >= 2 ? "hi" : ""}`}>{c.weight >= 2 ? "High" : "Med"}</span>
+                <div><b>{c.title}</b><p className="muted">{c.why}</p>{c.found && <code>Found: {c.found}</code>}</div></li>
+            ))}
+          </ol>
+        </div>
+
       </main>
     </div>
   );

@@ -9,12 +9,8 @@ const FIELDS: { k: string; label: string; ph: string; type?: string; req?: boole
   { k: "email", label: "Email", ph: "you@business.com", type: "email", req: true },
   { k: "phone", label: "Mobile number", ph: "(213) 555-0100", type: "tel", req: true },
   { k: "password", label: "Create a password for your dashboard", ph: "At least 8 characters", type: "password", req: true },
-  { k: "website", label: "Your website, if you have one (we'll use its logo and photos for your posts and postcards)", ph: "yourbusiness.com" },
-  { k: "googleProfile", label: "Google Business Profile link", ph: "Paste your Google Maps link" },
-  { k: "orderLink", label: "Ordering or booking link", ph: "DoorDash, Uber Eats, Square, Vagaro…", pro: true },
+  { k: "website", label: "Your website (optional, we'll grab your logo and photos)", ph: "yourbusiness.com" },
   { k: "shipTo", label: "Where should we mail your free NFC review card?", ph: "Business mailing address", req: true, card: true },
-  { k: "instagram", label: "Instagram", ph: "@yourbusiness" },
-  { k: "notes", label: "Anything we should know?", ph: "Specials you run, hours changes, what makes you different" },
 ];
 
 export default function Start() {
@@ -58,13 +54,13 @@ export default function Start() {
     <main className="narrow start">
       <section className="hero">
         <h1 className="sh-h2">Tell us about your business.</h1>
-        <p className="sh-lead">Send us your links and we'll take it from here. You'll approve everything before it goes live.</p>
+        <p className="sh-lead">Takes about a minute. You'll approve everything before it goes live.</p>
         <p className="pplabel" id="pplabel">Your plan</p>
         <div className="pickplan" role="radiogroup" aria-labelledby="pplabel">
-          {PLANS.map(p => (
+          {PLANS.filter(p => !p.addon).map(p => (
             <label key={p.id} className={plan === p.id ? "on" : ""}>
               <input type="radio" name="plan" value={p.id} checked={plan === p.id} onChange={() => setPlan(p.id)} />
-              <b>{p.name}</b><span>${p.price}{p.interval === "month" ? "/mo" : " one-time"}</span>
+              <b>{p.name}</b><span>{p.id === "site" ? "$299 once, then $25/mo after 3 free months" : `$${p.price}/mo`}</span>
             </label>
           ))}
         </div>
@@ -75,17 +71,9 @@ export default function Start() {
                 : <input type={x.type ?? "text"} required={x.req} placeholder={x.ph} value={f[x.k] ?? ""} onChange={set(x.k)} minLength={x.k === "password" ? 8 : undefined} autoComplete={x.k === "password" ? "new-password" : x.k === "email" ? "email" : x.k === "phone" ? "tel" : x.k === "contactName" ? "name" : x.k === "businessName" ? "organization" : "off"} />}
             </label>
           ))}
-          <div className="toolpick" role="group" aria-label="Marketing tools"><p className="tp-h">Which marketing tools do you want? <span className="opt">(optional)</span></p>
-            {MARKETING_TOOLS.filter(t => t.id !== "reviews").map(t => (
-              <label key={t.id} className={(f.tools ?? "").split(",").includes(t.id) ? "on" : ""}>
-                <input type="checkbox" checked={(f.tools ?? "").split(",").includes(t.id)} onChange={e => { const cur = (f.tools ?? "").split(",").filter(Boolean); setF({ ...f, tools: (e.target.checked ? [...cur, t.id] : cur.filter(x => x !== t.id)).join(",") }); }} />
-                <span><b>{t.name}</b> <em>{STATUS_LABEL[t.status]}{t.price ? `, ${t.price}` : t.included === "pro" ? ", in Pro" : ""}</em></span>
-              </label>
-            ))}
-          </div>
           <label className="check"><input type="checkbox" required checked={ok} onChange={e => setOk(e.target.checked)} />
             <span>I own or am authorized to manage this business and its Google profile, and I agree to the <a href="/terms" target="_blank">Terms</a> and <a href="/privacy" target="_blank">Privacy Policy</a>.</span></label>
-          <button className="btn dark" disabled={busy}>{busy ? "Opening secure checkout…" : `Continue to payment: ${chosen.name}, $${chosen.price}${chosen.interval === "month" ? "/mo" : ""}`}</button>
+          <button className="btn dark" disabled={busy}>{busy ? "Opening secure checkout…" : chosen.id === "site" ? "Continue: $299 today, 3 months free" : `Continue: ${chosen.name}, $${chosen.price}/mo`}</button>
           {err && <p className="err">{err}</p>}
         </form>
       </section>
