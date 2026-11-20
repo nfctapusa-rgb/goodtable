@@ -450,3 +450,4 @@ body:has(.mn) .nav,body:has(.mn) .foot,body:has(.me) .foot{display:none}
 .me-x{background:none;border:0;color:var(--gray);font-weight:700;cursor:pointer;padding:6px;flex:none}
 .me-qr{width:180px;height:180px;border:1px solid var(--line);border-radius:10px}.me-pub{display:flex!important;align-items:center;gap:8px}
 .me-sticky{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom));display:flex;justify-content:center;z-index:20}.me-sticky .btn{width:100%;max-width:640px}
+.mn-signup select,.mn-signup input{padding:12px;border:1px solid var(--line);border-radius:10px;font:inherit;font-size:16px;background:#fff;width:100%}
