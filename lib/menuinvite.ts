@@ -3,7 +3,8 @@ import { sendEmail } from "./email";
 import { html, postalAddress } from "./outreach";
 
 // One-time "free Lokly Menu" invite to restaurant/café/bar prospects. Skips suppressed, unsubscribed, bounced and customers.
-const FOOD = ["%restaurant%", "%cafe%", "%café%", "%coffee%", "% bar%", "bar%", "%pizza%", "%taco%", "%grill%", "%bakery%", "%food%", "%kitchen%", "%diner%", "%sushi%", "%burger%", "%bbq%", "%deli%", "%brew%", "%tea%", "%lounge%", "%hibachi%", "%ramen%", "%donut%", "%juice%"];
+const FOOD_RE = String.raw`(restaurant|caf[eé]|coffee|bakery|pizz|taco|grill|diner|\ydeli\y|food|kitchen|sushi|burger|bbq|barbecue|brew|lounge|\ybar\y|pub|ramen|donut|juice|tea house|boba|bistro|eatery|cantina)`;
+const _OLD = ["%restaurant%", "%cafe%", "%café%", "%coffee%", "% bar%", "bar%", "%pizza%", "%taco%", "%grill%", "%bakery%", "%food%", "%kitchen%", "%diner%", "%sushi%", "%burger%", "%bbq%", "%deli%", "%brew%", "%tea%", "%lounge%", "%hibachi%", "%ramen%", "%donut%", "%juice%"];
 const esc = (s: string) => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
 
 export function inviteEmail(p: { id: number; business_name: string; contact_name?: string | null }) {
@@ -24,9 +25,9 @@ export function inviteEmail(p: { id: number; business_name: string; contact_name
 export async function inviteStats() {
   const sql = await db();
   const [r] = await sql`SELECT count(*) FILTER (WHERE menu_invited_at IS NULL) AS pending, count(*) FILTER (WHERE menu_invited_at IS NOT NULL) AS sent
-    FROM prospects p WHERE (coalesce(category,'') ILIKE ANY(${FOOD}) OR business_name ILIKE ANY(${FOOD}))
+    FROM prospects p WHERE coalesce(category,'') ~* ${FOOD_RE} AND coalesce(category,'') !~* 'barber'
     AND status NOT IN ('unsubscribed','bounced','customer') AND NOT EXISTS (SELECT 1 FROM suppressions s WHERE s.email = p.email)` as any[];
-  const sample = await sql`SELECT id, business_name, category, email FROM prospects p WHERE menu_invited_at IS NULL AND (coalesce(category,'') ILIKE ANY(${FOOD}) OR business_name ILIKE ANY(${FOOD}))
+  const sample = await sql`SELECT id, business_name, category, email FROM prospects p WHERE menu_invited_at IS NULL AND coalesce(category,'') ~* ${FOOD_RE} AND coalesce(category,'') !~* 'barber'
     AND status NOT IN ('unsubscribed','bounced','customer') AND NOT EXISTS (SELECT 1 FROM suppressions s WHERE s.email = p.email) ORDER BY id LIMIT 300` as any[];
   return { pending: Number(r.pending), sent: Number(r.sent), list: sample };
 }
