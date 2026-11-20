@@ -11,7 +11,7 @@ const ROWS: [string, string][] = [
 ];
 export default function Compare() {
   return (
-    <main className="wrap sc-hero">
+    <main className="sc-hero"><div className="wrap">
       <h1 className="sh-title sm">One Lokly instead of five tools.</h1>
       <p className="sh-lead">Big restaurant platforms and SEO agencies charge hundreds a month for one piece of this. Lokly bundles it for local businesses, starting at $25.</p>
       <div className="sc-cmp">
@@ -25,6 +25,6 @@ export default function Compare() {
       </div>
       <p className="sh-fine">No contracts. Cancel anytime. Rankings are decided by Google and never guaranteed.</p>
       <p><a className="btn dark" href="/grader">Get my free report</a> <a className="btn ghost" href="/pricing" style={{ width: "auto" }}>See pricing</a></p>
-    </main>
+    </div></main>
   );
 }

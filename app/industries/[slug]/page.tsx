@@ -13,12 +13,12 @@ export default async function Industry({ params }: { params: Promise<{ slug: str
   const cases = casesFor(slug);
   return (
     <main>
-      <section className="wrap sc-hero">
+      <section className="sc-hero"><div className="wrap">
         <p className="sc-crumb"><a href="/industries">Industries</a> / {i.name}</p>
         <h1 className="sh-title sm">More customers for {i.plural}.</h1>
         <p className="sh-lead">{i.pain}</p>
         <SearchHero cta="Check my business" />
-      </section>
+      </div></section>
       <section className="wrap sc-two">
         <div className="card"><h2>What your customers search</h2><ul className="sc-searches">{i.searches.map(s => <li key={s}>“{s}”</li>)}</ul></div>
         <div className="card"><h2>What we handle for you</h2><ul className="sc-check">{i.wins.map(w => <li key={w}>{w}</li>)}</ul></div>

@@ -405,3 +405,4 @@ body:has(.vw) .nav,body:has(.vw) footer,body:has(.vw) .foot{display:none}
 .sc-cmp-h{background:var(--ink);color:#fff;font-weight:700;border-top:0!important}.sc-yes{color:var(--palm);font-weight:800}
 .sc-price{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0}.sc-price div{background:#fff;border:2px solid var(--ink);padding:16px;display:grid}.sc-price b{font-size:30px;font-weight:900}.sc-price span{color:var(--graphite)}
 @media(max-width:700px){.sc-two,.sc-price{grid-template-columns:1fr}.sc-cmp>div{grid-template-columns:1fr;gap:2px}.sc-cmp-h{display:none!important}.sc-grid{grid-template-columns:1fr}}
+.sc-hero .sh-title.sm{color:var(--ink);font-size:clamp(40px,6.5vw,84px);max-width:14ch}.sc-hero{background:linear-gradient(#DCEBF3,#F4F7F9 85%)}

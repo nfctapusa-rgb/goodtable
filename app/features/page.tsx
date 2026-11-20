@@ -26,11 +26,11 @@ const GROUPS: { title: string; sub: string; items: [string, string, string][] }[
 export default function Features() {
   return (
     <main>
-      <section className="wrap sc-hero">
+      <section className="sc-hero"><div className="wrap">
         <h1 className="sh-title sm">Everything a local business needs to grow. One place, one bill.</h1>
         <p className="sh-lead">Most owners juggle a website builder, an SEO agency, a review tool, a social scheduler and an ads person. Lokly does all of it for less than most of them charge alone.</p>
         <p><a className="btn dark" href="/grader">Get my free report</a> <a className="btn ghost" href="/compare" style={{ width: "auto" }}>Compare</a></p>
-      </section>
+      </div></section>
       {GROUPS.map(g => (
         <section key={g.title} className="wrap sc-group">
           <h2 className="sh-h2">{g.title}</h2><p className="sh-sub">{g.sub}</p>
