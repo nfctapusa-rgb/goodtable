@@ -1,4 +1,5 @@
 import { db, dbReady } from "@/lib/db";
+import { AdminNav } from "../nav";
 import { currentUser } from "@/lib/auth";
 import { PLANS, SITE_MONTHLY_CENTS } from "@/lib/plans";
 
@@ -83,6 +84,7 @@ export default async function Growth({ searchParams }: { searchParams: Promise<{
 
   return (
     <main className="wrap admin growth">
+      <AdminNav k={key} on="/growth" />
       <div className="gc-top">
         <h1 className="sh-h2">Growth Center</h1>
         <nav className="gc-range" aria-label="Date range">

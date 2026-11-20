@@ -1,4 +1,5 @@
 import { db, dbReady } from "@/lib/db";
+import { AdminNav } from "../nav";
 import { currentUser } from "@/lib/auth";
 import { ayrshareReady } from "@/lib/ayrshare";
 import { getHouse, houseLinked, HOUSE_NETWORKS } from "@/lib/house";
@@ -20,6 +21,7 @@ export default async function Social({ searchParams }: { searchParams: Promise<{
   const K = () => key ? <input type="hidden" name="key" value={key} /> : null;
   return (
     <main className="wrap admin">
+      <AdminNav k={key} on="/social" />
       <p><a href={`/admin${key ? `?key=${encodeURIComponent(key)}` : ""}`}>← Leads & clients</a></p>
       <h1 className="sh-h2">Lokly's socials</h1>
       {ok && <p className="ok-note">Done.</p>}{err && <p className="err-note">{err}</p>}

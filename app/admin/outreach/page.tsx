@@ -1,4 +1,5 @@
 import { db, dbReady } from "@/lib/db";
+import { AdminNav } from "../nav";
 import { preview, postalAddress, DAILY_CAP, getTemplates, renderEmail, defaultBody, MERGE_TAGS, STEPS } from "@/lib/outreach";
 
 export const dynamic = "force-dynamic";
@@ -27,6 +28,7 @@ export default async function Outreach({ searchParams }: { searchParams: Promise
   const funnel: [string, number][] = [["Leads", total], ["Emailed", sent[0].n], ["Opened report link", (counts.clicked ?? 0) + (counts.report ?? 0) + (counts.customer ?? 0)], ["Ran report", (counts.report ?? 0) + (counts.customer ?? 0)], ["Customers", counts.customer ?? 0]];
   return (
     <main className="wrap admin">
+      <AdminNav k={key} on="/outreach" />
       <p><a href={`/admin?key=${k}`}>← Leads & clients</a></p>
       <h1 className="sh-h2">Outreach</h1>
       <p className="sh-sub">Import leads, send a personal 3-email sequence that points them to their free Google report, and see who turns into a customer.</p>

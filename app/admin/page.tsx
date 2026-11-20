@@ -1,7 +1,9 @@
 import { db, dbReady } from "@/lib/db";
+import { AdminNav } from "./nav";
+import { Today } from "./today";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Leads | Lokly", robots: { index: false, follow: false } };
+export const metadata = { title: "Admin | Lokly", robots: { index: false, follow: false } };
 
 export default async function Admin({ searchParams }: { searchParams: Promise<{ key?: string; msg?: string }> }) {
   const { key, msg } = await searchParams;
@@ -30,8 +32,10 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
   const when = (d: string) => new Date(d).toLocaleString("en-US", { timeZone: "America/Los_Angeles", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
   return (
     <main className="wrap admin">
-      <h1 className="sh-h2">Leads</h1>
-      <p><a className="btn dark sm" href={`/admin/posts?key=${encodeURIComponent(key!)}`}>This week's social posts</a> <a className="btn dark sm" href={`/admin/growth?key=${encodeURIComponent(key!)}`}>Growth Center</a> <a className="btn dark sm" href={`/admin/social?key=${encodeURIComponent(key!)}`}>Lokly's socials</a></p>
+      <AdminNav k={key} on="" />
+      <h1 className="sh-h2">Today</h1>
+      <Today k={key!} />
+      <h2 className="ad-h">Leads</h2>
       <p className="sh-sub">{signups.length} signups · {reports.length} free reports ({fromCard} from your business card)</p>
       {msg && <p className="ok-note" style={{ wordBreak: "break-all" }}>{msg}</p>}
       <h2 className="ad-h" id="clients">Client accounts</h2>

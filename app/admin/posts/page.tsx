@@ -1,4 +1,5 @@
 import { db, dbReady } from "@/lib/db";
+import { AdminNav } from "../nav";
 import { draftsFor } from "@/lib/postdrafts";
 import { CopyButton } from "./copy";
 
@@ -14,6 +15,7 @@ export default async function Posts({ searchParams }: { searchParams: Promise<{ 
   const all = await Promise.all(clients.map(async c => ({ c, drafts: await draftsFor(c) })));
   return (
     <main className="wrap admin">
+      <AdminNav k={key} on="/posts" />
       <p><a href={`/admin?key=${encodeURIComponent(key!)}`}>← Leads & clients</a></p>
       <h1 className="sh-h2">This week's posts</h1>
       <p className="sh-sub">For each client: open <a href="https://business.facebook.com/latest/content_calendar" target="_blank" rel="noreferrer">Meta Business Suite Planner</a>, pick their account, and schedule these to Facebook and Instagram. Clients with auto-posting get a one-click Schedule button.</p>
