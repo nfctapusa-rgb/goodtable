@@ -24,8 +24,8 @@ ${cta ? `<p style="margin:22px 0 4px"><a href="${cta.href}" style="background:#1
 </table></td></tr></table></body></html>`;
 }
 
-export async function sendEmail(to: string, subject: string, html: string, opts: { userId?: string; marketing?: boolean } = {}) {
-  const key = process.env.RESEND_API_KEY, from = process.env.EMAIL_FROM;
+export async function sendEmail(to: string, subject: string, html: string, opts: { userId?: string; marketing?: boolean; from?: string } = {}) {
+  const key = process.env.RESEND_API_KEY, from = opts.from || process.env.EMAIL_FROM;
   if (!key || !from) return { skipped: true };
   const headers: Record<string, string> = {};
   if (opts.marketing && opts.userId) { headers["List-Unsubscribe"] = `<${unsubUrl(opts.userId)}>`; headers["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click"; }

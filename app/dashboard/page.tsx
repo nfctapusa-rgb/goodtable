@@ -247,9 +247,9 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         </div>
 
         <div className="kpis">
-          <div className="card kpi"><span>Visibility score</span><b>{latest ? latest.score : "—"}<small>/100</small></b>
+          <div className="card kpi"><span>{paid ? "Google score (we're taking it to 100)" : "Visibility score"}</span><b>{latest ? latest.score : "—"}<small>/100</small></b>
             {delta !== null && <em className={delta >= 0 ? "good" : "bad"}>{delta >= 0 ? "▲" : "▼"} {Math.abs(delta)} since last scan</em>}</div>
-          <div className="card kpi"><span>Issues to fix</span><b>{latest ? todo.length : "—"}</b><em className="muted">from your latest scan</em></div>
+          <div className="card kpi"><span>{paid ? "Fixes in progress" : "Issues to fix"}</span><b>{latest ? todo.length : "—"}</b><em className="muted">{paid ? "your Lokly team is on these" : "from your latest scan"}</em></div>
           <div className="card kpi"><span>Last scanned</span><b className="sm">{latest ? new Date(latest.created_at).toLocaleDateString() : "Never"}</b><RescanButton businessId={biz.id} /></div>
         </div>
 
@@ -261,9 +261,9 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         )}
 
         <div className="card">
-          <p className="eyebrow">Your to-do list</p>
+          <p className="eyebrow">{paid ? "What we're fixing next" : "Your to-do list"}</p>
           {!latest && <p className="muted">No scan yet. Run one to build your list.</p>}
-          {latest && todo.length === 0 && <p>Nothing to fix. Nice work.</p>}
+          {latest && todo.length === 0 && <p>{paid ? "You're at 100. We'll keep it there." : "Nothing to fix. Nice work."}</p>}
           <ol className="todo">
             {todo.slice(0, 15).map(c => (
               <li key={c.id}><span className={`sev ${c.weight >= 2 ? "hi" : ""}`}>{c.weight >= 2 ? "High" : "Med"}</span>
