@@ -58,7 +58,7 @@ export default function Home() {
 
       <section className="wrap sh-results">
         <h2 className="sh-h2">Real numbers from shops we manage.</h2>
-        <p className="sh-sub">Google's own data for two takeout locations we took over in mid-October. Owners asked us to keep their names private.</p>
+        <p className="sh-sub">Google's own data for two takeout locations we took over in mid-October. Owners asked us to keep their names private. <a href="/results">See all results</a>.</p>
         <div className="res-grid">
           {RESULTS.map(r => (
             <article key={r.label} className="res">
