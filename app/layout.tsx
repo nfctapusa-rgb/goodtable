@@ -17,5 +17,5 @@ export const metadata: Metadata = {
 export const viewport: Viewport = { width: "device-width", initialScale: 1 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return <html lang="en" className={archivo.variable}><body><Attribution /><Nav /><div id="main">{children}</div><Footer /></body></html>;
+  return <html lang="en" className={archivo.variable}><body><Attribution /><Nav /><div id="main">{children}</div><Footer /><script defer src="/_vercel/insights/script.js" /></body></html>;
 }
