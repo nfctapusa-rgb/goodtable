@@ -17,5 +17,5 @@ export const metadata: Metadata = {
 export const viewport: Viewport = { width: "device-width", initialScale: 1 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return <html lang="en" className={archivo.variable}><body><Attribution /><Nav /><div id="main">{children}</div><Footer /><script defer src="/_vercel/insights/script.js" /></body></html>;
+  return <html lang="en" className={archivo.variable}><head><script dangerouslySetInnerHTML={{ __html: 'try{var q=new URLSearchParams(location.search),u=navigator.userAgent,s=q.get("utm_source")||(/Instagram/i.test(u)?"instagram":/FBAN|FBAV|FB_IAB/i.test(u)||q.get("fbclid")?"facebook":null);if(s){sessionStorage.setItem("lokly_src",s);if(!q.get("utm_source")){q.set("utm_source",s);q.set("utm_medium",q.get("fbclid")?"paid":"social");if(!q.get("src"))q.set("src",s);history.replaceState(null,"",location.pathname+"?"+q+location.hash)}}}catch(e){}' }} /></head><body><Attribution /><Nav /><div id="main">{children}</div><Footer /><script defer src="/_vercel/insights/script.js" /></body></html>;
 }

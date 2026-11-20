@@ -102,7 +102,7 @@ export default function Page() {
   async function grade(payload: object, label: string) {
     setLoading(label); setErr(null);
     try {
-      const res = await fetch("/api/grade", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...payload, src: new URLSearchParams(location.search).get("src") ?? "web", pid: new URLSearchParams(location.search).get("pid") }) });
+      const res = await fetch("/api/grade", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...payload, src: (new URLSearchParams(location.search).get("src") ?? (typeof sessionStorage !== "undefined" && sessionStorage.getItem("lokly_src")) ?? "web"), pid: new URLSearchParams(location.search).get("pid") }) });
       const j = await res.json();
       if (!res.ok) throw new Error(j.error || "Something went wrong.");
       setR(j); setStep("report"); scrollTo(0, 0);
@@ -212,11 +212,11 @@ function ReportView({ r, onReset }: { r: Report; onReset: () => void }) {
       {(r as any).manual && (r as any).manual.hasGoogle !== "yes" && !r.placeId && (
         <div className="nogbp"><b>You're not showing up on Google Maps yet.</b> When people nearby search for what you sell, you're not in the results. We'll create and verify your Google Business Profile as part of Google Management. <a href="#plan">Get set up</a></div>
       )}
-      {typeof window !== "undefined" && /src=outreach|src=card|src=email/.test(location.search) ? (
+      {typeof window !== "undefined" && (/src=outreach|src=card|src=email|src=instagram|src=facebook/.test(location.search) || !!sessionStorage.getItem("lokly_src")) ? (
         <div className="fixcta">
           <div><b>We'll fix {failed.length ? `all ${failed.length} issues` : "your profile"} for $25 a month.</b>
             <p className="small">Review replies, weekly posts and offers, fresh photos, and a monthly report. Month to month, cancel anytime. Free NFC review card included.</p></div>
-          <a className="btn lime" href={`/start?plan=local&name=${encodeURIComponent(r.businessName)}&website=${encodeURIComponent(r.url ?? "")}&place=${encodeURIComponent(r.placeId ?? "")}&src=${new URLSearchParams(location.search).get("src") ?? "web"}`}>Start for $25/mo</a>
+          <a className="btn lime" href={`/start?plan=local&name=${encodeURIComponent(r.businessName)}&website=${encodeURIComponent(r.url ?? "")}&place=${encodeURIComponent(r.placeId ?? "")}&src=${(new URLSearchParams(location.search).get("src") ?? (typeof sessionStorage !== "undefined" && sessionStorage.getItem("lokly_src")) ?? "web")}`}>Start for $25/mo</a>
         </div>
       ) : <p className="upsell">Want us to fix these for you? Google management starts at $25/mo. <a href="#plan">See plans</a></p>}
 
@@ -338,7 +338,7 @@ function SaveReport({ r, pct }: { r: Report; pct: number }) {
   async function save(e: React.FormEvent) {
     e.preventDefault(); setState("busy"); setErr(null);
     const res = await fetch("/api/lead", { method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...f, businessName: r.businessName, website: r.url, placeId: r.placeId, city: r.city, score: pct, src: new URLSearchParams(location.search).get("src") ?? "web" }) });
+      body: JSON.stringify({ ...f, businessName: r.businessName, website: r.url, placeId: r.placeId, city: r.city, score: pct, src: (new URLSearchParams(location.search).get("src") ?? (typeof sessionStorage !== "undefined" && sessionStorage.getItem("lokly_src")) ?? "web") }) });
     if (res.ok) setState("done"); else { setErr((await res.json()).error ?? "Couldn't save. Try again."); setState("idle"); }
   }
   if (state === "done") return <div className="card saved"><b>Report saved.</b><p className="muted small">We'll send a copy to {f.email} and follow up with what to fix first.</p></div>;
