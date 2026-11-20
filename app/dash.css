@@ -31,3 +31,23 @@
 @media(max-width:860px){.plans{grid-template-columns:1fr}}
 .planwrap{margin-top:28px}.planwrap .h2{font-size:26px}
 .ticks.dk{margin:14px 0}.ticks.dk li:before{color:var(--lime)}
+
+/* Growth Center */
+.growth{padding-bottom:60px}
+.gc-top{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px;margin-top:28px}
+.gc-range{display:flex;gap:6px;flex-wrap:wrap}
+.gc-range a{padding:8px 12px;border:1px solid var(--line);border-radius:999px;text-decoration:none;color:var(--ink);font-size:13px;background:#fff}
+.gc-range a.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.gc-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.gc-kpi{display:grid;gap:4px;margin:0}.gc-kpi span{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--gray)}
+.gc-kpi b{font-size:32px;letter-spacing:-.02em;font-variant-numeric:tabular-nums}.gc-kpi small{font-size:13px;color:var(--gray)}
+.gc-funnel{display:grid;gap:14px}.gc-step{display:grid;gap:6px}.gc-step em{font-style:normal;color:var(--gray);font-size:13px}
+.gc-bar{height:12px;background:var(--sky);border-radius:6px;overflow:hidden}.gc-bar i{display:block;height:100%;background:var(--ink);border-radius:6px}
+.gc-chart{display:grid;grid-template-columns:repeat(30,1fr);gap:3px;height:200px;align-items:end;padding-bottom:44px;position:relative}
+.gc-day{display:flex;gap:1px;align-items:end;height:100%}.gc-day i{flex:1;min-height:1px;border-radius:2px 2px 0 0}
+.gc-chart .g,.gc-legend .g{background:var(--ink)}.gc-chart .r,.gc-legend .r{background:var(--lime)}.gc-chart .p,.gc-legend .p{background:var(--palm)}
+.gc-legend{position:absolute;left:20px;bottom:14px;display:flex;gap:16px;font-size:13px;color:var(--gray)}
+.gc-legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.gc-table .ad-row{display:grid;grid-template-columns:2fr repeat(5,1fr);gap:8px;align-items:center;font-variant-numeric:tabular-nums}
+.gc-recent .ad-row{grid-template-columns:2fr 1fr 3fr}.gc-table small{display:block;color:var(--gray);font-size:12px}
+@media (max-width:640px){.gc-table .ad-row{grid-template-columns:1.4fr repeat(5,1fr);font-size:13px}.gc-recent .ad-row{grid-template-columns:1fr}}

@@ -188,6 +188,9 @@ export default function Page() {
 
 function ReportView({ r, onReset }: { r: Report; onReset: () => void }) {
   const failed = r.checks.filter(c => c.status === "fail");
+  // null = still checking. Anonymous visitors see the score and top issues; the full report unlocks with a free account.
+  const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
+  useEffect(() => { fetch("/api/me").then(x => x.json()).then(j => setLoggedIn(!!j.loggedIn)).catch(() => setLoggedIn(false)); }, []);
   const total = SECTIONS.reduce((a, s) => a + r.scores[s.key].got, 0);
   const max = SECTIONS.reduce((a, s) => a + r.scores[s.key].max, 0);
   const pct = max ? Math.round((total / max) * 100) : 0;
@@ -236,9 +239,11 @@ function ReportView({ r, onReset }: { r: Report; onReset: () => void }) {
       <div className="card aisite"><div><b>See your AI-built website</b><p className="muted small">We built a new site for {r.businessName} that fixes every SEO issue above.</p></div>
         <button className="btn lime sm" onClick={() => { try { sessionStorage.setItem("lokly_report", JSON.stringify(r)); } catch {} location.href = "/preview"; }}>Show me</button></div>
 
-      <SaveReport r={r} pct={pct} />
+      {loggedIn === false && <Gate r={r} failed={failed} />}
 
-      {SECTIONS.map(s => <SectionView key={s.key} id={s.key} label={s.label} checks={r.checks.filter(c => c.section === s.key)}
+      {loggedIn && <SaveReport r={r} pct={pct} />}
+
+      {loggedIn && SECTIONS.map(s => <SectionView key={s.key} id={s.key} label={s.label} checks={r.checks.filter(c => c.section === s.key)}
         note={s.key === "local" && !r.placesConnected ? "Google Maps isn't connected yet, so listing and ranking checks were skipped."
           : s.key === "local" && r.placesError ? `Google Maps error: ${r.placesError}` : undefined} />)}
 
@@ -341,5 +346,28 @@ function SaveReport({ r, pct }: { r: Report; pct: number }) {
       {err && <p className="err">{err}</p>}
       <p className="tiny muted">By saving, you agree we can contact you about your report. See our <a href="/privacy">Privacy Policy</a>.</p>
     </form>
+  );
+}
+
+function Gate({ r, failed }: { r: Report; failed: Check[] }) {
+  const top = [...failed].sort((a: any, b: any) => (b.weight ?? 0) - (a.weight ?? 0)).slice(0, 3);
+  const rest = failed.length - top.length;
+  const unlock = () => {
+    try { sessionStorage.setItem("kern_report", JSON.stringify(r)); } catch {}
+    location.href = "/signup?from=grader";
+  };
+  return (
+    <div className="card gate">
+      <p className="eyebrow">Your biggest issues</p>
+      {top.length === 0 ? <p className="muted">No major issues found. Create a free account to see the full checklist and track your score.</p>
+        : top.map(c => <div key={c.id} className="item fail"><button tabIndex={-1} aria-disabled="true"><i>✕</i><span className="t">{c.title}<small>{c.why}</small></span></button></div>)}
+      {rest > 0 && <div className="gate-locked" aria-hidden="true">{failed.slice(3, 6).map(c => <div key={c.id} className="gate-blur">{c.title}</div>)}</div>}
+      <div className="gate-cta">
+        <b>{rest > 0 ? `See all ${failed.length} issues and how to fix each one` : "Save your report and track your score"}</b>
+        <p className="muted small">Free account. Your report saves to your dashboard so you can rescan and watch your score go up.</p>
+        <button className="btn dark" onClick={unlock}>Create my free account</button>
+        <p className="small muted">Already have one? <a href="/login" onClick={e => { e.preventDefault(); try { sessionStorage.setItem("kern_report", JSON.stringify(r)); } catch {} location.href = "/login"; }}>Log in to save it</a></p>
+      </div>
+    </div>
   );
 }

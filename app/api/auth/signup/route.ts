@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { db, dbReady } from "@/lib/db";
 import { hashPassword, createSession, createBusinessFromReport } from "@/lib/auth";
+import { readAttr, track } from "@/lib/track";
+import { sendTemplate } from "@/lib/email";
 
 export async function POST(req: Request) {
   if (!dbReady()) return NextResponse.json({ error: "Accounts aren't connected yet. Add a Postgres database in Vercel." }, { status: 503 });
@@ -13,8 +15,11 @@ export async function POST(req: Request) {
   const sql = await db();
   const exists = await sql`SELECT 1 FROM users WHERE email = ${email}`;
   if (exists.length) return NextResponse.json({ error: "An account with that email already exists. Log in instead." }, { status: 409 });
-  const [u] = await sql`INSERT INTO users (email, name, password_hash) VALUES (${email}, ${name}, ${hashPassword(password)}) RETURNING id`;
-  await createBusinessFromReport(u.id, b.report, b.businessName);
+  const attr = await readAttr();
+  const [u] = await sql`INSERT INTO users (email, name, password_hash, source, attribution) VALUES (${email}, ${name}, ${hashPassword(password)}, ${attr.s ?? "direct"}, ${JSON.stringify(attr)}) RETURNING id`;
+  const bizId = await createBusinessFromReport(u.id, b.report, b.businessName);
   await createSession(u.id);
+  await track("register", { attr, userId: u.id, businessId: bizId, meta: { withReport: !!b.report?.checks } });
+  await sendTemplate(u.id, "welcome", { businessId: bizId });
   return NextResponse.json({ ok: true });
 }

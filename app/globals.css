@@ -99,3 +99,9 @@ input:focus{border-color:var(--ink)}
 @media(max-width:860px){.grid4,.grid3{grid-template-columns:1fr 1fr}.split,.hw{grid-template-columns:1fr}.hw.rev>div{order:0}
  .links{display:none;position:absolute;top:64px;left:0;right:0;background:var(--paper);flex-direction:column;padding:20px;border-bottom:1px solid var(--line)}.links.open{display:flex}.burger{display:block}}
 @media(max-width:520px){.grid4,.grid3{grid-template-columns:1fr}.herosearch{flex-direction:column}.footin{flex-direction:column}}
+
+.gate .item button{cursor:default}
+.gate-locked{position:relative;margin-top:6px}
+.gate-blur{padding:14px 12px;border-top:1px solid var(--line);filter:blur(5px);user-select:none;color:var(--gray)}
+.gate-cta{margin-top:14px;padding-top:16px;border-top:1px solid var(--line);display:grid;gap:8px;text-align:center}
+.gate-cta b{font-size:18px}.gate-cta p{margin:0}

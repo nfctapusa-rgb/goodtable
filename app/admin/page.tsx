@@ -22,7 +22,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
   return (
     <main className="wrap admin">
       <h1 className="sh-h2">Leads</h1>
-      <p><a className="btn dark sm" href={`/admin/posts?key=${encodeURIComponent(key!)}`}>This week's social posts</a></p>
+      <p><a className="btn dark sm" href={`/admin/posts?key=${encodeURIComponent(key!)}`}>This week's social posts</a> <a className="btn dark sm" href={`/admin/growth?key=${encodeURIComponent(key!)}`}>Growth Center</a></p>
       <p className="sh-sub">{signups.length} signups · {reports.length} free reports ({fromCard} from your business card)</p>
       <h2 className="ad-h" id="clients">Client accounts</h2>
       <div className="ad-table">

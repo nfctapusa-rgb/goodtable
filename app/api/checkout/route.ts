@@ -5,6 +5,7 @@ import { db, dbReady } from "@/lib/db";
 import { currentUser, hashPassword, verifyPassword, createSession } from "@/lib/auth";
 import { seedTasks, stripe } from "@/lib/accounts";
 import { refreshBrandKit } from "@/lib/brandkit";
+import { readAttr, track } from "@/lib/track";
 
 const s = (v: unknown, n = 300) => (v == null ? null : String(v).trim().slice(0, n) || null);
 
@@ -31,8 +32,10 @@ export async function POST(req: Request) {
       user = { id: ex.id } as any;
     } else {
       if (pw.length < 8) return NextResponse.json({ error: "Choose a password with at least 8 characters." }, { status: 400 });
-      const [u] = await sql`INSERT INTO users (email, name, password_hash) VALUES (${email}, ${s(body.contactName, 80)}, ${hashPassword(pw)}) RETURNING id` as any[];
+      const attr = await readAttr();
+      const [u] = await sql`INSERT INTO users (email, name, password_hash, source, attribution) VALUES (${email}, ${s(body.contactName, 80)}, ${hashPassword(pw)}, ${attr.s ?? "direct"}, ${JSON.stringify(attr)}) RETURNING id` as any[];
       user = { id: u.id } as any;
+      await track("register", { attr, userId: u.id, meta: { via: "checkout", plan: plan.id } });
     }
     await createSession(user!.id);
   }

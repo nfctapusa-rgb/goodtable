@@ -105,6 +105,33 @@ async function migrate(sql: ReturnType<typeof neon>) {
     action text NOT NULL,
     meta jsonb,
     created_at timestamptz NOT NULL DEFAULT now())`;
+  // Growth funnel: one row per step (click, ig_comment, grade, register, paid, canceled).
+  await sql`CREATE TABLE IF NOT EXISTS funnel_events (
+    id bigserial PRIMARY KEY,
+    event text NOT NULL,
+    source text,
+    medium text,
+    campaign text,
+    visitor_id text,
+    user_id uuid,
+    business_id uuid,
+    meta jsonb,
+    created_at timestamptz NOT NULL DEFAULT now())`;
+  await sql`CREATE INDEX IF NOT EXISTS funnel_events_ev ON funnel_events(event, created_at DESC)`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS source text`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS attribution jsonb`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_opt_out boolean NOT NULL DEFAULT false`;
+  await sql`CREATE TABLE IF NOT EXISTS payments (
+    id text PRIMARY KEY,
+    business_id uuid,
+    amount_cents int NOT NULL,
+    currency text NOT NULL DEFAULT 'usd',
+    paid_at timestamptz NOT NULL DEFAULT now())`;
+  await sql`CREATE TABLE IF NOT EXISTS email_log (
+    user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    template text NOT NULL,
+    sent_at timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (user_id, template))`;
 }
 
 export function reportScore(r: { scores: Record<string, { got: number; max: number }> }) {
