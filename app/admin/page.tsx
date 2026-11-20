@@ -3,9 +3,18 @@ import { db, dbReady } from "@/lib/db";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Leads | Lokly", robots: { index: false, follow: false } };
 
-export default async function Admin({ searchParams }: { searchParams: Promise<{ key?: string }> }) {
-  const { key } = await searchParams;
-  if (!process.env.ADMIN_KEY || key !== process.env.ADMIN_KEY) return <main className="narrow"><section className="hero"><h1 className="sh-h2">Not found</h1></section></main>;
+export default async function Admin({ searchParams }: { searchParams: Promise<{ key?: string; msg?: string }> }) {
+  const { key, msg } = await searchParams;
+  if (!process.env.ADMIN_KEY || key !== process.env.ADMIN_KEY) return (
+    <main className="narrow"><section className="hero">
+      <h1 className="sh-h2">Lokly admin</h1>
+      <form method="get" action="/admin" className="form" style={{ maxWidth: 360 }}>
+        <label>Admin key<input name="key" type="password" autoComplete="current-password" required /></label>
+        <button className="btn dark">Open admin</button>
+        {key && <p className="err">That key didn't match.</p>}
+      </form>
+    </section></main>
+  );
   if (!dbReady()) return <main className="narrow"><section className="hero"><p>Database not connected.</p></section></main>;
   const sql = await db();
   const rows = await sql`SELECT * FROM leads ORDER BY created_at DESC LIMIT 300` as any[];
@@ -24,7 +33,22 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
       <h1 className="sh-h2">Leads</h1>
       <p><a className="btn dark sm" href={`/admin/posts?key=${encodeURIComponent(key!)}`}>This week's social posts</a> <a className="btn dark sm" href={`/admin/growth?key=${encodeURIComponent(key!)}`}>Growth Center</a> <a className="btn dark sm" href={`/admin/social?key=${encodeURIComponent(key!)}`}>Lokly's socials</a></p>
       <p className="sh-sub">{signups.length} signups · {reports.length} free reports ({fromCard} from your business card)</p>
+      {msg && <p className="ok-note" style={{ wordBreak: "break-all" }}>{msg}</p>}
       <h2 className="ad-h" id="clients">Client accounts</h2>
+      <form className="card ad-add" method="post" action="/api/admin/client">
+        <b>Add an existing client</b>
+        <p className="muted small">For clients you already manage. They get a sign-in link to their results app, no password needed.</p>
+        <input type="hidden" name="key" value={key} />
+        <input name="business" placeholder="Business name" required />
+        <input name="owner" placeholder="Owner name" />
+        <input name="email" type="email" placeholder="Owner email" required />
+        <input name="phone" placeholder="Owner mobile (optional)" />
+        <input name="leadsnap" placeholder="LeadSnap ID, e.g. 105266" inputMode="numeric" />
+        <input name="website" placeholder="Website (optional)" />
+        <select name="plan" defaultValue="local"><option value="local">Google Management $25</option><option value="site">Website Package</option><option value="pro">Lokly Pro $99</option></select>
+        <label className="small"><input type="checkbox" name="send" value="1" defaultChecked /> Email them their sign-in link now</label>
+        <button className="btn dark sm">Add client</button>
+      </form>
       <div className="ad-table">
         <div className="ad-row ad-head c3"><span>Business</span><span>Login email</span><span>Plan, LeadSnap location ID & optional report link</span></div>
         {clients.length === 0 && <p className="ad-empty">No accounts yet. Clients sign up at lokly.pro/signup.</p>}

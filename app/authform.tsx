@@ -15,7 +15,7 @@ export function AuthForm({ mode }: { mode: "signup" | "login" }) {
       const j = await res.json();
       if (!res.ok) throw new Error(j.error);
       try { sessionStorage.removeItem("kern_report"); } catch {}
-      location.href = "/dashboard";
+      location.href = new URLSearchParams(location.search).get("next") || "/dashboard";
     } catch (e) { setErr((e as Error).message); setBusy(false); }
   }
 
