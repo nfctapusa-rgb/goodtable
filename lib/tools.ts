@@ -10,7 +10,7 @@ export const MARKETING_TOOLS: Tool[] = [
   { id: "review-requests", name: "Automatic review requests", desc: "A text or email to each customer after their visit asking for a Google review.", status: "soon", included: "pro" },
   { id: "ai", name: "Lokly AI assistant", desc: "Ask about your numbers and get posts, offers and replies written for you.", status: "soon", included: "pro" },
   { id: "mailers", name: "Postcard mailers", desc: "Postcards to homes near your shop with a tracked QR code.", status: "live", included: "addon", price: "from $349" },
-  { id: "nfc", name: "Extra NFC review cards", desc: "More tap-to-review cards for every register, table or counter.", status: "live", included: "addon", price: "$15 each" },
+  { id: "nfc", name: "Extra NFC review cards", desc: "More tap-to-review cards for every register, table or counter.", status: "live", included: "addon", price: "$24.99 each" },
   { id: "ads", name: "Lokly Ads", desc: "Ads on Instagram, Facebook and Google, run and reported monthly.", status: "managed", included: "addon", price: "$149/mo + ad spend", cents: 14900, monthly: true },
 ];
 
