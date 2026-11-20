@@ -31,7 +31,7 @@ export async function sendEmail(to: string, subject: string, html: string, opts:
   if (opts.marketing && opts.userId) { headers["List-Unsubscribe"] = `<${unsubUrl(opts.userId)}>`; headers["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click"; }
   const r = await fetch("https://api.resend.com/emails", {
     method: "POST", headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ from, to: [to], subject, html, headers }),
+    body: JSON.stringify({ from, to: [to], subject, html, headers, ...(process.env.EMAIL_REPLY_TO ? { reply_to: process.env.EMAIL_REPLY_TO } : {}) }),
   });
   if (!r.ok) throw new Error(`Resend ${r.status}: ${await r.text()}`);
   return r.json();
