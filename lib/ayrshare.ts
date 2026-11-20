@@ -1,6 +1,6 @@
 // Ayrshare: posts to clients' Instagram, Facebook and TikTok. Each business gets its own Ayrshare
 // "user profile"; the owner links their accounts through Ayrshare's hosted page (JWT link).
-// Env: AYRSHARE_API_KEY, AYRSHARE_PRIVATE_KEY (PEM), AYRSHARE_DOMAIN (from Ayrshare dashboard).
+// Env: AYRSHARE_API_KEY. Linking uses Ayrshare link sessions (no private key needed).
 import { db } from "./db";
 
 const API = "https://api.ayrshare.com/api";
@@ -21,17 +21,14 @@ export async function profileKeyFor(businessId: string, name: string) {
   const sql = await db();
   const [b] = await sql`SELECT social FROM businesses WHERE id = ${businessId}` as any[];
   if (b?.social?.profileKey) return b.social.profileKey as string;
-  const j = await call("profiles", { title: `${name.slice(0, 60)} (${businessId.slice(0, 8)})` });
+  const j = await call("profiles/profile", { title: `${name.slice(0, 60)} (${businessId.slice(0, 8)})` });
   await sql`UPDATE businesses SET social = COALESCE(social, '{}'::jsonb) || ${JSON.stringify({ profileKey: j.profileKey, refId: j.refId })}::jsonb WHERE id = ${businessId}`;
   return j.profileKey as string;
 }
 
-// One-time link the owner opens to connect their socials.
-export async function connectUrl(profileKey: string, redirect: string) {
-  const j = await call("profiles/generateJWT", {
-    domain: process.env.AYRSHARE_DOMAIN, privateKey: (process.env.AYRSHARE_PRIVATE_KEY ?? "").replace(/\\n/g, "\n"),
-    profileKey, redirect, allowedSocial: ["instagram", "facebook", "tiktok"], expiresIn: 30,
-  });
+// One-time link (5 min) the owner opens to connect their socials on Ayrshare's hosted page.
+export async function connectUrl(profileKey: string, _redirect?: string) {
+  const j = await call("profiles/link-sessions", {}, profileKey);
   return j.url as string;
 }
 
