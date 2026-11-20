@@ -28,7 +28,7 @@ async function serp(params: Record<string, string>) {
 }
 const fromSerp = (x: any): Place => ({
   id: x.place_id, displayName: { text: x.title }, formattedAddress: x.address, rating: x.rating, userRatingCount: x.reviews,
-  websiteUri: x.website, primaryTypeDisplayName: x.type ? { text: x.type } : undefined, types: x.types,
+  websiteUri: x.website, primaryTypeDisplayName: x.type ? { text: Array.isArray(x.type) ? x.type[0] : x.type } : undefined, types: x.types ?? (Array.isArray(x.type) ? x.type : undefined),
   regularOpeningHours: x.operating_hours ?? x.hours ?? undefined, nationalPhoneNumber: x.phone, editorialSummary: x.description ? { text: typeof x.description === "string" ? x.description : x.description.snippet ?? "" } : undefined,
   photos: x.photos_count ? Array(Math.min(x.photos_count, 50)).fill(0) : x.images ?? (x.thumbnail ? [x.thumbnail] : []),
   googleMapsUri: x.place_id ? `https://www.google.com/maps/place/?q=place_id:${x.place_id}` : undefined,
