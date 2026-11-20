@@ -71,7 +71,7 @@ export default function Page() {
         setSearchErr(!!j.error); setHits(j.results ?? []); setActive(-1);
       } catch { setSearchErr(true); setHits([]); }
       finally { setSearching(false); }
-    }, 300);
+    }, 700);
   }, [q, near, mapsOff]);
 
   async function useLink(e: React.FormEvent) {

@@ -18,7 +18,24 @@ export const placesKey = () => process.env.GOOGLE_PLACES_API_KEY || "";
 const LEAN = ["id", "displayName", "formattedAddress", "rating", "userRatingCount", "websiteUri", "primaryTypeDisplayName"];
 
 // near: bias results toward the searcher (defaults to Los Angeles, where we sell).
+// Google search calls are metered per day, so identical searches are cached for 7 days.
 export async function searchPlaces(q: string, size = 20, near?: { lat: number; lng: number }, lean = false): Promise<Place[]> {
+  const ck = `s:${lean ? 1 : 0}:${size}:${near ? `${near.lat},${near.lng}` : "la"}:${q.trim().toLowerCase().replace(/\s+/g, " ")}`;
+  let sql: any = null;
+  try {
+    const { db, dbReady } = await import("./db");
+    if (dbReady()) {
+      sql = await db();
+      const [hit] = await sql`SELECT v FROM places_cache WHERE k = ${ck} AND at > now() - interval '7 days'`;
+      if (hit) return hit.v as Place[];
+    }
+  } catch {}
+  const res = await searchPlacesLive(q, size, near, lean);
+  if (sql) await sql`INSERT INTO places_cache (k, v) VALUES (${ck}, ${JSON.stringify(res)}) ON CONFLICT (k) DO UPDATE SET v = EXCLUDED.v, at = now()`.catch(() => null);
+  return res;
+}
+
+async function searchPlacesLive(q: string, size: number, near: { lat: number; lng: number } | undefined, lean: boolean): Promise<Place[]> {
   const c = near ?? { lat: 34.0522, lng: -118.2437 };
   const r = await fetch(`${BASE}/places:searchText`, {
     method: "POST", cache: "no-store",

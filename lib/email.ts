@@ -14,7 +14,7 @@ function layout(title: string, paras: string[], cta: { label: string; href: stri
   return `<!doctype html><html><body style="margin:0;background:#F4F7F9;font-family:Arial,Helvetica,sans-serif;color:#142133">
 <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:28px 12px">
 <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;background:#fff;border:1px solid #DCE3E9;border-radius:16px">
-<tr><td style="padding:22px 28px;border-bottom:1px solid #DCE3E9;font-weight:800;font-size:20px"><span style="color:#E30A23">&#9679;</span> Lokly</td></tr>
+<tr><td style="padding:22px 28px;border-bottom:1px solid #DCE3E9;font-weight:800;font-size:22px;color:#142133"><img src="${SITE()}/pin-96.png" width="28" height="28" alt="" style="vertical-align:-6px;border:0"> Lokly</td></tr>
 <tr><td style="padding:26px 28px">
 <h1 style="font-size:22px;line-height:1.25;margin:0 0 14px">${esc(title)}</h1>
 ${paras.map(p => `<p style="font-size:15px;line-height:1.55;margin:0 0 14px">${p}</p>`).join("")}

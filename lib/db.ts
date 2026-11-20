@@ -164,6 +164,10 @@ async function migrate(sql: ReturnType<typeof neon>) {
     resend_id text,
     notes text,
     created_at timestamptz NOT NULL DEFAULT now())`;
+  await sql`CREATE TABLE IF NOT EXISTS places_cache (
+    k text PRIMARY KEY,
+    v jsonb NOT NULL,
+    at timestamptz NOT NULL DEFAULT now())`;
   await sql`CREATE TABLE IF NOT EXISTS suppressions (
     email text PRIMARY KEY,
     reason text NOT NULL,

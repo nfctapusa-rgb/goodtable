@@ -10,6 +10,7 @@ const archivo = Archivo({ subsets: ["latin"], axes: ["wdth"], variable: "--font-
 import { Nav, Footer } from "./ui";
 import { Attribution } from "./attribution";
 
+export const metadata_og = { images: ["/icon-512.png"] };
 export const metadata: Metadata = {
   title: "Lokly | Get found by the people on your block",
   description: "Lokly builds local business websites and manages Google Business Profiles in Los Angeles. Google profile management from $25/mo. Website packages $299 with 3 months of management free.",

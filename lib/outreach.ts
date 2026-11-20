@@ -40,7 +40,7 @@ export const STEPS = [
 function html(lines: string[], id: number) {
   return `<!doctype html><html><body style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.55;color:#142133;max-width:560px">
 ${lines.map(l => `<p style="margin:0 0 14px">${l}</p>`).join("")}
-<p style="margin:0 0 14px">Mark<br>Lokly · lokly.pro</p>
+<table cellpadding="0" cellspacing="0" style="margin:6px 0 14px"><tr><td style="padding-right:8px"><img src="${SITE()}/pin-96.png" width="32" height="32" alt="Lokly" style="display:block;border:0"></td><td style="font-size:14px;line-height:1.35">Mark<br><b>Lokly</b> · <a href="${SITE()}" style="color:#142133">lokly.pro</a></td></tr></table>
 <p style="font-size:12px;color:#6B7785;margin-top:24px">${esc(postalAddress())}<br>Don't want these emails? <a href="${optoutUrl(id)}" style="color:#6B7785">Unsubscribe</a>.</p></body></html>`;
 }
 
