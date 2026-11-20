@@ -140,6 +140,34 @@ async function migrate(sql: ReturnType<typeof neon>) {
     amount_cents int NOT NULL,
     currency text NOT NULL DEFAULT 'usd',
     paid_at timestamptz NOT NULL DEFAULT now())`;
+  await sql`CREATE TABLE IF NOT EXISTS prospects (
+    id bigserial PRIMARY KEY,
+    business_name text NOT NULL,
+    contact_name text,
+    email text NOT NULL UNIQUE,
+    phone text,
+    website text,
+    city text,
+    category text,
+    source text NOT NULL,
+    sms_consent boolean NOT NULL DEFAULT false,
+    sms_consent_at timestamptz,
+    status text NOT NULL DEFAULT 'new',
+    step int NOT NULL DEFAULT 0,
+    next_send_at timestamptz,
+    last_sent_at timestamptz,
+    clicked_at timestamptz,
+    report_at timestamptz,
+    replied_at timestamptz,
+    customer_at timestamptz,
+    score int,
+    resend_id text,
+    notes text,
+    created_at timestamptz NOT NULL DEFAULT now())`;
+  await sql`CREATE TABLE IF NOT EXISTS suppressions (
+    email text PRIMARY KEY,
+    reason text NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now())`;
   await sql`CREATE TABLE IF NOT EXISTS email_log (
     user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     template text NOT NULL,

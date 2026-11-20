@@ -100,6 +100,11 @@ export async function POST(req: Request) {
     manual: placeId ? null : manual,
     placesConnected: local.connected, placesError: local.error, rankings: local.rankings, checks,
   };
+  if (body.pid && /^\d+\.[\w-]{24}$/.test(String(body.pid))) {
+    const [pid, t] = String(body.pid).split(".");
+    const { ptoken } = await import("@/lib/outreach");
+    if (ptoken(pid) === t) await (await (await import("@/lib/db")).db())`UPDATE prospects SET report_at = COALESCE(report_at, now()), score = ${reportScore(out as any)}, status = CASE WHEN status IN ('customer') THEN status ELSE 'report' END, next_send_at = NULL WHERE id = ${Number(pid)}`.catch(() => null);
+  }
   await saveLead({ kind: "report", source: String(body.src ?? "web"), businessName: out.businessName, website: out.url, placeId: out.placeId, city: out.city, phone: manual.phone || undefined, score: reportScore(out as any), data: placeId ? undefined : { ...manual, needsGoogleProfile: manual.hasGoogle !== "yes", keyword } });
   await track("grade", { meta: { score: reportScore(out as any), business: out.businessName?.slice(0, 120), place: out.placeId } });
   return NextResponse.json(out);

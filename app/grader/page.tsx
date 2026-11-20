@@ -100,7 +100,7 @@ export default function Page() {
   async function grade(payload: object, label: string) {
     setLoading(label); setErr(null);
     try {
-      const res = await fetch("/api/grade", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...payload, src: new URLSearchParams(location.search).get("src") ?? "web" }) });
+      const res = await fetch("/api/grade", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...payload, src: new URLSearchParams(location.search).get("src") ?? "web", pid: new URLSearchParams(location.search).get("pid") }) });
       const j = await res.json();
       if (!res.ok) throw new Error(j.error || "Something went wrong.");
       setR(j); setStep("report"); scrollTo(0, 0);
