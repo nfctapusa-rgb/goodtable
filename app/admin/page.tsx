@@ -9,7 +9,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
   if (!dbReady()) return <main className="narrow"><section className="hero"><p>Database not connected.</p></section></main>;
   const sql = await db();
   const rows = await sql`SELECT * FROM leads ORDER BY created_at DESC LIMIT 300` as any[];
-  const clients = await sql`SELECT b.id, b.name, b.plan, b.stats_url, b.leadsnap_id, b.status, b.trial_ends_at, b.setup, b.phone, b.created_at, u.email FROM businesses b
+  const clients = await sql`SELECT b.id, b.name, b.plan, b.stats_url, b.leadsnap_id, b.status, b.trial_ends_at, b.setup, b.phone, b.addons, b.created_at, u.email FROM businesses b
     LEFT JOIN memberships m ON m.business_id = b.id AND m.role = 'owner' LEFT JOIN users u ON u.id = m.user_id ORDER BY b.created_at DESC LIMIT 200` as any[];
   const allTasks = await sql`SELECT business_id, key, title, who, done FROM tasks ORDER BY sort` as any[];
   const tasksOf = (id: string) => allTasks.filter(t => t.business_id === id);
@@ -42,7 +42,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
           </form>
         ))}
       </div>
-      <h2 className="ad-h">Onboarding</h2>
+      <h2 className="ad-h" id="onboarding">Onboarding & results</h2>
       <div className="ad-table">
         {clients.filter(c => c.plan !== "free").map(c => {
           const ts = tasksOf(c.id);
@@ -54,6 +54,17 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
               <div className="ad-status">{["pending", "active", "trial", "past_due", "canceled"].map(st => (
                 <form key={st} method="post" action="/api/admin/task"><input type="hidden" name="key" value={key} /><input type="hidden" name="b" value={c.id} /><input type="hidden" name="status" value={st} />
                   <button className={`chip ${c.status === st ? "on" : ""}`}>{st}</button></form>))}</div>
+              <div className="ad-status">{["social", "campaigns", "ads", "mailers"].map(a => (
+                <form key={a} method="post" action="/api/admin/task"><input type="hidden" name="key" value={key} /><input type="hidden" name="b" value={c.id} /><input type="hidden" name="addon" value={a} />
+                  <button className={`chip ${(c.addons ?? []).includes(a) ? "on" : ""}`} title="Paid add-on (tap to toggle)">+ {a}</button></form>))}</div>
+              <form className="ad-result" method="post" action="/api/admin/result">
+                <input type="hidden" name="key" value={key} /><input type="hidden" name="b" value={c.id} />
+                <select name="kind" aria-label="Type">{["Google post", "Review reply", "Social post", "Postcard", "Campaign", "Website", "Ads", "Update"].map(k => <option key={k}>{k}</option>)}</select>
+                <input name="title" placeholder="What we did, e.g. Posted this week's 10% off offer" required />
+                <input name="detail" placeholder="Result (optional), e.g. 312 views, 9 calls" />
+                <input name="url" placeholder="Link (optional)" />
+                <button className="btn dark sm">Log it</button>
+              </form>
               <div className="ad-tasks">{ts.map(t => (
                 <form key={t.key} method="post" action="/api/admin/task"><input type="hidden" name="key" value={key} /><input type="hidden" name="b" value={c.id} /><input type="hidden" name="task" value={t.key} />
                   <button className={`chip ${t.done ? "on" : ""}`} title={t.who === "owner" ? "Client task" : "Lokly task"}>{t.done ? "✓ " : ""}{t.title}</button></form>))}</div>

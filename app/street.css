@@ -321,3 +321,8 @@ html{-webkit-text-size-adjust:100%}
 .pd pre{white-space:pre-wrap;font:14px/1.45 inherit;margin:0;background:#F7F9FB;padding:10px;border-radius:6px;max-height:260px;overflow:auto}
 .pd .btn{justify-self:start}
 .steps-sm{margin:8px 0;padding-left:20px;display:grid;gap:6px}.steps-sm code{background:var(--sky);padding:2px 6px;border-radius:4px;font-weight:700}
+.feed{list-style:none;margin:8px 0 0;padding:0;display:grid}
+.feed li{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:start;padding:10px 0;border-bottom:1px solid var(--line)}
+.feed p{margin:2px 0 0}.feed-k{font-size:12px;font-weight:700;background:var(--sky);padding:3px 8px;border-radius:4px;white-space:nowrap}
+.ad-result{display:flex;flex-wrap:wrap;gap:6px}.ad-result input,.ad-result select{padding:6px 8px;border:1px solid var(--line);border-radius:6px;font-size:13px;min-width:0;flex:1 1 160px}
+@media(max-width:600px){.feed li{grid-template-columns:1fr}.feed time{order:-1}}

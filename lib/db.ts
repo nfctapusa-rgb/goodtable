@@ -58,6 +58,15 @@ async function migrate(sql: ReturnType<typeof neon>) {
   await sql`ALTER TABLE businesses ADD COLUMN IF NOT EXISTS phone text`;
   await sql`ALTER TABLE businesses ADD COLUMN IF NOT EXISTS assets jsonb`;
   await sql`ALTER TABLE businesses ADD COLUMN IF NOT EXISTS social jsonb`;
+  await sql`ALTER TABLE businesses ADD COLUMN IF NOT EXISTS addons jsonb NOT NULL DEFAULT '[]'::jsonb`;
+  await sql`CREATE TABLE IF NOT EXISTS results (
+    id bigserial PRIMARY KEY,
+    business_id uuid NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
+    kind text NOT NULL,
+    title text NOT NULL,
+    detail text,
+    url text,
+    created_at timestamptz NOT NULL DEFAULT now())`;
   await sql`CREATE TABLE IF NOT EXISTS tasks (
     id bigserial PRIMARY KEY,
     business_id uuid NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,

@@ -13,11 +13,11 @@ export async function POST(req: Request) {
   if (!biz) return new NextResponse("Not found", { status: 404 });
   const offer = offerById(biz, String(f.get("offer") ?? ""));
   if (!offer) return new NextResponse("Offer not available", { status: 400 });
-  if (offer.id === "mailers") return NextResponse.redirect(new URL("/mailers", req.url), 303);
+  if (offer.href) return NextResponse.redirect(new URL(offer.href, req.url), 303);
   const origin = new URL(req.url).origin;
   if (!process.env.STRIPE_SECRET_KEY || !offer.cents) {
-    await saveLead({ kind: "tool", source: "upsell", businessName: biz.name, email: user.email, plan: biz.plan, data: { tool: offer.id, toolName: offer.title, businessId: bizId, price: offer.price } });
-    return NextResponse.redirect(new URL(`/dashboard?b=${bizId}&requested=${offer.id}#tools`, req.url), 303);
+    await saveLead({ kind: "tool", source: "upsell", businessName: biz.name, email: user.email, plan: biz.plan, data: { tool: offer.id, toolName: offer.name, businessId: bizId, price: offer.price } });
+    return NextResponse.redirect(new URL(`/dashboard?b=${bizId}&requested=${offer.id}#services`, req.url), 303);
   }
   const p = new URLSearchParams();
   p.set("mode", offer.mode);
@@ -29,7 +29,7 @@ export async function POST(req: Request) {
   p.set("line_items[0][quantity]", "1");
   p.set("line_items[0][price_data][currency]", "usd");
   p.set("line_items[0][price_data][unit_amount]", String(offer.cents));
-  p.set("line_items[0][price_data][product_data][name]", offer.title);
+  p.set("line_items[0][price_data][product_data][name]", offer.name);
   if (offer.mode === "subscription") p.set("line_items[0][price_data][recurring][interval]", "month");
   const j = await stripe("checkout/sessions", p);
   return NextResponse.redirect(j.url, 303);

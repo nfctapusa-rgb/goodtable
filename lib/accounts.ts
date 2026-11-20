@@ -50,17 +50,28 @@ export async function setPlan(businessId: string, plan: PlanId, status: Status, 
   await sql`INSERT INTO audit_log (business_id, action, meta) VALUES (${businessId}, 'plan.set', ${JSON.stringify({ plan, status })})`;
 }
 
-// Upsells: what to offer next, based on plan and status. Prices in cents.
-export interface Offer { id: string; title: string; body: string; cta: string; price: string; cents: number; mode: "payment" | "subscription"; newPlan?: PlanId }
-export function offersFor(b: { plan: string; status: string; website?: string | null; trial_ends_at?: string | null }, score?: number | null): Offer[] {
-  const out: Offer[] = [];
-  if (b.plan === "local") out.push({ id: "site_member", title: "Add a website for $199", body: `Members save $100 on the website package.${score != null && score < 70 ? ` Your report score is ${score}/100, and a new site fixes most of the website issues.` : " Built from your Google profile, with hosting and weekly changes included in your $25."}`, cta: "Add my website", price: "$199 once", cents: 19900, mode: "payment", newPlan: "site" });
-  if (b.plan === "local" || b.plan === "site") out.push({ id: "pro", title: "Upgrade to Lokly Pro", body: b.plan === "site" && b.trial_ends_at ? `Your free months end ${new Date(b.trial_ends_at).toLocaleDateString("en-US", { month: "long", day: "numeric" })}. Pro adds online ordering, a live analytics dashboard, social posting and email & text campaigns.` : "Online ordering, a live analytics dashboard, social posting and email & text campaigns.", cta: "Upgrade to Pro", price: "$89 a month", cents: 8900, mode: "subscription", newPlan: "pro" });
-  if (b.plan === "pro") out.push({ id: "mailers", title: "Send postcards to your neighborhood", body: "250 homes near your shop for $199, with a tracked QR code.", cta: "Design a postcard", price: "from $199", cents: 0, mode: "payment" });
-  out.push({ id: "ads", title: "Lokly Ads", body: "We run your Instagram, Facebook and Google ads and report results monthly.", cta: "Add Lokly Ads", price: "$149 a month + ad spend", cents: 14900, mode: "subscription" });
+// Services menu in the owner dashboard. No pop-ups or pitches: every option is listed with its
+// state, and the owner adds what they want. We do the work; results show in their feed.
+import { MARKETING_TOOLS } from "./tools";
+export type SvcState = "included" | "active" | "available" | "soon";
+export interface Service { id: string; name: string; desc: string; price?: string; cents: number; mode: "payment" | "subscription"; state: SvcState; newPlan?: PlanId; href?: string }
+export function servicesFor(b: { plan: string; status?: string; addons?: string[] | null }): Service[] {
+  const addons = new Set(b.addons ?? []);
+  const pro = b.plan === "pro", site = b.plan === "site" || pro;
+  const out: Service[] = [
+    { id: "site_member", name: "Website", desc: "Built from your Google profile, hosted, with weekly changes.", price: b.plan === "local" ? "$199 once" : undefined, cents: 19900, mode: "payment", newPlan: "site", state: site ? "included" : b.plan === "local" ? "available" : "available" },
+    { id: "pro", name: "Lokly Pro", desc: "Online ordering, live analytics, social posting and email & text campaigns in one plan.", price: "$89/mo", cents: 8900, mode: "subscription", newPlan: "pro", state: pro ? "active" : "available" },
+  ];
+  for (const t of MARKETING_TOOLS) {
+    if (t.id === "reviews") continue;
+    const state: SvcState = t.status === "soon" ? "soon" : addons.has(t.id) ? "active" : t.included === "pro" && pro ? "included" : "available";
+    out.push({ id: t.id, name: t.name, desc: t.desc, price: t.price, cents: t.cents ?? 0, mode: t.monthly ? "subscription" : "payment", state, href: t.id === "mailers" ? "/mailers" : undefined });
+  }
   return out;
 }
-export const offerById = (b: Parameters<typeof offersFor>[0], id: string) => offersFor(b).find(o => o.id === id);
+export const offerById = (b: Parameters<typeof servicesFor>[0], id: string) => servicesFor(b).find(o => o.id === id && o.state === "available");
+// kept for older imports
+export const offersFor = (b: Parameters<typeof servicesFor>[0], _score?: number | null) => [] as Service[];
 
 // Minimal Stripe REST helper (no SDK).
 export async function stripe(path: string, params?: URLSearchParams, method = params ? "POST" : "GET") {

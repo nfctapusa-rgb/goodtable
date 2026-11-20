@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { currentUser, businessFor } from "@/lib/auth";
-import { offersFor } from "@/lib/accounts";
 import { planById } from "@/lib/plans";
 
 export const dynamic = "force-dynamic";
@@ -16,7 +15,6 @@ export default async function Welcome({ searchParams }: { searchParams: Promise<
   const sql = await db();
   const tasks = await sql`SELECT key, title, who, done FROM tasks WHERE business_id = ${biz.id} ORDER BY sort` as any[];
   const plan = planById(biz.plan);
-  const offer = offersFor(biz)[0];
   const yours = tasks.filter(t => t.who === "owner" && !t.done);
   return (
     <main className="narrow welcome">
@@ -35,15 +33,7 @@ export default async function Welcome({ searchParams }: { searchParams: Promise<
             <p className="small muted">Easiest way: text your logo, photos and links to us. We'll handle the rest.</p>
           </div>
         )}
-        {offer && (
-          <form className="wl-offer" method="post" action="/api/upsell">
-            <p className="wl-tag">One-time offer for new members</p>
-            <b>{offer.title}</b>
-            <p>{offer.body}</p>
-            <input type="hidden" name="b" value={biz.id} /><input type="hidden" name="offer" value={offer.id} />
-            <div className="wl-actions"><button className="btn lime">{offer.cta}, {offer.price}</button><a className="link" href={`/dashboard?b=${biz.id}`}>No thanks, go to my dashboard</a></div>
-          </form>
-        )}
+        <a className="btn dark" href={`/dashboard?b=${biz.id}`}>Go to my dashboard</a>
       </section>
     </main>
   );

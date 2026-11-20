@@ -41,7 +41,10 @@ export async function POST(req: Request) {
       if (newPlan === "pro" && b.stripe_subscription_id && o.subscription && b.stripe_subscription_id !== o.subscription)
         await stripe(`subscriptions/${b.stripe_subscription_id}`, undefined, "DELETE").catch(() => null);
       if (newPlan) await setPlan(bizId, newPlan, "active", { sub: newPlan === "pro" ? o.subscription : null, customer: o.customer });
-      else await sql`INSERT INTO audit_log (business_id, action, meta) VALUES (${bizId}, 'addon.purchased', ${JSON.stringify({ offer: o.metadata?.offer })})`;
+      else {
+        await sql`UPDATE businesses SET addons = (SELECT jsonb_agg(DISTINCT x) FROM jsonb_array_elements(addons || ${JSON.stringify([o.metadata?.offer])}::jsonb) x) WHERE id = ${bizId}`;
+        await sql`INSERT INTO audit_log (business_id, action, meta) VALUES (${bizId}, 'addon.purchased', ${JSON.stringify({ offer: o.metadata?.offer })})`;
+      }
     } else {
       await setPlan(bizId, (newPlan ?? b.plan) as PlanId, status, { sub: o.subscription, customer: o.customer, trialEnds });
     }

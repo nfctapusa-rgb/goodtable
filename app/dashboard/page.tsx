@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { googleStats } from "@/lib/leadsnap";
 import { MARKETING_TOOLS, STATUS_LABEL } from "@/lib/tools";
-import { offersFor } from "@/lib/accounts";
+import { servicesFor } from "@/lib/accounts";
 import { planById } from "@/lib/plans";
 import { db, dbReady } from "@/lib/db";
 import { currentUser } from "@/lib/auth";
@@ -16,7 +16,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   const user = await currentUser();
   if (!user) redirect("/login");
   const sql = await db();
-  const bizList = await sql`SELECT b.id, b.name, b.plan, b.website, b.address, b.place_id, b.stats_url, b.leadsnap_id, b.status, b.trial_ends_at, b.stripe_customer_id, b.assets FROM businesses b
+  const bizList = await sql`SELECT b.id, b.name, b.plan, b.website, b.address, b.place_id, b.stats_url, b.leadsnap_id, b.status, b.trial_ends_at, b.stripe_customer_id, b.assets, b.addons FROM businesses b
     JOIN memberships m ON m.business_id = b.id WHERE m.user_id = ${user.id} ORDER BY b.created_at`;
   const { b, requested, upgraded, billing } = await searchParams;
   const biz = bizList.find(x => x.id === b) ?? bizList[0];
@@ -35,7 +35,8 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   const paid = biz.plan !== "free" && biz.status !== "canceled";
   const tasks = await sql`SELECT key, title, who, done FROM tasks WHERE business_id = ${biz.id} ORDER BY sort` as any[];
   const doneN = tasks.filter(t => t.done).length;
-  const offers = offersFor(biz, latest?.score ?? null).slice(0, 2);
+  const services = servicesFor(biz);
+  const results = await sql`SELECT kind, title, detail, url, created_at FROM results WHERE business_id = ${biz.id} ORDER BY created_at DESC LIMIT 12` as any[];
   const planInfo = planById(biz.plan);
   const STATUS: Record<string, string> = { pending: "Payment pending", active: "Active", trial: "Free months", past_due: "Payment failed", canceled: "Canceled" };
   const delta = latest && prev ? latest.score - prev.score : null;
@@ -46,7 +47,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         <BizSwitcher list={bizList.map(x => ({ id: x.id, name: x.name }))} current={biz.id} />
         <nav>
           <a className="on" href={`/dashboard?b=${biz.id}`}>Overview</a>
-          <a href={`/dashboard?b=${biz.id}#tools`}>Marketing tools</a>
+          <a href={`/dashboard?b=${biz.id}#services`}>Services</a>
           <a href="/mailers">Postcards</a>
         </nav>
         <form action="/api/auth/logout" method="post"><button className="link">Log out</button></form>
@@ -95,17 +96,14 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
           </div>
         )}
 
-        {offers.length > 0 && paid && (
-          <div className="offers">
-            {offers.map(o => (
-              <form key={o.id} className="card offer" method="post" action="/api/upsell">
-                <b>{o.title}</b><p className="muted small">{o.body}</p>
-                <input type="hidden" name="b" value={biz.id} /><input type="hidden" name="offer" value={o.id} />
-                <button className="btn dark sm">{o.cta} · {o.price}</button>
-              </form>
-            ))}
-          </div>
-        )}
+        <div className="card" id="results">
+          <div className="gs-head"><b>What we did for you</b><span className="muted small">Updated by your Lokly team</span></div>
+          {results.length === 0 ? <p className="small muted">Your posts, review replies, postcards and campaigns will show up here as we do them.</p> : (
+            <ul className="feed">{results.map((r, i) => (
+              <li key={i}><span className="feed-k">{r.kind}</span><div><b>{r.url ? <a href={r.url} target="_blank" rel="noreferrer">{r.title}</a> : r.title}</b>{r.detail && <p className="muted small">{r.detail}</p>}</div><time className="muted small">{new Date(r.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</time></li>
+            ))}</ul>
+          )}
+        </div>
 
         <div className="kpis">
           <div className="card kpi"><span>Visibility score</span><b>{latest ? latest.score : "—"}<small>/100</small></b>
@@ -149,9 +147,6 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         </div>
         )}
 
-        {!paid && (
-          <a href="/pricing" className="card nudge"><b>Let Lokly fix {todo.length ? `all ${todo.length} issues` : "everything"} from $25/mo</b><span>See the plan →</span></a>
-        )}
 
         <div className="card">
           <p className="eyebrow">Your to-do list</p>
@@ -189,8 +184,9 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
           ) : <p className="small muted">Add your website and we'll pull your logo, colors and photos. No website? Text us your logo and photos instead.</p>}
         </div>
 
-        <div className="card" id="tools">
-          <p className="eyebrow">Marketing tools</p>
+        <div className="card" id="services">
+          <p className="eyebrow">Services</p>
+          <p className="muted small">Add anything here and we handle it. You'll see the results above.</p>
           {requested && <p className="ok-note">Got it. We'll text you within one business day to set that up.</p>}
           {biz.place_id && (
             <div className="rkit">
@@ -204,22 +200,18 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
             </div>
           )}
           <div className="toolgrid">
-            {MARKETING_TOOLS.map(t => {
-              const has = t.status !== "soon" && (t.included === "local" ? paid : t.included === "pro" ? biz.plan === "pro" && paid : false);
-              return (
-                <form key={t.id} className="tool" method="post" action="/api/tools">
-                  <span className={`st ${t.status}`}>{STATUS_LABEL[t.status]}</span>
-                  <b>{t.name}</b>
-                  <p className="muted">{t.desc}</p>
-                  <input type="hidden" name="tool" value={t.id} /><input type="hidden" name="b" value={biz.id} />
-                  {t.id === "reviews" ? <span className="small muted">{biz.place_id ? "Ready above" : "Run your free report to connect your Google profile"}</span>
-                    : t.id === "mailers" ? <a className="btn dark sm" href="/mailers">Design a postcard</a>
-                    : t.status === "soon" ? <button className="btn ghost sm">Notify me</button>
-                    : has ? <button className="btn dark sm">Set it up</button>
-                    : <button className="btn ghost sm">{t.included === "addon" ? `Add it (${t.price})` : "Upgrade to Pro"}</button>}
-                </form>
-              );
-            })}
+            {services.map(v => (
+              <form key={v.id} className="tool" method="post" action="/api/upsell">
+                <b>{v.name}</b>
+                <p className="muted">{v.desc}</p>
+                <input type="hidden" name="b" value={biz.id} /><input type="hidden" name="offer" value={v.id} />
+                {v.state === "active" ? <span className="st live">Active, we're on it</span>
+                  : v.state === "included" ? <span className="st live">Included in your plan</span>
+                  : v.state === "soon" ? <span className="st soon">Coming soon</span>
+                  : v.href ? <a className="btn ghost sm" href={v.href}>{v.price ? `Order, ${v.price}` : "Open"}</a>
+                  : <button className="btn ghost sm">Add{v.price ? `, ${v.price}` : ""}</button>}
+              </form>
+            ))}
           </div>
         </div>
       </main>
