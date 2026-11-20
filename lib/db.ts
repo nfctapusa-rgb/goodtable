@@ -118,6 +118,21 @@ async function migrate(sql: ReturnType<typeof neon>) {
     action text NOT NULL,
     meta jsonb,
     created_at timestamptz NOT NULL DEFAULT now())`;
+  // Lokly's own social accounts (house posting) and small key/value settings.
+  await sql`CREATE TABLE IF NOT EXISTS settings (key text PRIMARY KEY, value jsonb NOT NULL, updated_at timestamptz NOT NULL DEFAULT now())`;
+  await sql`CREATE TABLE IF NOT EXISTS house_posts (
+    id bigserial PRIMARY KEY,
+    kind text NOT NULL,
+    caption text NOT NULL,
+    image text,
+    platforms text[] NOT NULL,
+    scheduled_for timestamptz NOT NULL,
+    status text NOT NULL DEFAULT 'pending',
+    ayrshare_id text,
+    error text,
+    week int NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    UNIQUE (week, kind))`;
   // Growth funnel: one row per step (click, ig_comment, grade, register, paid, canceled).
   await sql`CREATE TABLE IF NOT EXISTS funnel_events (
     id bigserial PRIMARY KEY,
