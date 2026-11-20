@@ -43,3 +43,30 @@ export async function googleStats(locationId: string): Promise<GoogleStats | nul
     };
   } catch { return null; }
 }
+
+export type Card = { current: number | null; prior: number | null; change_pct: number | null };
+export type FullStats = {
+  m1: { appearances: Card; actions: Card; calls: Card };
+  m6: { appearances: Card; actions: Card; calls: Card };
+  trend: { period: string; maps: number | null; search: number | null }[];
+  reviews: { count: number; rating: number; unreplied: number } | null;
+  asOf: string;
+};
+
+// 30-day and 6-month comparisons plus monthly trend. Live when LEADSNAP_API_KEY is set, else null.
+export async function fullStats(locationId: string): Promise<FullStats | null> {
+  if (!/^\d+$/.test(locationId)) return null;
+  const end = new Date(Date.now() - 86400000);
+  try {
+    const [a, b, loc] = await Promise.all([
+      get(`/locations/${locationId}/performance/overview`, { start_date: mdy(new Date(end.getTime() - 29 * 864e5)), end_date: mdy(end) }),
+      get(`/locations/${locationId}/performance/overview`, { start_date: mdy(new Date(end.getTime() - 182 * 864e5)), end_date: mdy(end) }),
+      get(`/locations/${locationId}`),
+    ]);
+    if (!a?.cards || !b?.cards) return null;
+    const l = loc?.data ?? loc;
+    return { m1: a.cards, m6: b.cards, trend: b.chart?.data ?? [],
+      reviews: l?.review_count != null ? { count: l.review_count, rating: l.ave_review_rating, unreplied: l.unreplied_review_count ?? 0 } : null,
+      asOf: new Date().toISOString() };
+  } catch { return null; }
+}
