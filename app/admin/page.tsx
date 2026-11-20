@@ -86,7 +86,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
           </div>
         ))}
       </div>
-      <h2 className="ad-h">Postcard requests</h2>
+      <h2 className="ad-h" id="mailers">Postcard requests</h2>
       <div className="ad-table">
         <div className="ad-row ad-head"><span>When</span><span>Business</span><span>Contact</span><span>Order</span><span>Offer & area</span></div>
         {mailers.length === 0 && <p className="ad-empty">No postcard requests yet.</p>}
@@ -95,7 +95,9 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
             <span>{when(r.created_at)}</span>
             <span><b>{r.business_name}</b><small>{r.data?.address}</small></span>
             <span>{r.contact_name}<a href={`tel:${r.phone}`}>{r.phone}</a><a href={`mailto:${r.email}`}>{r.email}</a></span>
-            <span>{r.plan}<small>{r.data?.status}</small></span>
+            <span>{r.plan}<small>{r.data?.status}{r.data?.scans ? ` · ${r.data.scans} scans` : ""}</small>
+              {r.data?.proofUrl ? <a href={r.data.proofUrl} target="_blank" rel="noreferrer">View proof PDF</a>
+                : process.env.LOB_API_KEY ? <form method="post" action="/api/admin/proof"><input type="hidden" name="key" value={key} /><input type="hidden" name="lead" value={r.id} /><button className="btn dark sm">Make proof</button></form> : <small>Add Lob key for proofs</small>}</span>
             <span className="ad-notes"><b>{r.data?.headline}</b><em>{r.data?.detail}</em><span>{r.data?.area}{r.data?.zips ? `: ${r.data.zips}` : ""}</span></span>
           </div>
         ))}

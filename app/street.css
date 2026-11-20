@@ -326,3 +326,4 @@ html{-webkit-text-size-adjust:100%}
 .feed p{margin:2px 0 0}.feed-k{font-size:12px;font-weight:700;background:var(--sky);padding:3px 8px;border-radius:4px;white-space:nowrap}
 .ad-result{display:flex;flex-wrap:wrap;gap:6px}.ad-result input,.ad-result select{padding:6px 8px;border:1px solid var(--line);border-radius:6px;font-size:13px;min-width:0;flex:1 1 160px}
 @media(max-width:600px){.feed li{grid-template-columns:1fr}.feed time{order:-1}}
+.pd-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}

@@ -11,14 +11,15 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Dashboard | Lokly" };
 
 
-export default async function Dashboard({ searchParams }: { searchParams: Promise<{ b?: string; requested?: string; upgraded?: string; billing?: string }> }) {
+export default async function Dashboard({ searchParams }: { searchParams: Promise<{ b?: string; requested?: string; upgraded?: string; billing?: string; social?: string }> }) {
   if (!dbReady()) return <main className="narrow"><section className="hero"><h1>Dashboard</h1><p className="note">The database isn't connected yet. Add a Postgres database to this Vercel project to turn on accounts.</p></section></main>;
   const user = await currentUser();
   if (!user) redirect("/login");
   const sql = await db();
-  const bizList = await sql`SELECT b.id, b.name, b.plan, b.website, b.address, b.place_id, b.stats_url, b.leadsnap_id, b.status, b.trial_ends_at, b.stripe_customer_id, b.assets, b.addons FROM businesses b
+  const bizList = await sql`SELECT b.id, b.name, b.plan, b.website, b.address, b.place_id, b.stats_url, b.leadsnap_id, b.status, b.trial_ends_at, b.stripe_customer_id, b.assets, b.addons, b.social FROM businesses b
     JOIN memberships m ON m.business_id = b.id WHERE m.user_id = ${user.id} ORDER BY b.created_at`;
-  const { b, requested, upgraded, billing } = await searchParams;
+  const { b, requested, upgraded, billing, social } = await searchParams;
+  const autoSocial = !!process.env.AYRSHARE_API_KEY;
   const biz = bizList.find(x => x.id === b) ?? bizList[0];
   const gs = biz?.leadsnap_id ? await googleStats(biz.leadsnap_id) : null;
 
@@ -82,17 +83,27 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
           </div>
         )}
 
-        {tasks.some(t => t.key === "social" && !t.done) && (
+        {(biz.plan === "pro" || (biz.addons ?? []).includes("social")) && (
           <div className="card" id="social">
-            <b>Connect your Facebook & Instagram (5 minutes)</b>
-            <p className="muted small">This lets us post for you. You stay the owner and can remove us anytime.</p>
-            <ol className="steps-sm">
-              <li>On your phone, open <a href="https://business.facebook.com/settings/partners" target="_blank" rel="noreferrer">business.facebook.com → Settings → Partners</a>.</li>
-              <li>Tap <b>Add</b>, then <b>Give a partner access to your assets</b>.</li>
-              <li>Paste Lokly's Business ID: <code>{process.env.META_BUSINESS_ID ?? "we'll text it to you"}</code></li>
-              <li>Turn on your <b>Facebook Page</b> and <b>Instagram account</b> with <b>Content</b> access, then save.</li>
-            </ol>
-            <p className="small muted">Instagram must be a Business account linked to your Facebook Page (Instagram → Settings → Account type). Stuck? Text us and we'll do it with you.</p>
+            <div className="gs-head"><b>Your social media</b><span className="muted small">Instagram, Facebook{autoSocial ? " and TikTok" : ""}</span></div>
+            {social === "linked" && <p className="ok-note">Connected. We'll start posting this week.</p>}
+            {social === "error" && <p className="err-note">That didn't connect. Try again or text us.</p>}
+            {autoSocial ? (
+              <form method="post" action="/api/social/connect"><input type="hidden" name="b" value={biz.id} />
+                <p className="muted small">{biz.social?.profileKey ? "Add or reconnect an account anytime." : "One tap: log in to your accounts on the secure page and you're done. You stay the owner."}</p>
+                <button className="btn dark sm">{biz.social?.profileKey ? "Manage connected accounts" : "Connect Instagram, Facebook & TikTok"}</button></form>
+            ) : (
+              <>
+                <p className="muted small">Add Lokly as a partner so we can post for you. You stay the owner and can remove us anytime. About 5 minutes.</p>
+                <ol className="steps-sm">
+                  <li>On your phone, open <a href="https://business.facebook.com/latest/settings/partners" target="_blank" rel="noreferrer">business.facebook.com → Settings → Partners</a>.</li>
+                  <li>Tap <b>Add</b>, then <b>Give a partner access to your assets</b>.</li>
+                  <li>Paste Lokly's Business ID: <code>{process.env.META_BUSINESS_ID ?? "we'll text it to you"}</code></li>
+                  <li>Turn on your <b>Facebook Page</b> and <b>Instagram account</b> with <b>Content</b> access, then save.</li>
+                </ol>
+                <p className="small muted">Instagram must be a Business account linked to your Facebook Page. Stuck? Text us and we'll do it with you.</p>
+              </>
+            )}
           </div>
         )}
 
