@@ -8,7 +8,7 @@ export async function POST(req: Request) {
   const sql = await db();
   const names = String(f.get("names") ?? "").split("|").map(s => s.trim()).filter(Boolean);
   const out: any = {};
-  if (names.length) out.leads = (await sql`DELETE FROM leads WHERE kind IN ('report','signup') AND business_name ILIKE ANY(${names.map(n => n + "%")}) RETURNING id` as any[]).length;
+  if (names.length) out.leads = (await sql`DELETE FROM leads WHERE kind IN ('report','signup','onboarding') AND business_name ILIKE ANY(${names.map(n => n + "%")}) RETURNING id` as any[]).length;
   const bid = String(f.get("business") ?? "");
   if (bid) {
     const owners = await sql`SELECT user_id FROM memberships WHERE business_id = ${bid}` as any[];
