@@ -11,14 +11,15 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Dashboard | Lokly" };
 
 
-export default async function Dashboard({ searchParams }: { searchParams: Promise<{ b?: string; requested?: string; upgraded?: string; billing?: string; social?: string }> }) {
+export default async function Dashboard({ searchParams }: { searchParams: Promise<{ b?: string; requested?: string; upgraded?: string; billing?: string; social?: string; invited?: string }> }) {
   if (!dbReady()) return <main className="narrow"><section className="hero"><h1>Dashboard</h1><p className="note">The database isn't connected yet. Add a Postgres database to this Vercel project to turn on accounts.</p></section></main>;
   const user = await currentUser();
   if (!user) redirect("/login");
   const sql = await db();
   const bizList = await sql`SELECT b.id, b.name, b.plan, b.website, b.address, b.place_id, b.stats_url, b.leadsnap_id, b.status, b.trial_ends_at, b.stripe_customer_id, b.assets, b.addons, b.social FROM businesses b
     JOIN memberships m ON m.business_id = b.id WHERE m.user_id = ${user.id} ORDER BY b.created_at`;
-  const { b, requested, upgraded, billing, social } = await searchParams;
+  const { b, requested, upgraded, billing, social, invited } = await searchParams;
+  const managerEmail = process.env.GBP_MANAGER_EMAIL ?? "nfctapusa@gmail.com";
   const autoSocial = !!process.env.AYRSHARE_API_KEY;
   const biz = bizList.find(x => x.id === b) ?? bizList[0];
   const gs = biz?.leadsnap_id ? await googleStats(biz.leadsnap_id) : null;
@@ -69,6 +70,21 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         {billing === "none" && <p className="ok-note">Billing isn't set up online yet. Text us and we'll take care of it.</p>}
         {biz.status === "past_due" && <p className="err-note">Your last payment didn't go through. Update your card to keep your Google profile managed.</p>}
 
+        {invited && <p className="ok-note">Thanks! We'll accept the invite and start on your profile within one business day.</p>}
+        {tasks.some(t => t.key === "google" && !t.done) && biz.plan !== "free" && (
+          <div className="card gbpcard" id="google">
+            <b>Step 1: Add Lokly as a manager on your Google profile</b>
+            <p className="muted small">This lets us update your profile, reply to reviews and post offers. You stay the owner and can remove us anytime. Takes 2 minutes.</p>
+            <ol className="steps-sm">
+              <li>On your phone or computer, search Google for <b>{biz.name}</b> while signed in to the Google account that owns your profile. Or open <a href="https://business.google.com/locations" target="_blank" rel="noreferrer">business.google.com</a>.</li>
+              <li>Tap the <b>⋮ menu</b>, then <b>Business Profile settings</b>, then <b>People and access</b>.</li>
+              <li>Tap <b>Add</b> and enter <code>{managerEmail}</code></li>
+              <li>Choose <b>Manager</b> (not Owner) and tap <b>Invite</b>.</li>
+            </ol>
+            <form method="post" action="/api/gbp-invite"><input type="hidden" name="b" value={biz.id} /><button className="btn dark sm">I sent the invite</button></form>
+            <p className="small muted">Don't have a Google profile yet, or can't find it? Text us and we'll set it up with you.</p>
+          </div>
+        )}
         {tasks.length > 0 && doneN < tasks.length && (
           <div className="card">
             <div className="gs-head"><b>Getting set up</b><span className="muted small">{doneN} of {tasks.length} done</span></div>

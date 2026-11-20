@@ -33,7 +33,7 @@ export default function Start() {
   async function submit(e: React.FormEvent) {
     e.preventDefault(); setBusy(true); setErr(null);
     try {
-      const res = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan, ...f }) });
+      const res = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan, ...f, src: new URLSearchParams(location.search).get("src") ?? "web" }) });
       const j = await res.json();
       if (!res.ok) throw new Error(j.error);
       if (j.next) { location.href = j.next; return; }

@@ -5,6 +5,7 @@ import { db, dbReady } from "@/lib/db";
 import { currentUser, hashPassword, verifyPassword, createSession } from "@/lib/auth";
 import { seedTasks, stripe } from "@/lib/accounts";
 import { refreshBrandKit } from "@/lib/brandkit";
+import { shopifyPlans, planCheckoutUrl } from "@/lib/shopify";
 import { readAttr, track } from "@/lib/track";
 
 const s = (v: unknown, n = 300) => (v == null ? null : String(v).trim().slice(0, n) || null);
@@ -50,6 +51,10 @@ export async function POST(req: Request) {
   await sql`UPDATE prospects SET status = 'customer', customer_at = now(), next_send_at = NULL WHERE email = ${email}`.catch(() => null);
   await sql`INSERT INTO audit_log (business_id, user_id, action, meta) VALUES (${b.id}, ${user!.id}, 'signup', ${JSON.stringify({ plan: plan.id })})`;
 
+  if (shopifyPlans()) {
+    const url = planCheckoutUrl(plan.id, { businessId: b.id, email });
+    if (url) return NextResponse.json({ url });
+  }
   if (!process.env.STRIPE_SECRET_KEY) return NextResponse.json({ ok: true, manual: true, next: `/welcome?b=${b.id}` });
 
   const origin = new URL(req.url).origin;

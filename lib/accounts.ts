@@ -7,7 +7,8 @@ export type Status = "pending" | "active" | "trial" | "past_due" | "canceled";
 
 // Onboarding checklist per plan. who: "owner" = the client does it, "team" = Lokly does it.
 const BASE = [
-  { key: "google", title: "Connect your Google Business Profile", who: "owner" },
+  { key: "google", title: "Add Lokly as a manager on your Google profile", who: "owner" },
+  { key: "google_accept", title: "We accept access and connect your profile", who: "team" },
   { key: "assets", title: "Send your logo and 5+ photos (text them to us)", who: "owner" },
   { key: "optimize", title: "We optimize your Google profile", who: "team" },
   { key: "nfc", title: "We mail your free NFC review card", who: "team" },
@@ -32,7 +33,7 @@ export function tasksFor(plan: string) {
 export async function seedTasks(businessId: string, plan: string, opts: { hasPlace?: boolean } = {}) {
   const sql = await db();
   for (const t of tasksFor(plan)) {
-    const done = t.key === "google" && !!opts.hasPlace;
+    const done = false;
     await sql`INSERT INTO tasks (business_id, key, title, who, sort, done, done_at)
       VALUES (${businessId}, ${t.key}, ${t.title}, ${t.who}, ${t.sort}, ${done}, ${done ? new Date().toISOString() : null})
       ON CONFLICT (business_id, key) DO NOTHING`;

@@ -54,6 +54,8 @@ export default function Page() {
     const p = new URLSearchParams(location.search);
     if (p.get("welcome")) setStep("welcome");
     if (p.get("q")) setQ(p.get("q")!);
+    const place = p.get("place");
+    if (place && /^[\w-]{10,}$/.test(place)) grade({ placeId: place }, place);
   }, []);
 
   useEffect(() => {
@@ -210,7 +212,13 @@ function ReportView({ r, onReset }: { r: Report; onReset: () => void }) {
       {(r as any).manual && (r as any).manual.hasGoogle !== "yes" && !r.placeId && (
         <div className="nogbp"><b>You're not showing up on Google Maps yet.</b> When people nearby search for what you sell, you're not in the results. We'll create and verify your Google Business Profile as part of Google Management. <a href="#plan">Get set up</a></div>
       )}
-      <p className="upsell">Want us to fix these for you? Google management starts at $25/mo. <a href="#plan">See plans</a></p>
+      {typeof window !== "undefined" && /src=outreach|src=card|src=email/.test(location.search) ? (
+        <div className="fixcta">
+          <div><b>We'll fix {failed.length ? `all ${failed.length} issues` : "your profile"} for $25 a month.</b>
+            <p className="small">Review replies, weekly posts and offers, fresh photos, and a monthly report. Month to month, cancel anytime. Free NFC review card included.</p></div>
+          <a className="btn lime" href={`/start?plan=local&name=${encodeURIComponent(r.businessName)}&website=${encodeURIComponent(r.url ?? "")}&place=${encodeURIComponent(r.placeId ?? "")}&src=${new URLSearchParams(location.search).get("src") ?? "web"}`}>Start for $25/mo</a>
+        </div>
+      ) : <p className="upsell">Want us to fix these for you? Google management starts at $25/mo. <a href="#plan">See plans</a></p>}
 
       <div className="scores">
         {SECTIONS.map(s => {

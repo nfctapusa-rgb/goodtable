@@ -341,3 +341,6 @@ html{-webkit-text-size-adjust:100%}
 .ob-filter{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
 .ob-act{display:flex;flex-wrap:wrap;gap:4px}
 @media(max-width:900px){.ob-grid{grid-template-columns:1fr}.ob-funnel{grid-template-columns:repeat(2,1fr)}}
+.fixcta{display:flex;gap:16px;align-items:center;justify-content:space-between;border:2px solid var(--ink);background:var(--sign);padding:16px 18px;margin:0 0 16px;box-shadow:5px 5px 0 var(--ink)}
+.fixcta b{font-size:18px}.fixcta p{margin:4px 0 0}.fixcta .btn{white-space:nowrap;flex:0 0 auto}
+@media(max-width:600px){.fixcta{flex-direction:column;align-items:stretch}}

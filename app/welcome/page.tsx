@@ -30,7 +30,7 @@ export default async function Welcome({ searchParams }: { searchParams: Promise<
           <div className="wl-box">
             <b>What we need from you</b>
             <ol>{yours.map(t => <li key={t.key}>{t.title}</li>)}</ol>
-            <p className="small muted">Easiest way: text your logo, photos and links to us. We'll handle the rest.</p>
+            <p className="small muted">First step: add Lokly as a manager on your Google profile. Your dashboard walks you through it in 2 minutes.</p>
           </div>
         )}
         <a className="btn dark" href={`/dashboard?b=${biz.id}`}>Go to my dashboard</a>

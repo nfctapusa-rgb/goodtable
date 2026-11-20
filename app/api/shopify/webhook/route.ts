@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createHmac, timingSafeEqual } from "crypto";
 import { db } from "@/lib/db";
 import { itemForVariant } from "@/lib/shopify";
+import { setPlan } from "@/lib/accounts";
 
 // Shopify orders/paid -> mark the purchase on the client's account and show it in their results feed.
 export async function POST(req: Request) {
@@ -25,6 +26,16 @@ export async function POST(req: Request) {
   for (const li of o.line_items ?? []) {
     const item = itemForVariant(li.variant_id);
     if (!item) continue;
+    if (item.startsWith("plan_")) {
+      const plan = item.slice(5) as any;
+      const fromProp = (li.properties ?? []).find((p: any) => p.name === "_lokly_business")?.value;
+      const target = fromProp ?? bizId;
+      if (target) {
+        await setPlan(target, plan, plan === "site" ? "trial" : "active", { customer: `shopify:${o.customer?.id ?? ""}`, trialEnds: plan === "site" ? new Date(Date.now() + 90 * 864e5).toISOString() : null });
+        await sql`INSERT INTO payments (id, business_id, amount_cents) VALUES (${`shopify_${o.id}_${li.id}`}, ${target}, ${Math.round(Number(li.price) * 100)}) ON CONFLICT DO NOTHING`.catch(() => null);
+      }
+      continue;
+    }
     const label = item === "nfc" ? `${li.quantity} NFC review card${li.quantity > 1 ? "s" : ""} ordered` : item.startsWith("mailer_") ? `Postcards to ${item.split("_")[1]} homes paid` : `${li.title} paid`;
     if (bizId) await sql`INSERT INTO results (business_id, kind, title, detail) VALUES (${bizId}, ${item.startsWith("mailer") ? "Postcard" : "Order"}, ${label}, ${`Shopify order ${o.name ?? o.id}. We'll text you when it ships.`})`;
     if (attrs.lokly_ref && item.startsWith("mailer_")) await sql`UPDATE leads SET data = data || ${JSON.stringify({ status: "paid", shopifyOrder: o.name ?? String(o.id) })}::jsonb WHERE id = ${Number(attrs.lokly_ref)} AND kind = 'mailer'`;

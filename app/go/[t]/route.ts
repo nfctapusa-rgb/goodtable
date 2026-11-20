@@ -1,5 +1,6 @@
 import { db, dbReady } from "@/lib/db";
 import { ptoken } from "@/lib/outreach";
+import { searchPlaces, placesKey } from "@/lib/places";
 
 // Outreach email link: record the click, stop the sequence, open their free report.
 export async function GET(req: Request, { params }: { params: Promise<{ t: string }> }) {
@@ -11,5 +12,9 @@ export async function GET(req: Request, { params }: { params: Promise<{ t: strin
   const [p] = await sql`UPDATE prospects SET clicked_at = COALESCE(clicked_at, now()), status = CASE WHEN status IN ('emailed', 'queued', 'finished') THEN 'clicked' ELSE status END, next_send_at = NULL
     WHERE id = ${Number(id)} RETURNING business_name, city` as any[];
   const q = p ? `${p.business_name}${p.city ? ` ${p.city}` : ""}` : "";
-  return Response.redirect(`${base}/grader?q=${encodeURIComponent(q)}&src=outreach&pid=${encodeURIComponent(t)}&utm_source=outreach&utm_medium=email`, 302);
+  const tail = `&src=outreach&pid=${encodeURIComponent(t)}&utm_source=outreach&utm_medium=email`;
+  // Find their Google listing so the report opens already run, no searching needed.
+  let place: string | null = null;
+  if (q && placesKey()) { try { place = (await searchPlaces(q, 1, undefined, true))[0]?.id ?? null; } catch {} }
+  return Response.redirect(place ? `${base}/grader?place=${encodeURIComponent(place)}${tail}` : `${base}/grader?q=${encodeURIComponent(q)}${tail}`, 302);
 }
