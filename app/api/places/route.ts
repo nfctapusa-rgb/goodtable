@@ -14,7 +14,8 @@ export async function GET(req: Request) {
       connected: true,
       results: res.map(p => ({ id: p.id, name: p.displayName?.text, address: p.formattedAddress, category: p.primaryTypeDisplayName?.text ?? null, website: p.websiteUri ?? null, rating: p.rating ?? null, reviews: p.userRatingCount ?? 0 })),
     });
-  } catch {
+  } catch (e) {
+    console.error("places search failed:", (e as Error).message);
     return NextResponse.json({ connected: true, error: "Google search is having trouble right now.", results: [] }, { status: 502 });
   }
 }
