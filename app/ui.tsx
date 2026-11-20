@@ -45,6 +45,7 @@ export function Footer() {
         <div className="fcols">
           <div><b>Product</b><a href="/features">Features</a><a href="/how-it-works">How it works</a><a href="/pricing">Pricing</a><a href="/compare">Lokly vs 5 tools</a><a href="/mailers">Postcards</a><a href="/menu">Free digital menu</a><a href="/menus">Menus near you</a><a href="/grader">Free report</a><a href="/blog">Blog</a><a href="/faq">FAQ</a></div>
           <div><b>Proof</b><a href="/results">Results</a><a href="/industries/restaurants">Restaurants</a><a href="/industries/barbers-salons">Barbers &amp; salons</a><a href="/industries/jewelers">Jewelers</a><a href="/industries/studios-services">Services</a></div>
+          <div><b>Languages</b><a href="/">English</a><a href="/es" hrefLang="es">Español</a><a href="/ko" hrefLang="ko">한국어</a></div>
           <div><b>Company</b><a href="mailto:hello@lokly.pro">Contact</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></div>
         </div>
       </div>

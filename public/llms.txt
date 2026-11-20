@@ -23,6 +23,10 @@ Lokly serves restaurants, cafés, bars, food trucks, barbershops, salons, nail s
 - Blog: https://lokly.pro/blog
 - Menus near you: https://lokly.pro/menus
 
+## Languages
+- Spanish: https://lokly.pro/es
+- Korean: https://lokly.pro/ko
+
 ## Contact
 - Email: hello@lokly.pro
 - Phone: (323) 332-0577
