@@ -1,13 +1,13 @@
 import { db, dbReady } from "@/lib/db";
-import { preview, postalAddress, DAILY_CAP } from "@/lib/outreach";
+import { preview, postalAddress, DAILY_CAP, getTemplates, renderEmail, defaultBody, MERGE_TAGS, STEPS } from "@/lib/outreach";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Outreach | Lokly", robots: { index: false, follow: false } };
 
 const LABEL: Record<string, string> = { new: "New", queued: "Queued", emailed: "Emailed", clicked: "Opened report link", report: "Ran report", replied: "Replied", customer: "Customer", finished: "Sequence done", unsubscribed: "Unsubscribed", bounced: "Bounced" };
 
-export default async function Outreach({ searchParams }: { searchParams: Promise<{ key?: string; msg?: string; s?: string }> }) {
-  const { key, msg, s } = await searchParams;
+export default async function Outreach({ searchParams }: { searchParams: Promise<{ key?: string; msg?: string; s?: string; t?: string }> }) {
+  const { key, msg, s, t } = await searchParams;
   if (!process.env.ADMIN_KEY || key !== process.env.ADMIN_KEY || !dbReady()) return <main className="narrow"><section className="hero"><h1 className="sh-h2">Not found</h1></section></main>;
   const sql = await db();
   const counts = Object.fromEntries((await sql`SELECT status, count(*)::int n FROM prospects GROUP BY status` as any[]).map(r => [r.status, r.n]));
@@ -16,6 +16,12 @@ export default async function Outreach({ searchParams }: { searchParams: Promise
   const rows = await sql`SELECT * FROM prospects WHERE ${s ?? ""} = '' OR status = ${s ?? ""} ORDER BY COALESCE(report_at, clicked_at, last_sent_at, created_at) DESC LIMIT 200` as any[];
   const dnc = await sql`SELECT count(*)::int n FROM suppressions` as any[];
   const ready = !!process.env.RESEND_API_KEY && !!process.env.EMAIL_FROM && !!postalAddress();
+  const tpls = await getTemplates();
+  const tab = Math.min(Math.max(Number(t ?? 0) || 0, 0), STEPS.length - 1);
+  const sampleP = rows[0] ?? { id: 0, business_name: "Main St. Cuts", contact_name: "Alex Rivera", city: "Downtown LA", category: "barbershops" };
+  const cur = tpls[tab] ?? defaultBody(tab);
+  const tabPreview = renderEmail(sampleP, tab, tpls);
+  const testTo = process.env.EMAIL_REPLY_TO ?? "";
   const sample = preview(rows[0] ?? { id: 0, business_name: "Main St. Cuts", contact_name: "Alex Rivera", city: "Downtown LA", category: "barbershops" });
   const k = encodeURIComponent(key!);
   const funnel: [string, number][] = [["Leads", total], ["Emailed", sent[0].n], ["Opened report link", (counts.clicked ?? 0) + (counts.report ?? 0) + (counts.customer ?? 0)], ["Ran report", (counts.report ?? 0) + (counts.customer ?? 0)], ["Customers", counts.customer ?? 0]];
@@ -54,6 +60,45 @@ export default async function Outreach({ searchParams }: { searchParams: Promise
           <b>Email preview</b>
           <p className="small"><b>Subject:</b> {sample.subject}</p>
           <iframe title="Email preview" srcDoc={sample.html} />
+        </div>
+      </div>
+
+      <div className="card" id="emails">
+        <b>3. Your emails</b>
+        <p className="muted small">Edit each email in the sequence as HTML, or have AI write it from a short brief. Merge tags fill in each lead's details: {MERGE_TAGS.map(m => <code key={m} style={{ marginRight: 6 }}>{`{{${m}}}`}</code>)}. Your address and an unsubscribe link are always added at the bottom.</p>
+        <div className="ob-filter">{STEPS.map((_, i) => <a key={i} className={`chip ${i === tab ? "on" : ""}`} href={`/admin/outreach?key=${k}&t=${i}#emails`}>Email {i + 1} · {["Intro", "Day 3 follow-up", "Last note"][i] ?? ""}{tpls[i] ? " · custom" : ""}</a>)}</div>
+        <div className="ob-grid">
+          <form method="post" action="/api/admin/outreach">
+            <input type="hidden" name="key" value={key} /><input type="hidden" name="step" value={tab} />
+            <label className="small">Subject<input name="subject" defaultValue={cur.subject} style={{ width: "100%" }} /></label>
+            <label className="small">HTML<textarea name="html" rows={14} defaultValue={cur.html} style={{ width: "100%", fontFamily: "ui-monospace,monospace", fontSize: 12 }} /></label>
+            <p><button className="btn dark sm" name="action" value="template">Save email {tab + 1}</button>{" "}
+              {tpls[tab] && <button className="btn ghost sm" style={{ width: "auto" }} name="action" value="reset">Use built-in version</button>}</p>
+          </form>
+          <div>
+            <form method="post" action="/api/admin/outreach" className="card" style={{ marginTop: 0 }}>
+              <input type="hidden" name="key" value={key} /><input type="hidden" name="step" value={tab} /><input type="hidden" name="action" value="ai" />
+              <b className="small">Have AI write email {tab + 1}</b>
+              <textarea name="brief" rows={3} required placeholder="e.g. Friendly, mention their Google reviews and that shops near them post weekly. Offer a 10-minute call." style={{ width: "100%" }} />
+              <button className="btn dark sm">Write it</button>
+              <p className="tiny muted">Replaces email {tab + 1} with the draft. Check it, edit it, then test it.</p>
+            </form>
+            <form method="post" action="/api/admin/outreach" className="card">
+              <input type="hidden" name="key" value={key} /><input type="hidden" name="step" value={tab} /><input type="hidden" name="action" value="test" />
+              <b className="small">Send yourself a test of email {tab + 1}</b>
+              <input name="to" type="email" required defaultValue={testTo} placeholder="you@email.com" style={{ width: "100%" }} />
+              <select name="pid" defaultValue={String(rows[0]?.id ?? 0)} style={{ width: "100%", marginTop: 6 }} aria-label="Fill it in as">
+                <option value="0">Fill in with sample business</option>
+                {rows.slice(0, 50).map(p => <option key={p.id} value={p.id}>Fill in as {p.business_name}</option>)}
+              </select>
+              <button className="btn dark sm" style={{ marginTop: 6 }}>Send test</button>
+            </form>
+          </div>
+          <div className="card ob-preview" style={{ marginTop: 0 }}>
+            <b>Preview, email {tab + 1}</b>
+            <p className="small"><b>Subject:</b> {tabPreview.subject}</p>
+            <iframe title={`Email ${tab + 1} preview`} srcDoc={tabPreview.html} sandbox="" />
+          </div>
         </div>
       </div>
 

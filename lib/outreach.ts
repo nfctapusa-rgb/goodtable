@@ -103,8 +103,9 @@ export async function runOutreach() {
   const due = await sql`SELECT p.* FROM prospects p WHERE p.status IN ('queued', 'emailed') AND p.next_send_at <= now() AND p.step < ${STEPS.length}
     AND NOT EXISTS (SELECT 1 FROM suppressions s WHERE s.email = p.email) ORDER BY p.next_send_at LIMIT ${room}` as any[];
   let sent = 0, failed = 0;
+  const tpls = await getTemplates().catch(() => STEPS.map(() => null) as Tpl[]);
   for (const p of due) {
-    const m = preview(p, p.step);
+    const m = renderEmail(p, p.step, tpls);
     try {
       const j: any = await sendEmail(p.email, m.subject, m.html, {});
       const nextStep = p.step + 1;
@@ -120,4 +121,70 @@ export async function suppress(email: string, reason: string) {
   const sql = await db();
   await sql`INSERT INTO suppressions (email, reason) VALUES (${email.toLowerCase()}, ${reason}) ON CONFLICT (email) DO NOTHING`;
   await sql`UPDATE prospects SET status = ${reason === "bounced" ? "bounced" : "unsubscribed"}, next_send_at = NULL WHERE email = ${email.toLowerCase()}`;
+}
+
+// ---- Custom templates (your own HTML, with merge tags) ----
+// Stored in settings 'outreach_templates' as [{subject, html} | null] per step. null = built-in email.
+// Merge tags: {{business}} {{first_name}} {{city}} {{category}} {{website}} {{report_link}}
+// The legal footer (your address + unsubscribe link) is always added, so a custom email can't drop it.
+export type Tpl = { subject: string; html: string } | null;
+export const MERGE_TAGS = ["business", "first_name", "city", "category", "website", "report_link"];
+
+export async function getTemplates(): Promise<Tpl[]> {
+  const sql = await db();
+  const [r] = await sql`SELECT value FROM settings WHERE key = 'outreach_templates'` as any[];
+  const v = Array.isArray(r?.value) ? r.value : [];
+  return STEPS.map((_, i) => (v[i]?.html ? v[i] : null));
+}
+export async function saveTemplate(step: number, t: Tpl) {
+  const all = await getTemplates();
+  all[step] = t && t.html.trim() ? { subject: t.subject.slice(0, 200), html: t.html.slice(0, 50_000) } : null;
+  const sql = await db();
+  await sql`INSERT INTO settings (key, value) VALUES ('outreach_templates', ${JSON.stringify(all)}::jsonb)
+    ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = now()`;
+}
+
+function merge(s: string, p: any, html: boolean) {
+  const vals: Record<string, string> = {
+    business: p.business_name ?? "", first_name: first(p.contact_name), city: p.city ?? "your area",
+    category: p.category ?? "local business", website: p.website ?? "", report_link: goUrl(p.id ?? 0),
+  };
+  return s.replace(/\{\{\s*(\w+)\s*\}\}/g, (m, k) => (k in vals ? (html && k !== "report_link" ? esc(vals[k]) : vals[k]) : m));
+}
+
+export function renderEmail(p: any, step: number, tpls: Tpl[]) {
+  const t = tpls[step];
+  if (!t) return preview(p, step);
+  const body = merge(t.html, p, true);
+  const foot = `<p style="font-size:12px;color:#6B7785;margin-top:24px;font-family:Arial,sans-serif">${esc(postalAddress())}<br>Don't want these emails? <a href="${optoutUrl(p.id ?? 0)}" style="color:#6B7785">Unsubscribe</a>.</p>`;
+  const html = /<\/body>/i.test(body) ? body.replace(/<\/body>/i, `${foot}</body>`) : `<!doctype html><html><body style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.55;color:#142133;max-width:560px">${body}${foot}</body></html>`;
+  return { subject: merge(t.subject || STEPS[step].build(p).subject, p, false), html };
+}
+
+// The built-in email for a step as editable HTML (no footer), to start a custom one from.
+export function defaultBody(step: number) {
+  const tagged = { id: 0, business_name: "{{business}}", contact_name: "{{first_name}}", city: "{{city}}", category: "{{category}}" };
+  const m = STEPS[step].build(tagged);
+  const unesc = (s: string) => s.replace(/&#123;|&amp;/g, x => (x === "&amp;" ? "&" : x));
+  return { subject: m.subject, html: m.lines.map(l => `<p>${unesc(l).replace(goUrl(0), "{{report_link}}").replace(/Hi \{\{first_name\}\}/, "Hi {{first_name}}")}</p>`).join("\n") };
+}
+
+// AI drafts a template from a short brief. Uses Vercel AI Gateway (AI_GATEWAY_API_KEY, or the deployment's OIDC token).
+export async function aiDraft(brief: string, step: number, oidc?: string | null): Promise<{ subject: string; html: string }> {
+  const token = process.env.AI_GATEWAY_API_KEY || oidc || process.env.VERCEL_OIDC_TOKEN;
+  if (!token) throw new Error("AI isn't connected: add AI_GATEWAY_API_KEY in Vercel (Vercel AI Gateway).");
+  const stage = ["first cold email", "short follow-up 3 days later", "brief last note"][step] ?? "email";
+  const sys = `You write short, plain, human cold emails for Lokly (lokly.pro), a Los Angeles company that manages Google Business Profiles ($25/mo) and builds websites for local shops. Sender: Mark. Goal: get the reader to open their free Google report. Rules: under 110 words, no hype, no emojis, no ALL CAPS, no spammy words (free!!!, guarantee, act now), one link only, written to one owner. Use these merge tags exactly where they fit: {{first_name}}, {{business}}, {{city}}, {{category}}, and the link must be <a href="{{report_link}}">...</a>. Output ONLY JSON: {"subject": "...", "html": "<p>...</p>..."} using simple <p>, <b>, <a> tags. No footer, no unsubscribe line, no signature block beyond "Mark".`;
+  const r = await fetch("https://ai-gateway.vercel.sh/v1/chat/completions", {
+    method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ model: process.env.AI_MODEL || "anthropic/claude-sonnet-4.5", max_tokens: 800,
+      messages: [{ role: "system", content: sys }, { role: "user", content: `Write the ${stage}. Brief from Mark: ${brief.slice(0, 1500)}` }] }),
+  });
+  const j: any = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(`AI error: ${j?.error?.message ?? r.status}`);
+  const text: string = j.choices?.[0]?.message?.content ?? "";
+  const m = text.match(/\{[\s\S]*\}/);
+  const out = m ? JSON.parse(m[0]) : null;
+  if (!out?.html) throw new Error("AI returned no email. Try a clearer brief.");
+  return { subject: String(out.subject ?? "").slice(0, 200), html: String(out.html).replace(/<script[\s\S]*?<\/script>/gi, "") };
 }
