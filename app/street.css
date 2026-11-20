@@ -327,3 +327,5 @@ html{-webkit-text-size-adjust:100%}
 .ad-result{display:flex;flex-wrap:wrap;gap:6px}.ad-result input,.ad-result select{padding:6px 8px;border:1px solid var(--line);border-radius:6px;font-size:13px;min-width:0;flex:1 1 160px}
 @media(max-width:600px){.feed li{grid-template-columns:1fr}.feed time{order:-1}}
 .pd-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pd textarea{width:100%;font:14px/1.45 inherit;border:1px solid var(--line);border-radius:6px;padding:8px;resize:vertical}
+.ap-toggle .chip{font-size:13px}

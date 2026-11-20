@@ -37,6 +37,8 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   const tasks = await sql`SELECT key, title, who, done FROM tasks WHERE business_id = ${biz.id} ORDER BY sort` as any[];
   const doneN = tasks.filter(t => t.done).length;
   const services = servicesFor(biz);
+  const socialOn = biz.plan === "pro" || (biz.addons ?? []).includes("social");
+  const weekPosts = socialOn ? await sql`SELECT id, kind, caption, photo, scheduled_for, status, error FROM posts WHERE business_id = ${biz.id} AND scheduled_for > now() - interval '7 days' ORDER BY scheduled_for` as any[] : [];
   const results = await sql`SELECT kind, title, detail, url, created_at FROM results WHERE business_id = ${biz.id} ORDER BY created_at DESC LIMIT 12` as any[];
   const planInfo = planById(biz.plan);
   const STATUS: Record<string, string> = { pending: "Payment pending", active: "Active", trial: "Free months", past_due: "Payment failed", canceled: "Canceled" };
@@ -103,6 +105,32 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
                 </ol>
                 <p className="small muted">Instagram must be a Business account linked to your Facebook Page. Stuck? Text us and we'll do it with you.</p>
               </>
+            )}
+          </div>
+        )}
+
+        {socialOn && (
+          <div className="card" id="posts">
+            <div className="gs-head"><b>This week's posts</b>
+              <form method="post" action="/api/posts" className="ap-toggle"><input type="hidden" name="b" value={biz.id} /><input type="hidden" name="action" value="autopilot" /><input type="hidden" name="on" value={biz.social?.autopilot ? "0" : "1"} />
+                <button className={`chip ${biz.social?.autopilot ? "on" : ""}`}>{biz.social?.autopilot ? "Autopilot on" : "I approve first"}</button></form>
+            </div>
+            <p className="muted small">{biz.social?.autopilot ? "We write and publish 3 posts a week to your Instagram and Facebook. Tap the button to approve them first instead." : "Every Monday we write 3 posts for you. Approve, edit, or skip each one. Tap the button to let them publish automatically."}</p>
+            {weekPosts.length === 0 ? <p className="small muted">Your first posts show up here on Monday.</p> : (
+              <div className="pd-grid">{weekPosts.map(p => (
+                <form key={p.id} className="pd" method="post" action="/api/posts">
+                  <div className="pd-top"><b>{p.kind}</b><span className="muted small">{new Date(p.scheduled_for).toLocaleString("en-US", { weekday: "short", hour: "numeric", timeZone: "America/Los_Angeles" })}</span></div>
+                  {p.photo && <img src={p.photo} alt="" loading="lazy" />}
+                  <input type="hidden" name="b" value={biz.id} /><input type="hidden" name="post" value={p.id} />
+                  {p.status === "pending" ? <>
+                    <textarea name="caption" defaultValue={p.caption} rows={6} aria-label="Caption" />
+                    <div className="pd-actions"><button className="btn dark sm" name="action" value="approve">Approve</button><button className="btn ghost sm" name="action" value="skip">Skip</button></div>
+                  </> : <>
+                    <pre>{p.caption}</pre>
+                    <span className={`st ${p.status === "error" ? "soon" : "live"}`}>{p.status === "scheduled" ? "Scheduled" : p.status === "approved" ? "Approved, we'll post it" : p.status === "skipped" ? "Skipped" : p.status === "error" ? "Couldn't post, we're on it" : p.status}</span>
+                  </>}
+                </form>
+              ))}</div>
             )}
           </div>
         )}

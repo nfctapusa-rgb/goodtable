@@ -17,6 +17,7 @@ export default async function Posts({ searchParams }: { searchParams: Promise<{ 
       <p><a href={`/admin?key=${encodeURIComponent(key!)}`}>← Leads & clients</a></p>
       <h1 className="sh-h2">This week's posts</h1>
       <p className="sh-sub">For each client: open <a href="https://business.facebook.com/latest/content_calendar" target="_blank" rel="noreferrer">Meta Business Suite Planner</a>, pick their account, and schedule these to Facebook and Instagram. Clients with auto-posting get a one-click Schedule button.</p>
+      <form method="get" action="/api/cron/weekly" target="_blank"><input type="hidden" name="key" value={key} /><button className="btn dark sm">Run this week's autopilot now</button></form>
       {ok && <p className="ok-note">Scheduled, and added to the client's results feed.</p>}
       {err && <p className="err-note">{err}</p>}
       {all.length === 0 && <p className="ad-empty">No active clients yet.</p>}
