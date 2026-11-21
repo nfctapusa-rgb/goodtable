@@ -5,6 +5,8 @@ import { fullStats, type FullStats } from "@/lib/leadsnap";
 import { computeWins, MONTH } from "@/lib/wins";
 import { verifyShare } from "@/lib/share";
 import { InstallHint } from "../../app/install";
+import { scansFor } from "@/lib/rankgrid";
+import { RankMap } from "./rankmap";
 
 export const dynamic = "force-dynamic";
 
@@ -37,6 +39,8 @@ export default async function View({ params }: { params: Promise<{ t: string }> 
   if (s) await sql`UPDATE businesses SET snapshot = ${JSON.stringify(s)}::jsonb WHERE id = ${b.id}`.catch(() => null);
   else s = b.snapshot ?? null;
   const done = await sql`SELECT kind, title, created_at FROM results WHERE business_id = ${b.id} ORDER BY created_at DESC LIMIT 5` as any[];
+  const maps = await scansFor(b.id).catch(() => []);
+  const [tp] = await sql`SELECT count(*) FILTER (WHERE created_at > now() - interval '30 days')::int AS m, count(*)::int AS all FROM taps WHERE business_id = ${b.id}` as any[];
   const w = s ? computeWins(s) : null;
   const max = Math.max(...(w?.months.map(m => m.v) ?? [1]), 1);
   const best = w?.months.reduce((x, y) => (y.v > x.v ? y : x), w.months[0]);
@@ -71,6 +75,21 @@ export default async function View({ params }: { params: Promise<{ t: string }> 
             </section>
           )}
         </>
+      )}
+
+      {maps.map(m => (
+        <section className="vw-card" key={m.keyword}>
+          <b>Where you show up for “{m.keyword}”</b>
+          <p className="muted">Each dot is a spot around your business. The number is your place in Google Maps results there.</p>
+          <div className="rm-pair">
+            {m.count > 1 && <RankMap label={`Before · ${new Date(m.first.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`} cells={m.first.grid} top3={m.first.top3} />}
+            <RankMap label={`${m.count > 1 ? "Now" : "Today"} · ${new Date(m.last.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`} cells={m.last.grid} top3={m.last.top3} />
+          </div>
+        </section>
+      ))}
+
+      {tp?.all > 0 && (
+        <section className="vw-totals"><div><strong>{tp.m}</strong><span>Review card taps</span><small>last 30 days · {tp.all} all time</small></div></section>
       )}
 
       {done.length > 0 && (

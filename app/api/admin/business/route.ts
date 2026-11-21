@@ -12,5 +12,8 @@ export async function POST(req: Request) {
   if (ls && !/^\d+$/.test(ls)) return new NextResponse("LeadSnap location ID must be a number", { status: 400 });
   const sql = await db();
   await sql`UPDATE businesses SET stats_url = ${url || null}, leadsnap_id = ${ls || null}, plan = COALESCE(NULLIF(${plan}, ''), plan) WHERE id = ${id}`;
+  const email = String(f.get("email") ?? "").trim(), pid = String(f.get("place_id") ?? "").trim();
+  if (f.has("email")) await sql`UPDATE businesses SET email = ${email || null} WHERE id = ${id}`;
+  if (f.has("place_id")) await sql`UPDATE businesses SET place_id = ${pid || null} WHERE id = ${id}`;
   return NextResponse.redirect(new URL(`/admin?key=${encodeURIComponent(String(f.get("key")))}#clients`, req.url), 303);
 }

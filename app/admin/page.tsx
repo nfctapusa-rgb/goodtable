@@ -21,7 +21,9 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
   if (!dbReady()) return <main className="narrow"><section className="hero"><p>Database not connected.</p></section></main>;
   const sql = await db();
   const rows = await sql`SELECT * FROM leads ORDER BY created_at DESC LIMIT 300` as any[];
-  const clients = await sql`SELECT b.id, b.name, b.plan, b.stats_url, b.leadsnap_id, b.status, b.trial_ends_at, b.setup, b.phone, b.addons, b.created_at, u.email FROM businesses b
+  const clients = await sql`SELECT b.id, b.name, b.plan, b.stats_url, b.leadsnap_id, b.status, b.trial_ends_at, b.setup, b.phone, b.addons, b.created_at, b.tap_code, b.place_id, coalesce(u.email, b.email) AS email,
+    (SELECT count(*)::int FROM taps t WHERE t.business_id = b.id AND t.created_at > now() - interval '30 days') AS taps30,
+    (SELECT avg FROM rank_scans r WHERE r.business_id = b.id ORDER BY created_at DESC LIMIT 1) AS rank_avg FROM businesses b
     LEFT JOIN memberships m ON m.business_id = b.id AND m.role = 'owner' LEFT JOIN users u ON u.id = m.user_id ORDER BY b.created_at DESC LIMIT 200` as any[];
   const allTasks = await sql`SELECT business_id, key, title, who, done FROM tasks ORDER BY sort` as any[];
   const tasksOf = (id: string) => allTasks.filter(t => t.business_id === id);
@@ -74,6 +76,12 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
                 <a className="ax-btn ghost" href={`sms:&body=${encodeURIComponent(`Your Google results are live: ${link}\nTip: add it to your home screen so you can check anytime.`)}`}>Text link</a>
                 {c.phone && <a className="ax-btn ghost" href={`tel:${c.phone}`}>Call</a>}
               </div>
+              <div className="ax-grow">
+                {c.tap_code ? <span>Review card: <b>lokly.pro/t/{c.tap_code}</b> · {c.taps30} taps (30d)</span>
+                  : <form method="post" action="/api/admin/growth"><input type="hidden" name="key" value={key} /><input type="hidden" name="business_id" value={c.id} /><input type="hidden" name="action" value="review_link" /><button className="chip">+ Make review card link</button></form>}
+                <form method="post" action="/api/admin/growth" className="ax-scan"><input type="hidden" name="key" value={key} /><input type="hidden" name="business_id" value={c.id} /><input type="hidden" name="action" value="scan" />
+                  <input name="keyword" placeholder="Rank map keyword, e.g. pizza near me" required /><button className="chip">Run rank map{c.rank_avg ? ` (last avg ${c.rank_avg})` : ""}</button></form>
+              </div>
               <details className="ax-more">
                 <summary>Manage{open ? ` · ${open} open task${open > 1 ? "s" : ""}` : ""}</summary>
                 <p className="ax-label">Status</p>
@@ -102,6 +110,8 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
                   <select name="plan" defaultValue={c.plan} aria-label="Plan"><option value="free">Free</option><option value="local">Google Management</option><option value="pro">Pro</option></select>
                   <input name="leadsnap_id" defaultValue={c.leadsnap_id ?? ""} placeholder="LeadSnap ID" inputMode="numeric" />
                   <input name="stats_url" defaultValue={c.stats_url ?? ""} placeholder="Report link (optional)" />
+                  <input name="email" type="email" defaultValue={c.email ?? ""} placeholder="Owner email (monthly report)" />
+                  <input name="place_id" defaultValue={c.place_id ?? ""} placeholder="Google place id" />
                   <button className="btn dark sm">Save</button>
                 </form>
                 {c.setup?.shipTo && <p className="ax-flag">Mail NFC card → {c.setup.shipTo}</p>}

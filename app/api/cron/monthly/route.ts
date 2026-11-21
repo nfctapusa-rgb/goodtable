@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db, dbReady } from "@/lib/db";
 import { sendEmail } from "@/lib/email";
 import { magicUrl, signInHtml } from "@/lib/magic";
+import { shareUrl } from "@/lib/share";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -25,5 +26,18 @@ export async function GET(req: Request) {
     await sendEmail(r.email, `Your ${month} results for ${r.biz}`, signInHtml(r.name, magicUrl(r.id, 7), intro), { from: process.env.CLIENT_EMAIL_FROM || undefined })
       .then(() => sent++).catch(e => console.error("monthly email failed", r.email, e));
   }
-  return NextResponse.json({ ok: true, clients: rows.length, sent });
+  // Managed clients with no login: email their no-login results page (with review taps and rank map).
+  const direct = await sql`SELECT b.id, b.name, b.email,
+      (SELECT count(*)::int FROM taps t WHERE t.business_id = b.id AND t.created_at > now() - interval '31 days') AS taps,
+      (SELECT count(*)::int FROM results r WHERE r.business_id = b.id AND r.created_at > now() - interval '31 days') AS done
+    FROM businesses b WHERE b.email IS NOT NULL AND b.status = 'active' AND b.plan <> 'free'
+      AND NOT EXISTS (SELECT 1 FROM memberships m WHERE m.business_id = b.id AND m.role = 'owner')` as any[];
+  for (const r of direct) {
+    const bits = [r.done ? `${r.done} things we did for you` : "", r.taps ? `${r.taps} review card taps` : ""].filter(Boolean).join(" and ");
+    const intro = `Your ${month} Google results for <b>${r.name}</b> are ready: calls, views, reviews${bits ? `, plus ${bits}` : ""}. Tap below to see them. This link always shows your latest numbers, so save it to your home screen.`;
+    const html = `<div style="font:16px/1.5 system-ui,sans-serif;max-width:520px;margin:auto;padding:24px"><p>Hi,</p><p>${intro}</p><p><a href="${shareUrl(r.id)}" style="display:inline-block;background:#111;color:#fff;padding:12px 20px;border-radius:10px;text-decoration:none;font-weight:600">See your results</a></p><p style="color:#667;font-size:13px">Lokly · Downtown Los Angeles</p></div>`;
+    await sendEmail(r.email, `Your ${month} results for ${r.name}`, html, { from: process.env.CLIENT_EMAIL_FROM || undefined })
+      .then(() => sent++).catch(e => console.error("monthly email failed", r.email, e));
+  }
+  return NextResponse.json({ ok: true, clients: rows.length + direct.length, sent });
 }

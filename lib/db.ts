@@ -61,6 +61,11 @@ async function migrate(sql: ReturnType<typeof neon>) {
   await sql`ALTER TABLE businesses ADD COLUMN IF NOT EXISTS addons jsonb NOT NULL DEFAULT '[]'::jsonb`;
   await sql`ALTER TABLE businesses ADD COLUMN IF NOT EXISTS snapshot jsonb`;
   await sql`ALTER TABLE businesses ADD COLUMN IF NOT EXISTS address text`;
+  await sql`ALTER TABLE businesses ADD COLUMN IF NOT EXISTS tap_code text UNIQUE`;
+  await sql`ALTER TABLE businesses ADD COLUMN IF NOT EXISTS email text`;
+  await sql`CREATE TABLE IF NOT EXISTS taps (id bigserial PRIMARY KEY, business_id uuid NOT NULL REFERENCES businesses(id) ON DELETE CASCADE, kind text NOT NULL DEFAULT 'review', ua text, created_at timestamptz NOT NULL DEFAULT now())`;
+  await sql`CREATE INDEX IF NOT EXISTS taps_biz ON taps (business_id, created_at)`;
+  await sql`CREATE TABLE IF NOT EXISTS rank_scans (id bigserial PRIMARY KEY, business_id uuid NOT NULL REFERENCES businesses(id) ON DELETE CASCADE, keyword text NOT NULL, center jsonb NOT NULL, grid jsonb NOT NULL, avg real, top3 int, created_at timestamptz NOT NULL DEFAULT now())`;
   await sql`CREATE TABLE IF NOT EXISTS posts (
     id bigserial PRIMARY KEY,
     business_id uuid NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
