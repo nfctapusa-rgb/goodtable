@@ -2,7 +2,7 @@ import { randomBytes } from "crypto";
 export type MenuItem = { name: string; desc?: string; price?: string; photo?: string; tags?: string[] };
 export type MenuSection = { name: string; items: MenuItem[] };
 export type Special = { title: string; desc?: string; when?: string };
-export type MenuData = { sections: MenuSection[]; specials: Special[]; hours?: string; about?: string; order?: string; instagram?: string };
+export type MenuData = { sections: MenuSection[]; specials: Special[]; hours?: string; about?: string; order?: string; instagram?: string; tables?: number };
 export const slugify = (s: string) => s.toLowerCase().normalize("NFKD").replace(/[^\w\s-]/g, "").trim().replace(/[\s_]+/g, "-").replace(/-+/g, "-").slice(0, 48) || "menu";
 export const newToken = () => randomBytes(18).toString("base64url");
 export const editUrl = (t: string) => `https://lokly.pro/menu/edit/${t}`;
@@ -16,7 +16,7 @@ export function cleanData(d: any): MenuData {
       name: str(i?.name, 80), desc: str(i?.desc, 240), price: str(i?.price, 20), photo: okImage(i?.photo) ?? "",
       tags: (Array.isArray(i?.tags) ? i.tags : []).slice(0, 4).map((t: any) => str(t, 16)) })).filter((i: MenuItem) => i.name) })).filter((s: MenuSection) => s.name || s.items.length);
   const specials = (Array.isArray(d?.specials) ? d.specials : []).slice(0, 10).map((x: any) => ({ title: str(x?.title, 80), desc: str(x?.desc, 240), when: str(x?.when, 60) })).filter((x: Special) => x.title);
-  return { sections, specials, hours: str(d?.hours, 300), about: str(d?.about, 600), order: /^https:\/\//.test(d?.order ?? "") ? str(d.order, 300) : "", instagram: str(d?.instagram, 40).replace(/^@/, "") };
+  return { sections, specials, hours: str(d?.hours, 300), about: str(d?.about, 600), order: /^https:\/\//.test(d?.order ?? "") ? str(d.order, 300) : "", instagram: str(d?.instagram, 40).replace(/^@/, ""), tables: Math.max(0, Math.min(200, Math.floor(Number(d?.tables) || 0))) };
 }
 
 // Each menu gets its own look: layout, type and texture, not just a color.

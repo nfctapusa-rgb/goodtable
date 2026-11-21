@@ -129,6 +129,8 @@ async function migrate(sql: ReturnType<typeof neon>) {
   await sql`CREATE TABLE IF NOT EXISTS settings (key text PRIMARY KEY, value jsonb NOT NULL, updated_at timestamptz NOT NULL DEFAULT now())`;
   await sql`ALTER TABLE prospects ADD COLUMN IF NOT EXISTS menu_invited_at timestamptz`.catch(() => null);
   await sql`ALTER TABLE menus ADD COLUMN IF NOT EXISTS theme text`.catch(() => null);
+  await sql`CREATE TABLE IF NOT EXISTS menu_scans (id bigserial PRIMARY KEY, menu_id uuid NOT NULL, table_no int, src text, created_at timestamptz NOT NULL DEFAULT now())`;
+  await sql`CREATE INDEX IF NOT EXISTS menu_scans_menu ON menu_scans (menu_id, created_at)`;
   await sql`CREATE TABLE IF NOT EXISTS menus (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     slug text UNIQUE NOT NULL,

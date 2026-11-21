@@ -14,7 +14,7 @@ async function shrink(file: File, max: number, q = 0.82): Promise<string> {
   return c.toDataURL(file.type === "image/png" && max <= 400 ? "image/png" : "image/jpeg", q);
 }
 
-export function Editor({ token, initial, isNew }: { token: string; initial: any; isNew: boolean }) {
+export function Editor({ token, initial, isNew, stats }: { token: string; initial: any; isNew: boolean; stats?: { week: number; month: number; tap: number; byTable: { t: number; n: number }[] } }) {
   const [m, setM] = useState({ ...initial, data: { sections: [], specials: [], hours: "", about: "", order: "", instagram: "", ...initial.data } });
   const [tables, setTables] = useState(10);
   const [state, setState] = useState<"" | "saving" | "saved" | string>(isNew ? "new" : "");
@@ -65,6 +65,11 @@ export function Editor({ token, initial, isNew }: { token: string; initial: any;
             </label>
             <a className="btn dark" href={`/api/buy?item=nfc_menu&qty=${tables}&menu=${encodeURIComponent(m.slug)}&ref=menu-${m.slug}`}>Order {tables} card{tables > 1 ? "s" : ""} · ${(tables * 9.99).toFixed(2)}</a>
           </div>
+          <ul className="me-deals">
+            <li><b>20+ cards:</b> your first month of Google Management free.</li>
+            <li><b>First order:</b> 10% off with code <b>LOKLY10</b> at checkout.</li>
+            <li>Every card is numbered to its table, so you see scans per table.</li>
+          </ul>
           <small className="muted">One card per table. Over 50 tables? Email hello@lokly.pro.</small>
         </div>
         <a className="me-offer" href={`/start?plan=local&name=${encodeURIComponent(m.name)}&src=menu&email=${encodeURIComponent(m.email ?? "")}`}>
@@ -114,6 +119,19 @@ export function Editor({ token, initial, isNew }: { token: string; initial: any;
             <button className="btn ghost sm" onClick={() => upd(c => { c[i].items.push({ name: "", price: "", desc: "" }); })}>+ Add item</button>
           </div>))}
         <button className="btn dark sm" onClick={() => upd(c => { c.push({ name: "", items: [{ name: "", price: "", desc: "" }] }); })}>+ Add section</button>
+      </section>
+
+      <section className="me-card"><h2>Tables & scans</h2>
+        <div className="me-stats">
+          <div><strong>{stats?.week ?? 0}</strong><span>menu opens, 7 days</span></div>
+          <div><strong>{stats?.month ?? 0}</strong><span>menu opens, 30 days</span></div>
+          <div><strong>{stats?.tap ?? 0}</strong><span>from table QR/NFC, 30 days</span></div>
+        </div>
+        {(stats?.byTable?.length ?? 0) > 0 && <><p className="ax-label" style={{ margin: 0 }}>Busiest tables (30 days)</p>
+          <div className="me-tables">{stats!.byTable.map(x => <span key={x.t}>Table {x.t}: {x.n}</span>)}</div></>}
+        <label>How many tables do you have?<input type="number" inputMode="numeric" min={0} max={200} value={m.data.tables ?? ""} onChange={e => setD("tables", Math.max(0, Math.min(200, Number(e.target.value) || 0)))} placeholder="e.g. 12" /></label>
+        <p className="muted small">Each table gets its own free QR code, so you can see which tables scan the most. Save, then print them.</p>
+        <p><a className="btn ghost sm" href={`/menu/edit/${token}/tables`} target="_blank" rel="noreferrer">Print table QR codes</a></p>
       </section>
 
       <section className="me-card"><h2>Share it</h2>

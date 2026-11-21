@@ -16,8 +16,8 @@ export async function GET(req: Request) {
     const [m] = await sql`SELECT slug, name, email FROM menus WHERE slug = ${slug}` as any[];
     if (m) {
       const link = `https://lokly.pro/m/${m.slug}`;
-      attrs = { "Restaurant": m.name, "Program cards to": link, "Tables": String(qty) };
-      note = `Program ${qty} NFC menu cards to ${link} (${m.name})`;
+      attrs = { "Restaurant": m.name, "Program cards to": `${link}?t=<table #>&src=nfc`, "Tables": String(qty), ...(qty >= 20 ? { "Deal": "20+ cards: 1 free month Google Management" } : {}) };
+      note = `Program ${qty} NFC menu cards for ${m.name}. Card N -> ${link}?t=N&src=nfc (N = 1 to ${qty}), label each card Table N.${qty >= 20 ? " Deal: 1 free month of Google Management." : ""}`;
       email = email ?? m.email ?? undefined;
     }
   }

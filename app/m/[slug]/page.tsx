@@ -16,12 +16,16 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return { title: `${m.name} Menu${m.city ? ` · ${m.city}` : ""}`, description: d.about || `See the ${m.name} menu, prices and specials${m.city ? ` in ${m.city}` : ""}.`,
     openGraph: { title: `${m.name} Menu`, images: m.banner?.startsWith("https") ? [m.banner] : undefined } };
 }
-export default async function Menu({ params }: { params: Promise<{ slug: string }> }) {
+export default async function Menu({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ t?: string; src?: string }> }) {
   const { slug } = await params;
+  const q = await searchParams;
+  const table = /^\d{1,3}$/.test(q.t ?? "") ? Number(q.t) : null;
+  const src = ["qr", "nfc", "google", "ig"].includes(q.src ?? "") ? q.src! : "link";
   const m = await load(slug);
   if (!m) notFound();
   const sql = await db();
   await sql`UPDATE menus SET views = views + 1 WHERE id = ${m.id}`.catch(() => null);
+  await sql`INSERT INTO menu_scans (menu_id, table_no, src) VALUES (${m.id}, ${table}, ${src})`.catch(() => null);
   const d = m.data as MenuData;
   const tel = m.phone ? `tel:${String(m.phone).replace(/[^\d+]/g, "")}` : null;
   const maps = m.address ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${m.name} ${m.address}`)}` : null;
