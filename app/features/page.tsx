@@ -5,7 +5,8 @@ const GROUPS: { title: string; sub: string; items: [string, string, string][] }[
     ["Google profile management", "Categories, services, hours, photos and description tuned to what customers search. Posts every week.", "From $25/mo"],
     ["Website that ranks", "A fast, mobile-first site built from your Google profile, with local SEO and structured data Google and AI assistants read.", "$299 + 3 months free"],
     ["AI search visibility", "Your business described the same way everywhere, so ChatGPT, Google AI and Maps recommend you.", "Included"],
-    ["Listings everywhere", "Same name, address and phone on Apple Maps, Bing, Yelp and Facebook.", "Included in Pro"],
+    ["Listings everywhere", "We set up and verify your business on Google Search Console, Bing Webmaster Tools, Bing Places, Apple Business Connect (Apple Maps), Yelp and Facebook, with the same name, address and phone everywhere. Plus a sitemap and AI-search setup so ChatGPT and Google's AI can find you.", "Included in Pro"],
+    ["Articles about your business", "We publish guides about your business and industry on Medium and LinkedIn that link back to your site, so Google and AI tools see you mentioned around the web.", "Included in Pro"],
   ] },
   { title: "Win the customer", sub: "Turn a search into a call, visit or order.", items: [
     ["Call, order and book buttons", "Every post and profile set up with the right button for your business.", "Included"],

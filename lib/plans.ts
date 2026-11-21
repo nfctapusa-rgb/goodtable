@@ -14,7 +14,7 @@ export const PLANS: Plan[] = [
   { id: "site", name: "Website Package", price: 299, cents: 29900, interval: "once", highlight: true,
     blurb: "We build your website and optimize your Google profile. Your first 3 months of management are free, then $39/mo covers management, hosting and up to 3 changes a week.", cta: "Get my website" },
   { id: "pro", name: "Lokly Pro", price: 99, cents: 9900, interval: "month",
-    blurb: "Everything in management plus your website, online ordering, a live analytics dashboard and our marketing tools.", cta: "Start Lokly Pro" },
+    blurb: "Everything in management plus your website, online ordering, a live analytics dashboard and our marketing tools. We fully set up your search presence: Google Search Console, Bing Webmaster Tools and Bing Places, Apple Business Connect (Apple Maps), Yelp and Facebook listings, AI-search setup so ChatGPT can find you, and articles about your business on Medium and LinkedIn.", cta: "Start Lokly Pro" },
   { id: "ads", name: "Lokly Ads", price: 149, cents: 14900, interval: "month", addon: true,
     blurb: "Done-for-you ads on Instagram, Facebook and Google. Ad budget paid separately to the ad platforms.", cta: "Add Lokly Ads" },
 ];
