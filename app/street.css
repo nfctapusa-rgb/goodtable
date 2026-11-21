@@ -491,3 +491,4 @@ body:has(.mn) .nav,body:has(.mn) .foot,body:has(.me) .foot{display:none}
 .rm figcaption{display:grid;gap:2px;font-size:13px}.rm figcaption span{color:var(--muted,#667)}
 .ax-grow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px;margin-top:8px}
 .ax-scan{display:flex;gap:6px;flex:1;min-width:240px}.ax-scan input{flex:1;min-width:0;font-size:16px;padding:6px 10px;border:1px solid var(--line);border-radius:8px}
+.rm{max-width:300px;width:100%}.rm-pair{justify-items:center}
