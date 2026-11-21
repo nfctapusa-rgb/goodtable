@@ -18,6 +18,7 @@ export async function POST(req: Request) {
   await sql`INSERT INTO leads (kind, source, business_name, email, phone, city, data) VALUES ('menu', 'lokly-menu', ${name}, ${email}, ${s("phone", 30) || null}, ${s("city", 60) || null}, ${JSON.stringify({ slug, kind: s("kind", 20) })})`.catch(() => null);
   await sendEmail(email, `Your free ${name} menu is live`, `<p>Hi! Your Lokly Menu is live at <a href="${menuUrl(slug)}">${menuUrl(slug)}</a>.</p>
     <p><b>Your private edit link</b> (keep it safe, anyone with it can edit):<br><a href="${editUrl(token)}">${editUrl(token)}</a></p>
-    <p>Add your logo, banner, menu items, prices and specials. Print the QR code or put it on a Lokly NFC tap card so guests open the menu with one tap.</p><p>— Lokly</p>`).catch(() => null);
+    <p>Add your logo, banner, menu items, prices and specials.</p>
+    <p><b>Want guests to open it with one tap?</b> Order NFC table cards for $9.99 each. We program every card to your menu before shipping: <a href="https://lokly.pro/api/buy?item=nfc_menu&qty=10&menu=${slug}&ref=menu-${slug}">order 10 cards ($99.90)</a>, or pick your exact table count in your editor.</p><p>— Lokly</p>`).catch(() => null);
   return NextResponse.redirect(new URL(`/menu/edit/${token}?new=1`, req.url), 303);
 }

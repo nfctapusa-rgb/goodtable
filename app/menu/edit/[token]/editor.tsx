@@ -16,6 +16,7 @@ async function shrink(file: File, max: number, q = 0.82): Promise<string> {
 
 export function Editor({ token, initial, isNew }: { token: string; initial: any; isNew: boolean }) {
   const [m, setM] = useState({ ...initial, data: { sections: [], specials: [], hours: "", about: "", order: "", instagram: "", ...initial.data } });
+  const [tables, setTables] = useState(10);
   const [state, setState] = useState<"" | "saving" | "saved" | string>(isNew ? "new" : "");
   const set = (k: string, v: any) => { setM((x: any) => ({ ...x, [k]: v })); setState(""); };
   const setD = (k: string, v: any) => { setM((x: any) => ({ ...x, data: { ...x.data, [k]: v } })); setState(""); };
@@ -52,8 +53,20 @@ export function Editor({ token, initial, isNew }: { token: string; initial: any;
 
       <section className="me-card me-grow">
         <h2>Grow {m.name}</h2>
-        <a className="me-offer" href={`/api/buy?item=nfc_menu&qty=10&ref=menu-${m.slug}`}>
-          <span className="me-ico">📲</span><div><b>NFC tap menu cards</b><small>Guests tap their phone on the table and this menu opens. Works with your QR code too.</small></div><em>Order</em></a>
+        <div className="me-nfc">
+          <div className="me-nfc-top"><span className="me-ico">📲</span><div><b>NFC tap menu cards, $9.99 each</b><small>Programmed to this menu before we ship them. Guests tap their phone on the table and your menu opens. Edit the menu anytime, the cards always show the latest.</small></div></div>
+          <div className="me-nfc-row">
+            <label>How many tables?
+              <div className="me-qty">
+                <button type="button" aria-label="Fewer" onClick={() => setTables(t => Math.max(1, t - 1))}>−</button>
+                <input type="number" inputMode="numeric" min={1} max={50} value={tables} onChange={e => setTables(Math.max(1, Math.min(50, Number(e.target.value) || 1)))} />
+                <button type="button" aria-label="More" onClick={() => setTables(t => Math.min(50, t + 1))}>+</button>
+              </div>
+            </label>
+            <a className="btn dark" href={`/api/buy?item=nfc_menu&qty=${tables}&menu=${encodeURIComponent(m.slug)}&ref=menu-${m.slug}`}>Order {tables} card{tables > 1 ? "s" : ""} · ${(tables * 9.99).toFixed(2)}</a>
+          </div>
+          <small className="muted">One card per table. Over 50 tables? Email hello@lokly.pro.</small>
+        </div>
         <a className="me-offer" href={`/start?plan=local&name=${encodeURIComponent(m.name)}&src=menu&email=${encodeURIComponent(m.email ?? "")}`}>
           <span className="me-ico">📍</span><div><b>Get found on Google: $25/mo</b><small>We run your Google profile every week, link this menu to it, and get you more reviews. Free review card included.</small></div><em>Start</em></a>
         <a className="me-offer" href={`/grader?q=${encodeURIComponent(`${m.name} ${m.city ?? ""}`.trim())}&src=menu`}>

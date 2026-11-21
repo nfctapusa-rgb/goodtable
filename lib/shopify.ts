@@ -11,13 +11,15 @@ export function variants(): Record<string, string> {
   try { return JSON.parse(process.env.SHOPIFY_VARIANTS ?? "{}"); } catch { return {}; }
 }
 
-export function buyUrl(item: string, qty: number, ctx: { businessId?: string; email?: string; ref?: string }) {
+export function buyUrl(item: string, qty: number, ctx: { businessId?: string; email?: string; ref?: string; attrs?: Record<string, string>; note?: string }) {
   const v = variants()[item];
   if (!shopifyReady() || !v) return null;
   const u = new URL(`https://${process.env.SHOPIFY_STORE_DOMAIN}/cart/${v}:${Math.max(1, Math.min(qty, 50))}`);
   if (ctx.email) u.searchParams.set("checkout[email]", ctx.email);
   if (ctx.businessId) u.searchParams.set("attributes[lokly_business]", ctx.businessId);
   if (ctx.ref) u.searchParams.set("attributes[lokly_ref]", ctx.ref);
+  for (const [k, val] of Object.entries(ctx.attrs ?? {})) u.searchParams.set(`attributes[${k}]`, val);
+  if (ctx.note) u.searchParams.set("note", ctx.note);
   u.searchParams.set("ref", "lokly");
   return u.toString();
 }
