@@ -36,11 +36,12 @@ export async function sendInvites(limit: number) {
   if (!postalAddress()) return { error: "BUSINESS_POSTAL_ADDRESS missing" };
   const sql = await db();
   const { list } = await inviteStats();
-  let sent = 0, failed = 0;
+  let sent = 0, failed = 0; const errors: string[] = [];
   for (const p of list.slice(0, Math.max(0, Math.min(limit, 100)))) {
     const m = inviteEmail(p);
     try { await sendEmail(p.email, m.subject, m.html, {}); await sql`UPDATE prospects SET menu_invited_at = now() WHERE id = ${p.id}`; sent++; }
-    catch { failed++; }
+    catch (e: any) { failed++; if (errors.length < 3) errors.push(String(e?.message ?? e).slice(0, 160)); }
+    await new Promise(r => setTimeout(r, 700)); // Resend allows ~2 sends/second
   }
-  return { sent, failed };
+  return { sent, failed, errors };
 }
