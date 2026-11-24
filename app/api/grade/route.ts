@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { runWebsiteChecks, score, type Check } from "@/lib/checks";
-import { runLocalChecks, getPlace, cityOf, placesKey, searchPlaces, type Place } from "@/lib/places";
+import { runLocalChecks, getPlace, cityOf, placesKey, searchPlaces, placeFromCid, type Place } from "@/lib/places";
 import { saveLead, reportScore } from "@/lib/leads";
 import { track } from "@/lib/track";
 
@@ -49,6 +49,13 @@ export async function POST(req: Request) {
       raw ||= place.websiteUri ?? "";
       city ||= cityOf(place);
       keyword ||= place.primaryTypeDisplayName?.text?.toLowerCase();
+    } catch { }
+  }
+  const cid = String(body.cid ?? "").trim();
+  if (!place && /^\d{5,25}$/.test(cid)) {
+    try {
+      place = await placeFromCid(cid);
+      if (place) { businessName ||= place.displayName?.text ?? ""; raw ||= place.websiteUri ?? ""; city ||= cityOf(place); keyword ||= place.primaryTypeDisplayName?.text?.toLowerCase(); }
     } catch { }
   }
   // A pasted Maps link gives us coordinates: find the profile there, not near LA.

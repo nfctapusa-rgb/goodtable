@@ -76,6 +76,16 @@ async function googleSearch(q: string, size: number, near: { lat: number; lng: n
   return ((await r.json()).places ?? []) as Place[];
 }
 
+// Look a listing up by Google's CID (from a Maps share link). Works for profiles the Places API search misses.
+export async function placeFromCid(cid: string): Promise<Place | undefined> {
+  if (!serpKey() || !/^\d+$/.test(cid)) return undefined;
+  const j = await serp({ data_cid: cid }).catch(() => null);
+  const x = j?.place_results;
+  if (!x) return undefined;
+  const p = fromSerp(x);
+  return p.id ? p : { ...p, id: `cid:${cid}` };
+}
+
 export async function getPlace(id: string): Promise<Place> {
   if (!googleKey()) return serpPlace(id);
   try { return await googlePlace(id); }

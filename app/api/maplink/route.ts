@@ -17,8 +17,15 @@ export async function GET(req: Request) {
     }
   } catch {}
   const dec = decodeURIComponent(final).replace(/\+/g, " ");
-  const name = dec.match(/\/maps\/place\/([^/@?]+)/)?.[1]?.trim() || new URL(final).searchParams.get("q")?.split(",")[0]?.trim() || null;
+  const sp = new URL(final).searchParams;
+  const qtext = sp.get("q") ?? sp.get("query") ?? "";
+  const name = dec.match(/\/maps\/place\/([^/@?]+)/)?.[1]?.trim() || qtext.split(",")[0]?.trim() || null;
+  // "Name, City, ST" -> "City, ST" (helps find businesses with no public street address)
+  const city = qtext.includes(",") ? qtext.split(",").slice(-2).join(",").trim() : null;
+  // Google's internal id: ftid=0x..:0xCID or !1s0x..:0xCID -> decimal CID
+  const hex = (sp.get("ftid") ?? dec.match(/!1s0x[0-9a-f]+:(0x[0-9a-f]+)/i)?.[0] ?? "").match(/:(0x[0-9a-f]+)/i)?.[1];
+  const cid = hex ? BigInt(hex).toString() : (sp.get("cid") ?? null);
   const at = dec.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/) ?? dec.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/);
-  if (!name) return NextResponse.json({ error: "We couldn't read that link. Try Share → Copy link in Google Maps, or enter your details below.", resolved: final.slice(0, 600) }, { status: 422 });
-  return NextResponse.json({ name, lat: at ? +at[1] : null, lng: at ? +at[2] : null, mapsUrl: final.slice(0, 500) });
+  if (!name) return NextResponse.json({ error: "We couldn't read that link. Try Share → Copy link in Google Maps, or enter your details below." }, { status: 422 });
+  return NextResponse.json({ name, city, cid, lat: at ? +at[1] : null, lng: at ? +at[2] : null, mapsUrl: final.slice(0, 500) });
 }

@@ -61,6 +61,12 @@ export default function Page() {
   useEffect(() => {
     clearTimeout(timer.current);
     if (q.trim().length < 3) { setHits([]); setDq(""); return; }
+    // A pasted Google Maps link goes straight to the report.
+    if (/^(https?:\/\/)?(maps\.app\.goo\.gl|goo\.gl\/maps|share\.google|(www\.)?google\.[a-z.]+\/maps|maps\.google\.)/i.test(q.trim())) {
+      setHits([]); setDq(""); setSearching(false);
+      timer.current = setTimeout(() => gradeLink(q.trim()), 300);
+      return;
+    }
     if (mapsOff) { timer.current = setTimeout(() => setDq(q.trim()), 600); return; }
     timer.current = setTimeout(async () => {
       setSearching(true);
@@ -74,13 +80,14 @@ export default function Page() {
     }, 700);
   }, [q, near, mapsOff]);
 
-  async function useLink(e: React.FormEvent) {
-    e.preventDefault(); setLinkErr(null); setLoading("link");
+  async function useLink(e: React.FormEvent) { e.preventDefault(); await gradeLink(link); }
+  async function gradeLink(u: string) {
+    setLinkErr(null); setErr(null); setLoading("link");
     try {
-      const j = await (await fetch(`/api/maplink?u=${encodeURIComponent(link)}`)).json();
+      const j = await (await fetch(`/api/maplink?u=${encodeURIComponent(u)}`)).json();
       if (j.error) throw new Error(j.error);
       setLoading(null);
-      await grade({ businessName: j.name, mapsUrl: j.mapsUrl, lat: j.lat, lng: j.lng, hasGoogle: "yes", keyword: "" }, "link");
+      await grade({ businessName: j.name, mapsUrl: j.mapsUrl, lat: j.lat, lng: j.lng, cid: j.cid, city: j.city ?? undefined, hasGoogle: "yes", keyword: "" }, "link");
     } catch (x) { setLinkErr((x as Error).message); setLoading(null); }
   }
 
@@ -120,9 +127,11 @@ export default function Page() {
           <div className="search">
             <input autoFocus type="search" enterKeyHint="search" autoComplete="off" aria-label="Search your business name"
               role="combobox" aria-expanded={hits.length > 0} aria-controls="hits" aria-activedescendant={active >= 0 ? `hit-${active}` : undefined}
-              placeholder="Search your business name" value={q} onChange={e => setQ(e.target.value)} onKeyDown={onKey} />
-            {searching && <span className="spin" />}
+              placeholder="Business name or Google Maps link" value={q} onChange={e => setQ(e.target.value)} onKeyDown={onKey} />
+            {(searching || loading === "link") && <span className="spin" />}
           </div>
+          {loading === "link" && <p className="muted">Reading your Google Maps link…</p>}
+          {linkErr && <p className="err">{linkErr}</p>}
           {hits.length > 0 && (
             <ul className="hits" id="hits" role="listbox">
               {hits.map((h, i) => (
