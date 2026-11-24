@@ -32,7 +32,13 @@ export async function locate(placeId: string | null, name: string, address?: str
       const r = await fetch(`https://places.googleapis.com/v1/places/${encodeURIComponent(placeId)}`, { cache: "no-store", headers: { "X-Goog-Api-Key": G(), "X-Goog-FieldMask": "id,location" } });
       if (r.ok) { const j = await r.json(); if (j.location) return { id: j.id, center: { lat: j.location.latitude, lng: j.location.longitude } }; }
     }
-    const [p] = await google(`${name} ${address ?? "Los Angeles"}`, { lat: 34.05, lng: -118.25 }, 50000, "places.id,places.location");
+    // No city bias: the business can be anywhere in the US.
+    const r = await fetch("https://places.googleapis.com/v1/places:searchText", {
+      method: "POST", cache: "no-store",
+      headers: { "Content-Type": "application/json", "X-Goog-Api-Key": G(), "X-Goog-FieldMask": "places.id,places.location" },
+      body: JSON.stringify({ textQuery: `${name} ${address ?? ""}`.trim(), pageSize: 1, regionCode: "us" }),
+    });
+    const [p] = r.ok ? (((await r.json()).places ?? []) as any[]) : [];
     return p?.location ? { id: p.id, center: { lat: p.location.latitude, lng: p.location.longitude } } : null;
   }
   return null;

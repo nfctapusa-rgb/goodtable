@@ -34,8 +34,7 @@ const fromSerp = (x: any): Place => ({
   googleMapsUri: x.place_id ? `https://www.google.com/maps/place/?q=place_id:${x.place_id}` : undefined,
 });
 async function serpSearch(q: string, size: number, near?: { lat: number; lng: number }): Promise<Place[]> {
-  const c = near ?? { lat: 34.0522, lng: -118.2437 };
-  const j = await serp({ q, type: "search", ll: `@${c.lat},${c.lng},13z` });
+  const j = await serp({ q, type: "search", gl: "us", ...(near ? { ll: `@${near.lat},${near.lng},13z` } : {}) });
   const list = j.local_results ?? (j.place_results ? [j.place_results] : []);
   return list.slice(0, size).map(fromSerp).filter((p: Place) => p.id);
 }
@@ -43,10 +42,10 @@ const overQuota = (e: unknown) => /Places API (429|403)/.test(String((e as Error
 
 const LEAN = ["id", "displayName", "formattedAddress", "rating", "userRatingCount", "websiteUri", "primaryTypeDisplayName"];
 
-// near: bias results toward the searcher (defaults to Los Angeles, where we sell).
+// near: bias results toward the searcher. Without it, search all of the US (no city bias).
 // Google search calls are metered per day, so identical searches are cached for 7 days.
 export async function searchPlaces(q: string, size = 20, near?: { lat: number; lng: number }, lean = false): Promise<Place[]> {
-  const ck = `s:${lean ? 1 : 0}:${size}:${near ? `${near.lat},${near.lng}` : "la"}:${q.trim().toLowerCase().replace(/\s+/g, " ")}`;
+  const ck = `s:${lean ? 1 : 0}:${size}:${near ? `${near.lat},${near.lng}` : "us"}:${q.trim().toLowerCase().replace(/\s+/g, " ")}`;
   let sql: any = null;
   try {
     const { db, dbReady } = await import("./db");
@@ -68,11 +67,10 @@ async function searchPlacesLive(q: string, size: number, near: { lat: number; ln
 }
 
 async function googleSearch(q: string, size: number, near: { lat: number; lng: number } | undefined, lean: boolean): Promise<Place[]> {
-  const c = near ?? { lat: 34.0522, lng: -118.2437 };
   const r = await fetch(`${BASE}/places:searchText`, {
     method: "POST", cache: "no-store",
     headers: { "Content-Type": "application/json", "X-Goog-Api-Key": googleKey(), "X-Goog-FieldMask": (lean ? LEAN : F).map(f => "places." + f).join(",") },
-    body: JSON.stringify({ textQuery: q, pageSize: size, locationBias: { circle: { center: { latitude: c.lat, longitude: c.lng }, radius: near ? 15000 : 50000 } } }),
+    body: JSON.stringify({ textQuery: q, pageSize: size, regionCode: "us", ...(near ? { locationBias: { circle: { center: { latitude: near.lat, longitude: near.lng }, radius: 15000 } } } : {}) }),
   });
   if (!r.ok) throw new Error(`Places API ${r.status}: ${(await r.text()).slice(0, 200)}`);
   return ((await r.json()).places ?? []) as Place[];
