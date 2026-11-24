@@ -80,7 +80,7 @@ export default function Page() {
       const j = await (await fetch(`/api/maplink?u=${encodeURIComponent(link)}`)).json();
       if (j.error) throw new Error(j.error);
       setLoading(null);
-      await grade({ businessName: j.name, mapsUrl: j.mapsUrl, hasGoogle: "yes", keyword: "" }, "link");
+      await grade({ businessName: j.name, mapsUrl: j.mapsUrl, lat: j.lat, lng: j.lng, hasGoogle: "yes", keyword: "" }, "link");
     } catch (x) { setLinkErr((x as Error).message); setLoading(null); }
   }
 

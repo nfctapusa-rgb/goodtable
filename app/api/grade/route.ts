@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { runWebsiteChecks, score, type Check } from "@/lib/checks";
-import { runLocalChecks, getPlace, cityOf, placesKey, type Place } from "@/lib/places";
+import { runLocalChecks, getPlace, cityOf, placesKey, searchPlaces, type Place } from "@/lib/places";
 import { saveLead, reportScore } from "@/lib/leads";
 import { track } from "@/lib/track";
 
@@ -49,6 +49,21 @@ export async function POST(req: Request) {
       raw ||= place.websiteUri ?? "";
       city ||= cityOf(place);
       keyword ||= place.primaryTypeDisplayName?.text?.toLowerCase();
+    } catch { }
+  }
+  // A pasted Maps link gives us coordinates: find the profile there, not near LA.
+  const lat = Number(body.lat), lng = Number(body.lng);
+  if (!place && businessName && placesKey() && body.lat != null && Number.isFinite(lat) && Number.isFinite(lng)) {
+    try {
+      const m = await searchPlaces(businessName, 5, { lat, lng });
+      const n = businessName.toLowerCase();
+      const hit = m.find(p => p.displayName?.text?.toLowerCase() === n) ?? m.find(p => p.displayName?.text?.toLowerCase().includes(n)) ?? m[0];
+      if (hit) {
+        place = hit;
+        raw ||= place.websiteUri ?? "";
+        city ||= cityOf(place);
+        keyword ||= place.primaryTypeDisplayName?.text?.toLowerCase();
+      }
     } catch { }
   }
   if (!raw && !place && !businessName) return NextResponse.json({ error: "Enter a website or pick your business from Google Maps." }, { status: 400 });
