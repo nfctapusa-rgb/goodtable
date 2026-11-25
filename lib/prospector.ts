@@ -37,10 +37,9 @@ function weakness(p: Place): string | null {
   if (n < 40) why.push(`${n} reviews`);
   if (r && r < 4.3) why.push(`${r} stars`);
   if (!p.websiteUri) why.push("no website");
+  if (n > 400 || !why.length) return null; // already strong, skip
   if (!p.regularOpeningHours) why.push("no hours");
-  if (!p.editorialSummary?.text) why.push("no description");
-  if (n > 400) return null; // already strong, skip
-  return why.length ? why.join(", ") : null;
+  return why.join(", ");
 }
 
 async function fetchText(url: string, ms = 6000): Promise<string> {
