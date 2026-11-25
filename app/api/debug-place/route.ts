@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { placeFromCid, searchPlaces } from "@/lib/places";
+import { placeFromCid, searchPlaces, getPlace } from "@/lib/places";
 
 // Preview-only diagnostics for business lookup. Disabled in production.
 export async function GET(req: Request) {
@@ -18,6 +18,8 @@ export async function GET(req: Request) {
     } catch (e) { out.serpErr = String(e); }
     try { out.placeFromCid = await placeFromCid(cid); } catch (e) { out.placeFromCidErr = String(e); }
   }
+  const pid = sp.get("pid");
+  if (pid) { try { const p = await getPlace(pid); out.getPlace = { name: p.displayName?.text, addr: p.formattedAddress, rating: p.rating, n: p.userRatingCount }; } catch (e) { out.getPlaceErr = String(e); } }
   if (q) { try { out.search = (await searchPlaces(q, 5)).map(p => ({ id: p.id, name: p.displayName?.text, addr: p.formattedAddress })); } catch (e) { out.searchErr = String(e); } }
   return NextResponse.json(out);
 }
